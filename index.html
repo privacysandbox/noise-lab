@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title> Noise impact </title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="module" src="js/laplace.js" defer></script>
+    <script type="module" src="js/main.js"></script>
+</head>
+<body>
+
+
+
+
+<div>
+    <ul>
+        <li>Contribution Budget: <input type="text" id="contr" value="65536"></li>
+        <li> Epsilon: <input type="text" id="eps" value="10"> </li>
+        <li> Maximum purchase amount: <input type="text" id="amount" value="2048"> </li>
+    </ul>
+    <button onclick="laplace()">Generate random noise </button>
+    <h4 id="laplace">Noise: </h4>
+    
+</div>
+
+
+
+    <h3>Enter number of keys:</h3>
+    <input type="text" id="keys" name="keys"><br>
+    <button onclick="parseKeys()">Submit keys</button>
+    <div id="wrapper"></div> <br>
+
+    <div id="preferences">
+
+        <label for="frequency">Aggregation frequency:</label>
+
+        <select name="frequency" id="frequency">
+            <option value="h">Hourly</option>
+            <option value="d">Daily</option>
+            <option value="w">Weekly</option>
+            <option value="m">Monthly</option>
+          </select> <br>
+    
+          <label for="daily">Daily conversion count:</label>
+          <select name="daily" id="daily">
+            <option value="10">10</option>
+            <option value="100">100</option>
+            <option value="1000">1000</option>
+            <option value="10000">10000</option>
+          </select><br>
+    
+          <label for="granularity">Key strategy:</label>
+          <select name="granularity" id="granularity">
+            <option value="A">A(more granular)</option>
+            <option value="B">B(less granular)</option>
+          </select><br>
+    
+          <label for="scaling">Scaling:</label>
+          <select name="scaling" id="scaling">
+            <option value="1">Yes</option>
+            <option value="0">No</option>
+          </select><br>
+    
+    
+    </div><br>
+
+    <button onclick="genKeyComb('all')">Generate sample </button>
+
+    <button onclick="splitKeys()"> Want to generate more </button>
+
+
+
+
+    
+    <div>
+        <ul>
+            <li id="noMetrics"> Number of metrics: </li>
+            <li id="perMetricBudget">Budget allocatable per metric: </li>
+            <li id="scaleCnt"> Scaling factor for PURCHASE COUNT: </li>
+            <li id="scaleAmt"> Scaling factor for PURCHASE VALUE: </li>
+        </ul>
+    </div>
+
+    <div id="splitKeys" hidden>
+        No of sub keys: <input type="text" id="noSubKeys">  <br>
+        <button onclick="configSubKeys()"> Configure subkeys </button>
+        <div id="splits" hidden></div>
+        <button onclick="genKeyComb()">Generate sk sample </button>
+    </div>
+
+    <div id="values"></div>
+    <br>
+ <!-- <button onclick="tableToCSV()">Download sample</button> -->
+    <div id="comp" hidden>
+    <h3>Enter first key to check and value:</h3>
+    <input type="text" id="firstkey" name="firstkey"><br>
+    <input type="text" id="firstvalue" name="firstvalue"><br>
+    <h3>Enter second key to check and value:</h3>
+    <input type="text" id="secondkey" name="secondkey"><br>
+    <input type="text" id="secondvalue" name="secondvalue"><br>
+    <h4 id="cumulated" hidden> Cumulated noise from ds with all keys: </h4>
+    <button onclick="compNoise()">Compare noise</button>
+    </div>
+
+    <div id="tables">
+        
+    </div>
+</body>
+</html>

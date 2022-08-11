@@ -1,0 +1,1 @@
+export const CONTRIBUTION_BUDGET = 65536

@@ -1,111 +1,242 @@
 <!DOCTYPE html>
 <html>
+    <head>
+        <title>🧪 Noise Lab</title>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <script type="module" src="js/main.js" defer></script>
+        <script type="module" src="js/laplace.js" defer></script>
+        <script type="module" src="js/simple-mode.js" defer></script>
+        <script type="module" src="js/tooltips.js" defer></script>
+        <link rel="stylesheet" href="./style.css" />
+        <link
+            href="https://unpkg.com/tabulator-tables/dist/css/tabulator.min.css"
+            rel="stylesheet"
+        />
+    </head>
+    <body>
+        <div id="menu">
+            <nav id="nav">
+                <!-- Populated automatically, see main.js -->
+            </nav>
 
-<head>
-    <title> Noise impact </title>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script type="module" src="js/laplace.js" defer></script>
-    <script type="module" src="js/main.js"></script>
-</head>
-<body>
+            <div>
+                <button class="secondary">
+                    <div class="feedback-hint">[external button]</div>
+                    <div>
+                        <a
+                            target="_blank"
+                            href="https://github.com/WICG/attribution-reporting-api/issues/485"
+                        >
+                            Share your obervations <br />
+                            / Give feedback
+                        </a>
+                    </div>
+                </button>
+                <button id="feedback-button" class="secondary">
+                    <div class="feedback-hint">
+                        [internal button to gather Googler <br />
+                        feedback in the prototyping phase]
+                    </div>
+                    <div>
+                        <a
+                            target="_blank"
+                            href="https://docs.google.com/document/d/1svEf54Yra13oS76R8W6J5jrGs11dpj4sQan0Ps4Uoek/edit#"
+                            >Give feedback / Ask a question
+                        </a>
+                    </div>
+                </button>
+            </div>
+        </div>
 
+        <div id="simple-mode" class="mode-section">
+            <div id="launch-panel">
+                <div id="parameters-wrapper">
+                    <div>
+                        <h2>Noise parameters</h2>
+                        <div>
+                            <label for="contribution-budget"
+                                >Contribution Budget:</label
+                            >
+                            <span id="contribution-budget"></span>
+                            <div class="help" id="help-budget"></div>
+                        </div>
+                        <div>
+                            Epsilon:
+                            <input type="number" max="64" min="0" id="eps" />
+                            <div class="help" id="help-epsilon"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <h2>Noise strategy parameters</h2>
+                        <div>
+                            <label for="metrics">Metrics:</label>
+                            <div id="metrics"></div>
+                        </div>
+                        <div>
+                            <label for="batching-frequency"
+                                >Batching frequency:</label
+                            >
+                            <select
+                                name="batching-frequency"
+                                id="batching-frequency-select"
+                            ></select>
+                            <!-- Options are populated automatically -->
+                        </div>
+                        <div>
+                            <label for="key-strategy">Key strategy:</label>
+                            <select
+                                name="key-strategy"
+                                id="key-strategy-select"
+                            ></select>
+                            <!-- Options are populated automatically -->
+                        </div>
+                        <div>
+                            <label for="scaling">Scaling:</label>
+                            <select name="scaling" id="scaling">
+                                <option value="1">Yes</option>
+                                <option value="0">No</option>
+                            </select>
+                            <div class="help" id="help-scaling"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <h2>Measurement data parameters</h2>
+                        <div>
+                            <label for="daily"
+                                >Average daily conversion count:</label
+                            >
+                            <select name="daily" id="daily">
+                                <option value="10">10</option>
+                                <option value="100" selected>100</option>
+                                <option value="1000">1000</option>
+                                <option value="10000">10000</option>
+                            </select>
+                            <div class="help" id="help-daily"></div>
+                        </div>
+                        <div>
+                            <label for="dimensions">Dimensions:</label>
+                            <div id="dimensions-table"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="buttons-wrapper">
+                    <button
+                        id="button-simulate"
+                        onclick="simulateAndDisplayResultsSimpleMode()"
+                    >
+                        ▶️ SIMULATE
+                    </button>
+                    <button
+                        class="secondary destructive"
+                        onclick="clearAllSimpleMode()"
+                    >
+                        🗑 CLEAR ALL SIMULATIONS
+                    </button>
+                </div>
+            </div>
+            <main>
+                <div id="all-simulations-wrapper-simple-mode"></div>
+            </main>
+        </div>
+        <div id="advanced-mode" class="mode-section">
+            <main>
+                <p style="background: #ffed009c; padding: 0.2rem">
+                    🚧 Work In Progress
+                </p>
 
+                <div>
+                    Maximum purchase amount:
+                    <input type="number" id="amount" />
+                </div>
+                <button onclick="laplace()">Generate random noise</button>
+                <h4 id="laplace">Noise:</h4>
+                <hr />
 
+                <h3>Enter number of keys:</h3>
+                <input type="text" id="keys" name="keys" /><br />
+                <button onclick="parseKeys()">Submit keys</button>
+                <div id="wrapper"></div>
+                <br />
 
-<div>
-    <ul>
-        <li>Contribution Budget: <input type="text" id="contr" value="65536"></li>
-        <li> Epsilon: <input type="text" id="eps" value="10"> </li>
-        <li> Maximum purchase amount: <input type="text" id="amount" value="2048"> </li>
-    </ul>
-    <button onclick="laplace()">Generate random noise </button>
-    <h4 id="laplace">Noise: </h4>
-    
-</div>
+                <div id="preferences">
+                    <label for="frequency">Aggregation frequency:</label>
 
+                    <select name="frequency" id="frequency">
+                        <option value="h">Hourly</option>
+                        <option value="d">Daily</option>
+                        <option value="w">Weekly</option>
+                        <option value="m">Monthly</option>
+                    </select>
+                    <br />
 
+                    <label for="granularity">Key strategy:</label>
+                    <select name="granularity" id="granularity">
+                        <option value="A">A(more granular)</option>
+                        <option value="B">B(less granular)</option></select
+                    ><br />
+                </div>
+                <br />
 
-    <h3>Enter number of keys:</h3>
-    <input type="text" id="keys" name="keys"><br>
-    <button onclick="parseKeys()">Submit keys</button>
-    <div id="wrapper"></div> <br>
+                <button onclick="genKeyComb('all')">Generate sample</button>
 
-    <div id="preferences">
+                <button onclick="splitKeys()">Want to generate more</button>
 
-        <label for="frequency">Aggregation frequency:</label>
+                <hr />
 
-        <select name="frequency" id="frequency">
-            <option value="h">Hourly</option>
-            <option value="d">Daily</option>
-            <option value="w">Weekly</option>
-            <option value="m">Monthly</option>
-          </select> <br>
-    
-          <label for="daily">Daily conversion count:</label>
-          <select name="daily" id="daily">
-            <option value="10">10</option>
-            <option value="100">100</option>
-            <option value="1000">1000</option>
-            <option value="10000">10000</option>
-          </select><br>
-    
-          <label for="granularity">Key strategy:</label>
-          <select name="granularity" id="granularity">
-            <option value="A">A(more granular)</option>
-            <option value="B">B(less granular)</option>
-          </select><br>
-    
-          <label for="scaling">Scaling:</label>
-          <select name="scaling" id="scaling">
-            <option value="1">Yes</option>
-            <option value="0">No</option>
-          </select><br>
-    
-    
-    </div><br>
+                <div>
+                    <ul>
+                        <li id="noMetrics">Number of metrics:</li>
+                        <li id="perMetricBudget">
+                            Budget allocatable per metric:
+                        </li>
+                        <li id="scaleCnt">
+                            Scaling factor for PURCHASE COUNT:
+                        </li>
+                        <li id="scaleAmt">
+                            Scaling factor for PURCHASE VALUE:
+                        </li>
+                    </ul>
+                </div>
 
-    <button onclick="genKeyComb('all')">Generate sample </button>
+                <div id="splitKeys" hidden>
+                    No of sub keys: <input type="text" id="noSubKeys" /> <br />
+                    <button onclick="configSubKeys()">Configure subkeys</button>
+                    <div id="splits" hidden></div>
+                    <button onclick="genKeyComb()">Generate sk sample</button>
+                </div>
 
-    <button onclick="splitKeys()"> Want to generate more </button>
+                <div id="values"></div>
+                <br />
+                <!-- <button onclick="tableToCSV()">Download sample</button> -->
+                <div id="comp" hidden>
+                    <h3>Enter first key to check and value:</h3>
+                    <input type="text" id="firstkey" name="firstkey" /><br />
+                    <input
+                        type="text"
+                        id="firstvalue"
+                        name="firstvalue"
+                    /><br />
+                    <h3>Enter second key to check and value:</h3>
+                    <input type="text" id="secondkey" name="secondkey" /><br />
+                    <input
+                        type="text"
+                        id="secondvalue"
+                        name="secondvalue"
+                    /><br />
+                    <h4 id="cumulated" hidden>
+                        Cumulated noise from ds with all keys:
+                    </h4>
+                    <button onclick="compNoise()">Compare noise</button>
+                </div>
 
-
-
-
-    
-    <div>
-        <ul>
-            <li id="noMetrics"> Number of metrics: </li>
-            <li id="perMetricBudget">Budget allocatable per metric: </li>
-            <li id="scaleCnt"> Scaling factor for PURCHASE COUNT: </li>
-            <li id="scaleAmt"> Scaling factor for PURCHASE VALUE: </li>
-        </ul>
-    </div>
-
-    <div id="splitKeys" hidden>
-        No of sub keys: <input type="text" id="noSubKeys">  <br>
-        <button onclick="configSubKeys()"> Configure subkeys </button>
-        <div id="splits" hidden></div>
-        <button onclick="genKeyComb()">Generate sk sample </button>
-    </div>
-
-    <div id="values"></div>
-    <br>
- <!-- <button onclick="tableToCSV()">Download sample</button> -->
-    <div id="comp" hidden>
-    <h3>Enter first key to check and value:</h3>
-    <input type="text" id="firstkey" name="firstkey"><br>
-    <input type="text" id="firstvalue" name="firstvalue"><br>
-    <h3>Enter second key to check and value:</h3>
-    <input type="text" id="secondkey" name="secondkey"><br>
-    <input type="text" id="secondvalue" name="secondvalue"><br>
-    <h4 id="cumulated" hidden> Cumulated noise from ds with all keys: </h4>
-    <button onclick="compNoise()">Compare noise</button>
-    </div>
-
-    <div id="tables">
-        
-    </div>
-</body>
+                <div id="tables"></div>
+            </main>
+        </div>
+        <script
+            type="text/javascript"
+            src="https://unpkg.com/tabulator-tables/dist/js/tabulator.min.js"
+        ></script>
+    </body>
 </html>

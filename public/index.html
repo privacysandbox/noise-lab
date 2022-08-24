@@ -18,34 +18,37 @@
     <body>
         <div id="menu">
             <nav id="nav">
+                <div>
+                    🧪 Noise Lab
+                    <div class="version">v0.1.0</div>
+                </div>
+
                 <!-- Populated automatically, see main.js -->
             </nav>
 
             <div>
                 <button class="secondary">
-                    <div class="feedback-hint">[external button]</div>
-                    <div>
-                        <a
-                            target="_blank"
-                            href="https://github.com/WICG/attribution-reporting-api/issues/485"
-                        >
-                            Share your obervations <br />
-                            / Give feedback
-                        </a>
-                    </div>
+                    <a
+                        target="_blank"
+                        href="https://github.com/WICG/attribution-reporting-api/issues/485"
+                    >
+                        <div class="feedback-hint">[external button]</div>
+
+                        Share your obervations <br />
+                        / Give feedback
+                    </a>
                 </button>
                 <button id="feedback-button" class="secondary">
-                    <div class="feedback-hint">
-                        [internal button to gather Googler <br />
-                        feedback in the prototyping phase]
-                    </div>
-                    <div>
-                        <a
-                            target="_blank"
-                            href="https://docs.google.com/document/d/1svEf54Yra13oS76R8W6J5jrGs11dpj4sQan0Ps4Uoek/edit#"
-                            >Give feedback / Ask a question
-                        </a>
-                    </div>
+                    <a
+                        target="_blank"
+                        href="https://docs.google.com/document/d/1svEf54Yra13oS76R8W6J5jrGs11dpj4sQan0Ps4Uoek/edit#"
+                    >
+                        <div class="feedback-hint">
+                            [internal button to gather Googler <br />
+                            feedback in the prototyping phase]
+                        </div>
+                        Give feedback / Ask a question
+                    </a>
                 </button>
             </div>
         </div>
@@ -72,6 +75,12 @@
                         <h2>Noise strategy parameters</h2>
                         <div>
                             <label for="metrics">Metrics:</label>
+                            <button
+                                class="ternary"
+                                onclick="window.alert('Not implemented yet.')"
+                            >
+                                🖊 Edit metrics
+                            </button>
                             <div id="metrics"></div>
                         </div>
                         <div>
@@ -117,6 +126,12 @@
                         </div>
                         <div>
                             <label for="dimensions">Dimensions:</label>
+                            <button
+                                class="ternary"
+                                onclick="window.alert('Not implemented yet.')"
+                            >
+                                🖊 Edit dimensions
+                            </button>
                             <div id="dimensions-table"></div>
                         </div>
                     </div>

@@ -31,11 +31,11 @@ const batchingFrequencies = {
 const dimensions = [
     {
         name: 'campaignID',
-        numberOfDistinctValues: 1,
+        numberOfDistinctValues: 2,
     },
     {
         name: 'geography',
-        numberOfDistinctValues: 4,
+        numberOfDistinctValues: 3,
     },
     {
         name: 'productCategory',

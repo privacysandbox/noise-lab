@@ -1,6 +1,6 @@
 body {
     font-family: monospace;
-    font-size: 1rem;
+    font-size: 0.9rem;
     padding: 0;
     margin: 0;
     --primary: #001bc0;
@@ -42,10 +42,19 @@ a {
     padding: 0 1rem;
 }
 
+#nav {
+    display: flex;
+    align-items: center;
+}
+
+nav > div {
+    margin-right: 2rem;
+}
+
 nav a {
     text-transform: uppercase;
     letter-spacing: 1px;
-    margin-right: 1.4rem;
+    margin-right: 1rem;
     padding: 0.2rem 0.4rem;
     text-decoration: none;
 }
@@ -88,6 +97,10 @@ main {
     padding-bottom: 1rem;
 }
 
+#parameters-wrapper > div {
+    margin: 0 1rem;
+}
+
 /* LAYOUT: DATA */
 
 #dimensions-table {
@@ -117,9 +130,9 @@ main {
 /* BUTTONS */
 
 button {
-    font-size: 1rem;
+    font-size: inherit;
     background: var(--primary);
-    border: none;
+    border: solid 1px;
     padding: 0.5rem 1.4rem;
     color: var(--text-inverted);
     border-radius: 4px;
@@ -133,6 +146,15 @@ button.secondary {
     background: none;
     border: solid 1px;
     color: var(--primary);
+}
+
+button.ternary {
+    background: none;
+    border: none;
+    text-transform: none;
+    color: var(--primary);
+    margin: 0;
+    padding: 0 1rem;
 }
 
 button.destructive {
@@ -149,7 +171,7 @@ button a {
 }
 
 .feedback-hint {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     text-transform: none;
 }
 
@@ -194,4 +216,14 @@ button a {
 
 .help::after {
     content: '?';
+}
+
+/* VERSION */
+
+.version {
+    display: inline-block;
+    padding: 0.1rem 0.2rem;
+    color: var(--x-light-grey);
+    background-color: black;
+    font-size: 0.7rem;
 }

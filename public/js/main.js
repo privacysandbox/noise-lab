@@ -1,15 +1,17 @@
 const modes = {
     simple: {
-        path: 'simple',
+        searchQueryParam: 'simple',
         displayName: 'simple mode',
     },
     advanced: {
-        path: 'advanced',
+        searchQueryParam: 'advanced',
         displayName: 'advanced mode',
     },
 }
 
-const modePaths = Object.values(modes).map((mode) => mode.path)
+const modeSearchQueryParam = Object.values(modes).map(
+    (mode) => mode.searchQueryParam
+)
 
 generateMenu()
 
@@ -17,29 +19,47 @@ generateMenu()
 export function generateMenu() {
     const navWrapper = document.getElementById('nav')
     Object.values(modes).forEach((mode) => {
-        const { path, displayName } = mode
+        const { searchQueryParam, displayName } = mode
         const a = document.createElement('a')
-        a.setAttribute('href', path)
-        a.setAttribute('id', path)
+        a.setAttribute(
+            'href',
+            `${location.origin}${location.pathname}?mode=${mode.searchQueryParam}`
+        )
+        a.setAttribute('id', searchQueryParam)
         a.innerText = displayName
         navWrapper.appendChild(a)
     })
 }
 
 export function getCurrentMode() {
-    return location.pathname.substring(1)
+    const urlParams = new URLSearchParams(window.location.search)
+    let mode = urlParams.get('mode')
+    return mode
 }
 
 window.addEventListener('load', function (event) {
     const mode = getCurrentMode()
 
-    // Highlight current menu item
-    for (let i = 0; i < document.links.length; i++) {
-        if (document.links[i].href === document.URL) {
-            current = i
-        }
+    // If the mode is unknown, redirect to simple mode (= fallback mode)
+    if (!modeSearchQueryParam.includes(mode)) {
+        console.log(0)
+        window.location.href = `${location.origin}${location.pathname}?mode=${modes.simple.searchQueryParam}`
     }
-    document.links[current].className = 'current-menu-item'
+
+    document.querySelectorAll('nav a').forEach((navItem) => {
+        console.log(navItem.href)
+        if (navItem.href === document.URL) {
+            navItem.className = 'current-menu-item'
+        }
+    })
+
+    // Highlight current menu item
+    // for (let i = 0; i < document.links.length; i++) {
+    //     if (document.links[i].href === document.URL) {
+    //         current = i
+    //     }
+    // //
+    // document.links[current].className = 'current-menu-item'
 
     // Display correct section and hide the other ones
     const allSections = document.querySelectorAll('.mode-section')
@@ -50,9 +70,4 @@ window.addEventListener('load', function (event) {
             section.className = 'mode-section not-current-mode'
         }
     })
-
-    // If the mode is unknown, redirect to simple mode (= fallback mode)
-    if (!modePaths.includes(mode)) {
-        window.location.href = modes.simple.path
-    }
 })

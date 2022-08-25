@@ -1,6 +1,11 @@
 runtime: nodejs16
 
 handlers:
-    - url: /
+    # Upload all of dist
+    - url: /(.*\..+)$
+      static_files: dist/\1
+      upload: dist/(.*\..+)$
+    # Point incoming requests at the root to dist/index.html
+    - url: /.*
       static_files: dist/index.html
       upload: dist/index.html

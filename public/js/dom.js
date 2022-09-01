@@ -51,7 +51,7 @@ export function displayTabularData(parentDomEl, tabularData) {
         data: tabularData,
         // Create columns from data field names
         autoColumns: true,
-        layout: 'fitDataStretch',
+        layout: 'fitData',
     })
 }
 
@@ -164,7 +164,7 @@ function displayReport(parentDomEl, report) {
         data,
         // Create columns from data field names
         autoColumns: true,
-        layout: 'fitDataStretch',
+        layout: 'fitData',
     })
 
     // Display average noise

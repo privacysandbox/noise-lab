@@ -30,7 +30,7 @@ tippy('#help-scaling', {
     ...options,
 })
 
-tippy('#help-daily', {
+tippy('#help-daily-simple-mode', {
     content: `Average daily conversion count for one bucket with all
     dimensions combined. With our usual example set of dimensions (Campaign Id * Geography * Product category), it would be the average daily conversion count for a given Campaign Id AND Geography AND Product category. This is a naive approach but sufificent to get started.`,
     ...options,

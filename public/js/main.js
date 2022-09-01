@@ -64,10 +64,9 @@ window.addEventListener('load', function (event) {
     // Display correct section and hide the other ones
     const allSections = document.querySelectorAll('.mode-section')
     allSections.forEach((section) => {
-        if (section.id === `${mode}-mode`) {
-            section.className = 'mode-section current-mode'
-        } else {
-            section.className = 'mode-section not-current-mode'
+        if (section.id !== `${mode}-mode`) {
+            // Mode isn't selected => remove it from the DOM
+            section.parentElement.removeChild(section)
         }
     })
 })

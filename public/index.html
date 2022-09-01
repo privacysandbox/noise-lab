@@ -52,7 +52,7 @@
                 </button>
             </div>
         </div>
-
+        <!-- SIMPLE MODE START -->
         <div id="simple-mode" class="mode-section">
             <div id="launch-panel">
                 <div id="parameters-wrapper">
@@ -116,7 +116,7 @@
                                 <option value="1000">1000</option>
                                 <option value="10000">10000</option>
                             </select>
-                            <div class="help" id="help-daily"></div>
+                            <div class="help" id="help-daily-simple-mode"></div>
                         </div>
                         <div>
                             <label for="dimensions">Dimensions:</label>
@@ -143,7 +143,24 @@
                 <div id="all-simulations-wrapper-simple-mode"></div>
             </main>
         </div>
+        <!-- SIMPLE MODE END -->
+        <!-- ADVANCED MODE START -->
         <div id="advanced-mode" class="mode-section">
+            <div>
+                <label for="daily">Average daily conversion count:</label>
+                <select name="daily" id="daily">
+                    <option value="10">10</option>
+                    <option value="100" selected>100</option>
+                    <option value="1000">1000</option>
+                    <option value="10000">10000</option>
+                </select>
+                <div class="help" id="help-daily-advanced-mode"></div>
+            </div>
+            <div>
+                Epsilon:
+                <input type="number" max="64" min="0" id="eps" />
+                <div class="help" id="help-epsilon"></div>
+            </div>
             <main>
                 <p style="background: #ffed009c; padding: 0.2rem">
                     🚧 Work In Progress
@@ -233,10 +250,10 @@
                     </h4>
                     <button onclick="compNoise()">Compare noise</button>
                 </div>
-
                 <div id="tables"></div>
             </main>
         </div>
+        <!-- ADVANCED MODE END -->
         <script
             type="text/javascript"
             src="https://unpkg.com/tabulator-tables/dist/js/tabulator.min.js"

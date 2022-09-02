@@ -1,5 +1,5 @@
 body {
-    font-family: monospace;
+    font-family: sans-serif;
     font-size: 0.9rem;
     padding: 0;
     margin: 0;
@@ -15,17 +15,16 @@ body {
 
 /* TYPOGRAPHY + BASIC STYLES */
 
+.tabulator {
+    font-family: monospace;
+}
+
 h2 {
     font-size: 1.24rem;
 }
 
 h3 {
     font-size: 1.1rem;
-}
-
-input,
-select {
-    font-family: monospace;
 }
 
 a {
@@ -127,7 +126,6 @@ button {
     color: var(--text-inverted);
     border-radius: 4px;
     margin: 0.6rem 1rem;
-    font-family: monospace;
     cursor: pointer;
     text-transform: uppercase;
 }

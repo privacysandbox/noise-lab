@@ -1,5 +1,9 @@
 import laplace from '@stdlib/random-base-laplace'
 
+import {
+    getElementValueById,
+} from './dom.js'
+
 export function getScalingFactorForMetric(
     metric,
     totalNumberOfMetrics,
@@ -34,3 +38,61 @@ export function calculateAverageNoisePercentage(report) {
     // Only display 3 decimal digits
     return Number.parseFloat(averageNoisePercentage).toFixed(3)
 }
+
+//ADVANCED MODE UTILS
+
+export function calculateMaximumCount(frequency, daily, count){
+    return daily*frequency*count 
+}
+
+
+export function generateKeyCombinationArray(params) {
+
+
+    var keysArray = [];
+
+    for (var i = 0; i < params.length ; i++)
+    {
+        var keyLength = params[i]
+        var arr = []
+        for (var x = 0; x < keyLength; x++) {
+            arr.push(x)
+        }
+        console.log("key arr:")
+        console.log(arr)
+        keysArray.push(arr)
+    }
+
+    console.log("keysArray:")
+    console.log(keysArray)
+
+    var keysComb = cartesian(...keysArray);
+
+    keysComb.forEach(element => element = element.join(''))
+
+    console.log("final key comb:")
+    console.log(keysComb)
+
+    return keysComb
+}
+// generate all possible key values combinations
+function cartesian(...args) {
+    console.log('cartesian input:')
+    console.log(args)
+    var r = [],
+        max = args.length - 1
+    function helper(arr, i) {
+        for (var j = 0, l = args[i].length; j < l; j++) {
+            var a = arr.slice(0) // clone arr
+            a.push(args[i][j])
+            if (i == max) r.push(a)
+            else helper(a, i + 1)
+        }
+    }
+    helper([], 0)
+    console.log('datatset')
+    console.log(r)
+    // return combinations
+    return r
+}
+

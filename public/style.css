@@ -111,6 +111,21 @@ main {
     width: 24rem;
 }
 
+#all-simulations-wrapper-advanced-mode {
+    display: flex;
+    width: 100%;
+    overflow-x: scroll;
+}
+
+.simulation-wrapper-advanced-mode {
+    background: var(--x-light-grey);
+    padding: 1rem 2rem 2rem 2rem;
+    border-radius: 8px;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    margin: 2rem 1rem;
+    width: 45rem;
+}
+
 .average-noise {
     color: var(--orange);
     font-weight: bold;
@@ -215,3 +230,4 @@ button a {
     background-color: black;
     font-size: 0.7rem;
 }
+

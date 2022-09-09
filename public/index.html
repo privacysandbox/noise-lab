@@ -1,266 +1,225 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>🧪 Noise Lab</title>
-        <meta charset="utf-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <script type="module" src="js/main.js" defer></script>
-        <script type="module" src="js/laplace.js" defer></script>
-        <script type="module" src="js/simple-mode.js" defer></script>
-        <script type="module" src="js/tooltips.js" defer></script>
-        <link rel="stylesheet" href="./style.css" />
-        <link
-            href="https://unpkg.com/tabulator-tables/dist/css/tabulator.min.css"
-            rel="stylesheet"
-        />
-    </head>
-    <body>
-        <div id="menu">
-            <nav id="nav">
-                <div>
-                    🧪 Noise Lab
-                    <div class="version">v0.1.0</div>
-                </div>
 
-                <!-- Populated automatically, see main.js -->
-            </nav>
+<head>
+    <title>🧪 Noise Lab</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script type="module" src="js/main.js" defer></script>
+    <script type="module" src="js/laplace.js" defer></script>
+    <script type="module" src="js/simple-mode.js" defer></script>
+    <script type="module" src="js/tooltips.js" defer></script>
+    <link rel="stylesheet" href="./style.css" />
+    <link href="https://unpkg.com/tabulator-tables/dist/css/tabulator.min.css" rel="stylesheet" />
+</head>
 
+<body>
+    <div id="menu">
+        <nav id="nav">
             <div>
-                <button class="secondary">
-                    <a
-                        target="_blank"
-                        href="https://github.com/WICG/attribution-reporting-api/issues/485"
-                    >
-                        <div class="feedback-hint">[external button]</div>
+                🧪 Noise Lab
+                <div class="version">v0.1.0</div>
+            </div>
 
-                        Share your obervations <br />
-                        / Give feedback
-                    </a>
+            <!-- Populated automatically, see main.js -->
+        </nav>
+
+        <div>
+            <button class="secondary">
+                <a target="_blank" href="https://github.com/WICG/attribution-reporting-api/issues/485">
+                    <div class="feedback-hint">[external button]</div>
+
+                    Share your obervations <br />
+                    / Give feedback
+                </a>
+            </button>
+            <button id="feedback-button" class="secondary">
+                <a target="_blank"
+                    href="https://docs.google.com/document/d/1svEf54Yra13oS76R8W6J5jrGs11dpj4sQan0Ps4Uoek/edit#">
+                    <div class="feedback-hint">
+                        [internal button to gather Googler <br />
+                        feedback in the prototyping phase]
+                    </div>
+                    Give feedback / Ask a question
+                </a>
+            </button>
+        </div>
+    </div>
+    <!-- SIMPLE MODE START -->
+    <div id="simple-mode" class="mode-section">
+        <div id="launch-panel">
+            <div id="parameters-wrapper">
+                <div>
+                    <h2>API parameters</h2>
+                    <div>
+                        <label for="contribution-budget">Contribution Budget:</label>
+                        <span id="contribution-budget"></span>
+                        <div class="help" id="help-budget"></div>
+                    </div>
+                    <div>
+                        Epsilon:
+                        <input type="number" max="64" min="0" id="eps" />
+                        <div class="help" id="help-epsilon"></div>
+                    </div>
+                </div>
+                <div>
+                    <h2>Your Attribution Reporting strategy</h2>
+                    <div>
+                        <label for="batching-frequency">Batching frequency:</label>
+                        <select name="batching-frequency" id="batching-frequency-select"></select>
+                        <!-- Options are populated automatically -->
+                    </div>
+                    <div>
+                        <label for="key-strategy">Key strategy:</label>
+                        <select name="key-strategy" id="key-strategy-select"></select>
+                        <!-- Options are populated automatically -->
+                    </div>
+                    <div>
+                        <label for="scaling">Scaling:</label>
+                        <select name="scaling" id="scaling">
+                            <option value="1">Yes</option>
+                            <option value="0">No</option>
+                        </select>
+                        <div class="help" id="help-scaling"></div>
+                    </div>
+                </div>
+                <div>
+                    <h2>Your measurement data</h2>
+                    <div>
+                        <label for="daily">Average daily conversion count:</label>
+                        <select name="daily" id="daily">
+                            <option value="10">10</option>
+                            <option value="100" selected>100</option>
+                            <option value="1000">1000</option>
+                            <option value="10000">10000</option>
+                        </select>
+                        <div class="help" id="help-daily-simple-mode"></div>
+                    </div>
+                    <div>
+                        <label for="dimensions">Dimensions you want to track:</label>
+                        <div id="dimensions-table"></div>
+                    </div>
+                    <div>
+                        <label for="metrics">Metrics you want to track:</label>
+                        <div id="metrics"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="buttons-wrapper">
+                <button id="button-simulate" onclick="simulateAndDisplayResultsSimpleMode()">
+                    ▶️ SIMULATE
                 </button>
-                <button id="feedback-button" class="secondary">
-                    <a
-                        target="_blank"
-                        href="https://docs.google.com/document/d/1svEf54Yra13oS76R8W6J5jrGs11dpj4sQan0Ps4Uoek/edit#"
-                    >
-                        <div class="feedback-hint">
-                            [internal button to gather Googler <br />
-                            feedback in the prototyping phase]
-                        </div>
-                        Give feedback / Ask a question
-                    </a>
+                <button class="secondary destructive" onclick="clearAllSimpleMode()">
+                    🗑 CLEAR ALL SIMULATIONS
                 </button>
             </div>
         </div>
-        <!-- SIMPLE MODE START -->
-        <div id="simple-mode" class="mode-section">
-            <div id="launch-panel">
-                <div id="parameters-wrapper">
-                    <div>
-                        <h2>API parameters</h2>
+        <main>
+            <div id="all-simulations-wrapper-simple-mode"></div>
+        </main>
+    </div>
+    <!-- SIMPLE MODE END -->
+    <!-- ADVANCED MODE START -->
+    <div id="advanced-mode" class="mode-section">
+        <main>
+            <p style="background: #ffed009c; padding: 0.2rem">
+                🚧 Work In Progress
+            </p>
+            <div id="advanced-mode" class="mode-section">
+                <div id="advanced-mode-parameters">
+
+                    <div id="api-params">
+                        <h2> API Parameters</h2>
                         <div>
-                            <label for="contribution-budget"
-                                >Contribution Budget:</label
-                            >
-                            <span id="contribution-budget"></span>
+                            Contribution budget: <input type="number" value="65536" disabled>
                             <div class="help" id="help-budget"></div>
                         </div>
                         <div>
                             Epsilon:
-                            <input type="number" max="64" min="0" id="eps" />
+                            <input type="number" max="64" min="0" value= "10" id="eps" />
                             <div class="help" id="help-epsilon"></div>
                         </div>
+
                     </div>
+                    <hr />
                     <div>
                         <h2>Your Attribution Reporting strategy</h2>
-                        <div>
-                            <label for="batching-frequency"
-                                >Batching frequency:</label
-                            >
-                            <select
-                                name="batching-frequency"
-                                id="batching-frequency-select"
-                            ></select>
-                            <!-- Options are populated automatically -->
-                        </div>
-                        <div>
-                            <label for="key-strategy">Key strategy:</label>
-                            <select
-                                name="key-strategy"
-                                id="key-strategy-select"
-                            ></select>
-                            <!-- Options are populated automatically -->
-                        </div>
-                        <div>
-                            <label for="scaling">Scaling:</label>
-                            <select name="scaling" id="scaling">
-                                <option value="1">Yes</option>
-                                <option value="0">No</option>
-                            </select>
-                            <div class="help" id="help-scaling"></div>
-                        </div>
+                        <label for="frequency">Batching frequency:</label>
+                        <select name="frequency" id="frequency">
+                            <option value="0.4167">Hourly</option>
+                            <option value="1">Daily</option>
+                            <option value="7">Weekly</option>
+                            <option value="30">Monthly</option>
+                        </select>
+                        <br />
+                        <label for="daily">Average daily conversion count:</label>
+                        <select name="daily" id="daily">
+                            <option value="10">10</option>
+                            <option value="100" selected>100</option>
+                            <option value="1000">1000</option>
+                            <option value="10000">10000</option>
+                        </select>
+
+                        <div class="help" id="help-daily-simple-mode"></div>
+                        <br />
+                        <label for="granularity">Key strategy:</label>
+                        <select name="granularity" id="granularity">
+                            <option value="A">A(more granular)</option>
+                            <option value="B">B(less granular)</option>
+                        </select> <br />
+
+                        <label for="scaling">Scaling:</label>
+                        <select name="scaling" id="scaling">
+                            <option value="1">Yes</option>
+                            <option value="0">No</option>
+                        </select>
+                        <div class="help" id="help-scaling"></div>
                     </div>
-                    <div>
-                        <h2>Your measurement data</h2>
-                        <div>
-                            <label for="daily"
-                                >Average daily conversion count:</label
-                            >
-                            <select name="daily" id="daily">
-                                <option value="10">10</option>
-                                <option value="100" selected>100</option>
-                                <option value="1000">1000</option>
-                                <option value="10000">10000</option>
-                            </select>
-                            <div class="help" id="help-daily-simple-mode"></div>
-                        </div>
-                        <div>
-                            <label for="dimensions"
-                                >Dimensions you want to track:</label
-                            >
-                            <div id="dimensions-table"></div>
-                        </div>
-                        <div>
-                            <label for="metrics"
-                                >Metrics you want to track:</label
-                            >
-                            <div id="metrics"></div>
-                        </div>
+                    <hr />
+                    <div id="metrics-params">
+                        <h2>Metrics that you want to track</h2>
+                         <label> Number of metrics to track</label><input type="number" value="2" id="metrics-number"
+                            max="64" min="0">
+                            <br /><br />
+                        <div id="metrics-div"> </div>
+                              
+                        <div id="metrics-buttons-div"></div>            
                     </div>
-                </div>
-                <div class="buttons-wrapper">
-                    <button
-                        id="button-simulate"
-                        onclick="simulateAndDisplayResultsSimpleMode()"
-                    >
-                        ▶️ SIMULATE
-                    </button>
-                    <button
-                        class="secondary destructive"
-                        onclick="clearAllSimpleMode()"
-                    >
-                        🗑 CLEAR ALL SIMULATIONS
-                    </button>
-                </div>
-            </div>
-            <main>
-                <div id="all-simulations-wrapper-simple-mode"></div>
-            </main>
-        </div>
-        <!-- SIMPLE MODE END -->
-        <!-- ADVANCED MODE START -->
-        <div id="advanced-mode" class="mode-section">
-            <div>
-                <label for="daily">Average daily conversion count:</label>
-                <select name="daily" id="daily">
-                    <option value="10">10</option>
-                    <option value="100" selected>100</option>
-                    <option value="1000">1000</option>
-                    <option value="10000">10000</option>
-                </select>
-                <div class="help" id="help-daily-advanced-mode"></div>
-            </div>
-            <div>
-                Epsilon:
-                <input type="number" max="64" min="0" id="eps" />
-                <div class="help" id="help-epsilon"></div>
-            </div>
-            <main>
-                <p style="background: #ffed009c; padding: 0.2rem">
-                    🚧 Work In Progress
-                </p>
 
-                <div>
-                    Maximum purchase amount:
-                    <input type="number" id="amount" />
-                </div>
-                <button onclick="laplace()">Generate random noise</button>
-                <h4 id="laplace">Noise:</h4>
-                <hr />
+                    <hr />
 
-                <h3>Enter number of keys:</h3>
-                <input type="text" id="keys" name="keys" /><br />
-                <button onclick="parseKeys()">Submit keys</button>
-                <div id="wrapper"></div>
-                <br />
+                    <div id="dimensions">
+                        
+                        <h2> Dimensions you want to track </h2>
 
-                <div id="preferences">
-                    <label for="frequency">Aggregation frequency:</label>
-
-                    <select name="frequency" id="frequency">
-                        <option value="h">Hourly</option>
-                        <option value="d">Daily</option>
-                        <option value="w">Weekly</option>
-                        <option value="m">Monthly</option>
-                    </select>
+                        <label>Enter number of dimensions you want to use:</label>
+                        <input type="number" id="dimensions-number" name="dimensions-number" max="64" min="0" />
+                        <div id="dimensions-div"></div>
+                        <div id="dimensions-buttons-div"></div>
+                        <br />
+                    </div>
                     <br />
 
-                    <label for="granularity">Key strategy:</label>
-                    <select name="granularity" id="granularity">
-                        <option value="A">A(more granular)</option>
-                        <option value="B">B(less granular)</option></select
-                    ><br />
-                </div>
-                <br />
 
-                <button onclick="genKeyComb('all')">Generate sample</button>
+                    <div id="granular" hidden>
+                        <hr />
+                        <h2> Key structures </h2>
 
-                <button onclick="splitKeys()">Want to generate more</button>
+                        <label>Enter number of key structures you want to use:</label>
+                        <input type="number" id="structures-number" name="structures-number" max="64" min="0" value="1" />
+                        <button onclick="generateKeyStrategies()">Submit</button>
+                        <div id="strategies"></div>
+                    </div>
 
-                <hr />
+                    <hr />
+                    <button onclick="triggerSimulation()">Proceed</button>
 
-                <div>
-                    <ul>
-                        <li id="noMetrics">Number of metrics:</li>
-                        <li id="perMetricBudget">
-                            Budget allocatable per metric:
-                        </li>
-                        <li id="scaleCnt">
-                            Scaling factor for PURCHASE COUNT:
-                        </li>
-                        <li id="scaleAmt">
-                            Scaling factor for PURCHASE VALUE:
-                        </li>
-                    </ul>
-                </div>
+                    <div id="all-simulations-wrapper-advanced-mode"></div>
+        </main>
+    </div>
+    <!-- ADVANCED MODE END -->
+    <script type="text/javascript" src="https://unpkg.com/tabulator-tables/dist/js/tabulator.min.js"></script>
+</body>
 
-                <div id="splitKeys" hidden>
-                    No of sub keys: <input type="text" id="noSubKeys" /> <br />
-                    <button onclick="configSubKeys()">Configure subkeys</button>
-                    <div id="splits" hidden></div>
-                    <button onclick="genKeyComb()">Generate sk sample</button>
-                </div>
-
-                <div id="values"></div>
-                <br />
-                <!-- <button onclick="tableToCSV()">Download sample</button> -->
-                <div id="comp" hidden>
-                    <h3>Enter first key to check and value:</h3>
-                    <input type="text" id="firstkey" name="firstkey" /><br />
-                    <input
-                        type="text"
-                        id="firstvalue"
-                        name="firstvalue"
-                    /><br />
-                    <h3>Enter second key to check and value:</h3>
-                    <input type="text" id="secondkey" name="secondkey" /><br />
-                    <input
-                        type="text"
-                        id="secondvalue"
-                        name="secondvalue"
-                    /><br />
-                    <h4 id="cumulated" hidden>
-                        Cumulated noise from ds with all keys:
-                    </h4>
-                    <button onclick="compNoise()">Compare noise</button>
-                </div>
-                <div id="tables"></div>
-            </main>
-        </div>
-        <!-- ADVANCED MODE END -->
-        <script
-            type="text/javascript"
-            src="https://unpkg.com/tabulator-tables/dist/js/tabulator.min.js"
-        ></script>
-    </body>
 </html>

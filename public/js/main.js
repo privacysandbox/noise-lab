@@ -37,6 +37,8 @@ export function getCurrentMode() {
     return mode
 }
 
+
+
 window.addEventListener('load', function (event) {
     const mode = getCurrentMode()
 

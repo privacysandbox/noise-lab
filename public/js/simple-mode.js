@@ -16,8 +16,8 @@ import {
 import { CONTRIBUTION_BUDGET } from './consts.js'
 
 const keyStrategies = {
-    A: { value: 'A', name: 'A (granular keys)' },
-    B: { value: 'B', name: 'B (coarse keys)' },
+    A: { value: 'A', name: 'A' },
+    B: { value: 'B', name: 'B' },
 }
 
 const batchingFrequencies = {

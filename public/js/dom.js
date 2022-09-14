@@ -828,7 +828,7 @@ export function addDimension() {
     dimensionsMainDiv.appendChild(dimensionDiv)
 
     var dimensionHeader = document.createElement('h4')
-    dimensionHeader.innerHTML = 'Dimensions' + dimensionsNo
+    dimensionHeader.innerHTML = 'Dimension ' + dimensionsNo
     dimensionDiv.appendChild(dimensionHeader)
 
     var dimensionName = document.createElement('input')

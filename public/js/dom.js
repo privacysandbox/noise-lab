@@ -288,7 +288,7 @@ export function displayAdvancedReports(
     allSimulationsWrapper.appendChild(simulationWrapperDiv)
 
     const metricTag = document.createElement('h4')
-    metricTag.innerHTML = 'Metric:' + metricName
+    metricTag.innerHTML = 'Measurement goal: ' + metricName
     allSimulationsWrapper.appendChild(metricTag)
 
     const dimensionsTag = document.createElement('h4')

@@ -47,7 +47,6 @@ window.addEventListener('load', function (event) {
     }
 
     document.querySelectorAll('nav a').forEach((navItem) => {
-        console.log(navItem.href)
         if (navItem.href === document.URL) {
             navItem.className = 'current-menu-item'
         }

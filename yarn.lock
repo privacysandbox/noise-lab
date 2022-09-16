@@ -5211,6 +5211,11 @@
     "picocolors" "^1.0.0"
     "stable" "^0.1.8"
 
+"tabulator-tables@^5.3.4":
+  "integrity" "sha512-cUeAd8eqrr7FokEQRal0j+2KmBXL2f0BlvTf9myetHE4bmQ9dNDrMF9YlpGwTbdXZ65W2EPyDA1eYoknZO3umg=="
+  "resolved" "https://registry.npmjs.org/tabulator-tables/-/tabulator-tables-5.3.4.tgz"
+  "version" "5.3.4"
+
 "term-size@^2.2.1":
   "integrity" "sha512-wK0Ri4fOGjv/XPy8SBHZChl8CM7uMc5VML7SqiQ0zG7+J5Vr+RMQDoHa2CNT6KHUnTGIXH34UDMkPzAUyapBZg=="
   "resolved" "https://registry.npmjs.org/term-size/-/term-size-2.2.1.tgz"

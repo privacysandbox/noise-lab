@@ -3,6 +3,9 @@ body {
     font-size: 0.9rem;
     padding: 0;
     margin: 0;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
     --primary: #001bc0;
     --primary-transparent: #001ac016;
     --link: #001bc0;
@@ -12,9 +15,6 @@ body {
     --x-light-grey: #e8e8e8;
     --orange: #ff6600;
     --red: red;
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
 }
 
 /* TYPOGRAPHY + BASIC STYLES */

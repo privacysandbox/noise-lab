@@ -141,7 +141,6 @@ function generateUnnoisyKeyValuePairsReport(
     const scalingFactorForThisMetric = isUseScaling
         ? getScalingFactorForMetric(metric, numberOfMetrics, budget)
         : 1
-    console.log(scalingFactorForThisMetric)
 
     for (let j = 0; j < getNumberOfDistinctKeyValuesPerKey(dimensions); j++) {
         report.push({

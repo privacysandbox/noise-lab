@@ -1,9 +1,5 @@
 import laplace from '@stdlib/random-base-laplace'
 
-import {
-    getElementValueById,
-} from './dom.js'
-
 export function getScalingFactorForMetric(
     metric,
     totalNumberOfMetrics,
@@ -39,43 +35,40 @@ export function calculateAverageNoisePercentage(report) {
     return Number.parseFloat(averageNoisePercentage).toFixed(3)
 }
 
-//ADVANCED MODE UTILS
+// ADVANCED MODE UTILS
 
-export function calculateMaximumCount(frequency, daily, count){
-    return daily*frequency*count 
+export function calculateMaximumCount(frequency, daily, count) {
+    return daily * frequency * count
 }
 
-
 export function generateKeyCombinationArray(params) {
+    var keysArray = []
 
-
-    var keysArray = [];
-
-    for (var i = 0; i < params.length ; i++)
-    {
+    for (var i = 0; i < params.length; i++) {
         var keyLength = params[i]
         var arr = []
         for (var x = 0; x < keyLength; x++) {
             arr.push(x)
         }
-        console.log("key arr:")
+        console.log('key arr:')
         console.log(arr)
         keysArray.push(arr)
     }
 
-    console.log("keysArray:")
+    console.log('keysArray:')
     console.log(keysArray)
 
-    var keysComb = cartesian(...keysArray);
+    var keysComb = cartesian(...keysArray)
 
-    keysComb.forEach(element => element = element.join(''))
+    keysComb.forEach((element) => (element = element.join('')))
 
-    console.log("final key comb:")
+    console.log('final key comb:')
     console.log(keysComb)
 
     return keysComb
 }
-// generate all possible key values combinations
+
+// Generate all possible key-values combinations
 function cartesian(...args) {
     console.log('cartesian input:')
     console.log(args)
@@ -95,4 +88,3 @@ function cartesian(...args) {
     // return combinations
     return r
 }
-

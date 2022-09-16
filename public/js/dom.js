@@ -1,3 +1,5 @@
+import Tabulator from 'tabulator-tables'
+
 export function displayContributionBudget(budget) {
     document.getElementById('contribution-budget').innerText = budget
 }
@@ -409,13 +411,13 @@ export function createSimulationDiv(simulationNo, metrics, dimensions) {
     simulationDiv.setAttribute('id', 'simulation-div' + simulationNo)
     simulationDiv.setAttribute('class', 'simulation-wrapper-advanced-mode')
 
-    //Display simulation main info in the simulation wrapper div
+    // Display simulation main info in the simulation wrapper div
     const simulationDateTime = new Date(Date.now())
     const simulationTitleDiv = document.createElement('h2')
     simulationTitleDiv.innerText = 'Simulation ' + simulationDateTime
     simulationDiv.appendChild(simulationTitleDiv)
 
-    //Display simulation parameters:
+    // Display simulation parameters:
     const simulationParams = document.createElement('div')
     simulationParams.setAttribute('id', 'simulation-params-div' + simulationNo)
 

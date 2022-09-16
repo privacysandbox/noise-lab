@@ -50,28 +50,18 @@ export function generateKeyCombinationArray(params) {
         for (var x = 0; x < keyLength; x++) {
             arr.push(x)
         }
-        console.log('key arr:')
-        console.log(arr)
         keysArray.push(arr)
     }
 
-    console.log('keysArray:')
-    console.log(keysArray)
-
-    var keysComb = cartesian(...keysArray)
+    var keysComb = cartesian(...keysArray);
 
     keysComb.forEach((element) => (element = element.join('')))
-
-    console.log('final key comb:')
-    console.log(keysComb)
 
     return keysComb
 }
 
-// Generate all possible key-values combinations
+// generate all possible key values combinations
 function cartesian(...args) {
-    console.log('cartesian input:')
-    console.log(args)
     var r = [],
         max = args.length - 1
     function helper(arr, i) {
@@ -83,8 +73,6 @@ function cartesian(...args) {
         }
     }
     helper([], 0)
-    console.log('datatset')
-    console.log(r)
     // return combinations
     return r
 }

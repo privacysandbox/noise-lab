@@ -1,4 +1,4 @@
-import Tabulator from 'tabulator-tables'
+import { TabulatorFull } from 'tabulator-tables'
 
 export function displayContributionBudget(budget) {
     document.getElementById('contribution-budget').innerText = budget
@@ -48,11 +48,12 @@ export function displayTabularData(parentDomEl, tabularData) {
     const div = document.createElement('div')
     div.setAttribute('id', inputTableId)
     parentDomEl.appendChild(div)
-    new Tabulator(`#${inputTableId}`, {
+    console.log(tabularData)
+    new TabulatorFull(`#${inputTableId}`, {
         data: tabularData,
         // Create columns from data field names
         autoColumns: true,
-        layout: 'fitData',
+        layout: 'fitColumns',
     })
 }
 
@@ -180,11 +181,11 @@ function displayReport(parentDomEl, report) {
     const div = document.createElement('div')
     div.setAttribute('id', tableId)
     parentDomEl.appendChild(div)
-    new Tabulator(`#${tableId}`, {
+    new TabulatorFull(`#${tableId}`, {
         data,
         // Create columns from data field names
         autoColumns: true,
-        layout: 'fitData',
+        layout: 'fitColumns',
     })
 
     // Display average noise
@@ -290,7 +291,7 @@ export function displayAdvancedReports(
     allSimulationsWrapper.appendChild(simulationWrapperDiv)
 
     const metricTag = document.createElement('h4')
-    metricTag.innerHTML = 'Metric:' + metricName
+    metricTag.innerHTML = 'Measurement goal: ' + metricName
     allSimulationsWrapper.appendChild(metricTag)
 
     const dimensionsTag = document.createElement('h4')
@@ -306,11 +307,11 @@ export function displayAdvancedReports(
     const div = document.createElement('div')
     div.setAttribute('id', tableId)
     simulationWrapperDiv.appendChild(div)
-    var table = new Tabulator(`#${tableId}`, {
+    var table = new TabulatorFull(`#${tableId}`, {
         data: data,
         // Create columns from data field names
         autoColumns: true,
-        layout: 'fitData',
+        layout: 'fitColumns',
     })
 
     const avgNoiseTitleSpan = document.createElement('span')
@@ -343,44 +344,44 @@ export function displayAdvancedReports(
     allSimulationsWrapper.appendChild(document.createElement('br'))
 }
 
-export function displayTabularDataEditable(tabularData) {
-    // Create a wrapper div that will contain the table
-    const parentDomEl = document.getElementById('metrics-div')
-    const inputTableId = `metrics-table`
-    const div = document.createElement('div')
-    div.setAttribute('id', inputTableId)
-    parentDomEl.appendChild(div)
-    var table = new Tabulator(`#${inputTableId}`, {
-        data: tabularData,
-        // Create columns from data field names
-        autoColumns: true,
-        layout: 'fitData',
-        autoColumnsDefinitions: function (definitions) {
-            //definitions - array of column definition objects
+// export function displayTabularDataEditable(tabularData) {
+//     // Create a wrapper div that will contain the table
+//     const parentDomEl = document.getElementById('metrics-div')
+//     const inputTableId = `metrics-table`
+//     const div = document.createElement('div')
+//     div.setAttribute('id', inputTableId)
+//     parentDomEl.appendChild(div)
+//     var table = new Tabulator(`#${inputTableId}`, {
+//         data: tabularData,
+//         // Create columns from data field names
+//         autoColumns: true,
+//         layout: 'fitData',
+//         autoColumnsDefinitions: function (definitions) {
+//             //definitions - array of column definition objects
 
-            definitions.forEach((column) => {
-                column.editor = 'input' // add input editor to every column
-            })
+//             definitions.forEach((column) => {
+//                 column.editor = 'input' // add input editor to every column
+//             })
 
-            return definitions
-        },
-    })
+//             return definitions
+//         },
+//     })
 
-    const addButton = document.createElement('button')
-    addButton.setAttribute('id', 'add-row')
-    addButton.innerHTML = 'Add Row'
-    parentDomEl.appendChild(addButton)
+//     const addButton = document.createElement('button')
+//     addButton.setAttribute('id', 'add-row')
+//     addButton.innerHTML = 'Add Row'
+//     parentDomEl.appendChild(addButton)
 
-    const delButton = document.createElement('button')
-    delButton.setAttribute('id', 'del-row')
-    delButton.innerHTML = 'Delete Last Row'
-    parentDomEl.appendChild(delButton)
+//     const delButton = document.createElement('button')
+//     delButton.setAttribute('id', 'del-row')
+//     delButton.innerHTML = 'Delete Last Row'
+//     parentDomEl.appendChild(delButton)
 
-    //Add row on "Add Row" button click
-    document.getElementById('add-row').addEventListener('click', function () {
-        table.addRow({})
-    })
-}
+//     //Add row on "Add Row" button click
+//     document.getElementById('add-row').addEventListener('click', function () {
+//         table.addRow({})
+//     })
+// }
 
 export function resetDimensionsDiv() {
     const dimensionsConfigDiv = document.getElementById('dimensions-div')
@@ -830,7 +831,7 @@ export function addDimension() {
     dimensionsMainDiv.appendChild(dimensionDiv)
 
     var dimensionHeader = document.createElement('h4')
-    dimensionHeader.innerHTML = 'Dimensions' + dimensionsNo
+    dimensionHeader.innerHTML = 'Dimension ' + dimensionsNo
     dimensionDiv.appendChild(dimensionHeader)
 
     var dimensionName = document.createElement('input')

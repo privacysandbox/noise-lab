@@ -68,13 +68,13 @@ function simulatePerMetric(mainDiv, keyCombinations, metricsNo, metric) {
         : 1
     const keyCombinationString = getKeyCombinationString(keyCombinations.names)
 
-    console.log('!!SCALING FACTOR!!' + scalingFactor)
+
     const max = calculateMaximumCount(
         getFrequencyValue(),
         getDailyValue(),
         metric.maxValue
     )
-    console.log(max)
+
     const min = metric.minValue * getFrequencyValue()
     const report = []
     var averageNoisePercentage = 0
@@ -90,8 +90,6 @@ function simulatePerMetric(mainDiv, keyCombinations, metricsNo, metric) {
         )
         averageNoisePercentage += noisePercentage
 
-        console.log('randCount')
-        console.log(randCount)
         report.push({
             key: keyCombinations.combinations[i],
             aggregatedValue: randCount,
@@ -109,9 +107,6 @@ function simulatePerMetric(mainDiv, keyCombinations, metricsNo, metric) {
         data: report,
         averageNoisePercentage: averageNoisePercentage,
     }
-
-    console.log('SIMULATION:')
-    console.log(report)
 
     displayAdvancedReports(
         mainDiv,
@@ -147,12 +142,9 @@ export function triggerSimulation() {
         })
     } else {
         const allCombs = getStrategiesKeyCombinations(dimensions)
-        console.log('!!ALL COMBS!!')
-        console.log(allCombs)
+
 
         for (let i = 0; i < allCombs.length; i++) {
-            console.log('CURRENT LIST')
-            console.log(allCombs[i])
             keyCombList.push({
                 names: allCombs[i].names,
                 combinations: generateKeyCombinationArray(
@@ -161,9 +153,6 @@ export function triggerSimulation() {
             })
         }
     }
-
-    console.log('!!KEY COMBINATIONS!!')
-    console.log(keyCombList)
 
     var simulationDiv = createSimulationDiv(simulationNo, metrics, dimensions)
 

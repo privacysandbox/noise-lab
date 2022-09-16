@@ -10,6 +10,7 @@
         <script type="module" src="js/simple-mode.js" defer></script>
         <script type="module" src="js/tooltips.js" defer></script>
         <link rel="stylesheet" href="./style.css" />
+        <link href="./third_party/tabulator.min.css" rel="stylesheet">
     </head>
 
     <body>
@@ -97,13 +98,13 @@
                             <select
                                 name="key-strategy"
                                 id="key-strategy-select"
-                            ></select>
+                            disabled></select>
                             <div class="help" id="help-key-strategy"></div>
                             <!-- Options are populated automatically -->
                         </div>
                         <div>
                             <label for="scaling">Scaling:</label>
-                            <select name="scaling" id="scaling">
+                            <select name="scaling" id="scaling" disabled>
                                 <option value="1">Yes</option>
                                 <option value="0">No</option>
                             </select>

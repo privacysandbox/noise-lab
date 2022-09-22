@@ -130,8 +130,7 @@ export function displaySimulationResults(simulation) {
     simulationWrapperDiv.setAttribute('class', 'simulation-wrapper-simple-mode')
     allSimulationsWrapper.appendChild(simulationWrapperDiv)
 
-    const flexWrapperDiv = document.createElement('div')
-    flexWrapperDiv.setAttribute('class', 'flex')
+    const extraWrapperDiv = document.createElement('div')
     const simulationInputWrapperDiv = document.createElement('div')
     simulationInputWrapperDiv.setAttribute(
         'class',
@@ -159,9 +158,9 @@ export function displaySimulationResults(simulation) {
     reportsTitleDiv.innerText = 'Summary reports (output)'
     simulationOutputWrapperDiv.appendChild(reportsTitleDiv)
 
-    flexWrapperDiv.appendChild(simulationInputWrapperDiv)
-    flexWrapperDiv.appendChild(simulationOutputWrapperDiv)
-    simulationWrapperDiv.appendChild(flexWrapperDiv)
+    extraWrapperDiv.appendChild(simulationInputWrapperDiv)
+    extraWrapperDiv.appendChild(simulationOutputWrapperDiv)
+    simulationWrapperDiv.appendChild(extraWrapperDiv)
 
     reports.forEach((report) => {
         displayReport(simulationOutputWrapperDiv, report)

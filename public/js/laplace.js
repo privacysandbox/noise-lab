@@ -1,6 +1,5 @@
 import {
     clearDataDisplay,
-    displayContributionBudget,
     getEpsilonFromDom,
     getFrequencyValue,
     getDailyValue,
@@ -9,7 +8,6 @@ import {
     getMetricsArray,
     createSimulationDiv,
     getDimensionsArray,
-    addKeyStrategyListener,
     isGranular,
     getStrategiesKeyCombinations,
     getAllDimensionNames,
@@ -17,10 +15,9 @@ import {
     displayDimensions,
     addMetric,
     removeMetric,
-    addMetricsButtons,
+    initializeDisplayAdvancedMode,
     addDimension,
     removeDimension,
-    addDimensionsButtons,
     getIsUseScalingFromDom,
     getKeyCombinationString,
 } from './dom.js'
@@ -51,15 +48,12 @@ const defaultDimensions = [
     { id: '3', size: '2', name: 'productCategory' },
 ]
 
-initialize()
-
-function initialize() {
-    displayContributionBudget(CONTRIBUTION_BUDGET)
-    addKeyStrategyListener()
-    displayMetrics(defaultMetrics)
-    addMetricsButtons()
-    displayDimensions(defaultDimensions)
-    addDimensionsButtons()
+export function initializeDisplayAdvancedModeWithParams() {
+    initializeDisplayAdvancedMode(
+        defaultMetrics,
+        defaultDimensions,
+        CONTRIBUTION_BUDGET
+    )
 }
 
 function simulatePerMetric(mainDiv, keyCombinations, metricsNo, metric) {
@@ -67,7 +61,6 @@ function simulatePerMetric(mainDiv, keyCombinations, metricsNo, metric) {
         ? getScalingFactorForMetric(metric, metricsNo, CONTRIBUTION_BUDGET)
         : 1
     const keyCombinationString = getKeyCombinationString(keyCombinations.names)
-
 
     const max = calculateMaximumCount(
         getFrequencyValue(),
@@ -143,7 +136,6 @@ export function triggerSimulation() {
     } else {
         const allCombs = getStrategiesKeyCombinations(dimensions)
 
-
         for (let i = 0; i < allCombs.length; i++) {
             keyCombList.push({
                 names: allCombs[i].names,
@@ -184,3 +176,5 @@ window.addDimension = addDimension
 window.removeDimension = removeDimension
 window.resetDimensions = resetDimensions
 window.clearAllAdvancedMode = clearAllAdvancedMode
+window.initializeDisplayAdvancedModeWithParams =
+    initializeDisplayAdvancedModeWithParams

@@ -38,34 +38,34 @@ export function getCurrentMode() {
 }
 
 window.addEventListener('load', function (event) {
-    const mode = getCurrentMode()
-
     // If the mode is unknown, redirect to simple mode (= fallback mode)
-    if (!modeSearchQueryParam.includes(mode)) {
-        console.log(0)
+    if (!modeSearchQueryParam.includes(getCurrentMode())) {
         window.location.href = `${location.origin}${location.pathname}?mode=${modes.simple.searchQueryParam}`
     }
 
+    // Highlight current menu item
     document.querySelectorAll('nav a').forEach((navItem) => {
         if (navItem.href === document.URL) {
             navItem.className = 'current-menu-item'
         }
     })
 
-    // Highlight current menu item
-    // for (let i = 0; i < document.links.length; i++) {
-    //     if (document.links[i].href === document.URL) {
-    //         current = i
-    //     }
-    // //
-    // document.links[current].className = 'current-menu-item'
-
     // Display correct section and hide the other ones
     const allSections = document.querySelectorAll('.mode-section')
     allSections.forEach((section) => {
-        if (section.id !== `${mode}-mode`) {
+        if (section.id !== `${getCurrentMode()}-mode`) {
             // Mode isn't selected => remove it from the DOM
             section.parentElement.removeChild(section)
         }
     })
+
+    // Initialize parameters and fields for the current mode
+    const mode = getCurrentMode()
+    if (mode === modes.simple.searchQueryParam) {
+        initializeDisplaySimpleModeWithParams()
+    } else if (mode === modes.advanced.searchQueryParam) {
+        initializeDisplayAdvancedModeWithParams()
+    } else {
+        throw new Error('mode unkown')
+    }
 })

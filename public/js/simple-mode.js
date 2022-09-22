@@ -48,12 +48,15 @@ const metrics = [
     { name: 'purchaseCount', defaultValuePerConversion: 1, maxValue: 1 },
 ]
 
-initializeDisplaySimpleMode(
-    Object.values(keyStrategies),
-    Object.values(batchingFrequencies),
-    metrics,
-    dimensions
-)
+function initializeDisplaySimpleModeWithParams() {
+    initializeDisplaySimpleMode(
+        Object.values(keyStrategies),
+        Object.values(batchingFrequencies),
+        metrics,
+        dimensions,
+        CONTRIBUTION_BUDGET
+    )
+}
 
 export function simulateAndDisplayResultsSimpleMode() {
     const simulation = simulate(
@@ -186,3 +189,5 @@ function clearAllSimpleMode() {
 
 window.simulateAndDisplayResultsSimpleMode = simulateAndDisplayResultsSimpleMode
 window.clearAllSimpleMode = clearAllSimpleMode
+window.initializeDisplaySimpleModeWithParams =
+    initializeDisplaySimpleModeWithParams

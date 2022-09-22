@@ -10,7 +10,7 @@ export function displayNoise(l) {
 
 export function clearDataDisplay() {
     var tablesDiv = document.getElementById('tables')
-    tablesDiv.innerHtml = ''
+    tablesDiv.innerHTML = ''
 }
 
 export function displayEpsilon(epsilon) {
@@ -69,12 +69,23 @@ export function populateSelectDomElement(selectDomElement, options) {
     })
 }
 
+export function initializeDisplayAdvancedMode(metrics, dimensions, budget) {
+    displayContributionBudget(budget)
+    addKeyStrategyListener()
+    displayMetrics(metrics)
+    addMetricsButtons()
+    displayDimensions(dimensions)
+    addDimensionsButtons()
+}
+
 export function initializeDisplaySimpleMode(
     keyStrategies, // as array
     batchingFrequencies, // as array
     metrics,
-    dimensions
+    dimensions,
+    budget
 ) {
+    displayContributionBudget(budget)
     populateSelectDomElement(
         document.getElementById('key-strategy-select'),
         keyStrategies

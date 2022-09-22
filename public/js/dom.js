@@ -123,7 +123,7 @@ export function displayInputParametersSimpleMode(parentDomEl, inputParameters) {
     parentDomEl.appendChild(keyStrategyDiv)
 
     const dimensionsTitleDiv = document.createElement('div')
-    dimensionsTitleDiv.innerText = `Dimensions:`
+    dimensionsTitleDiv.innerText = `Dimensions:` + JSON.stringify(dimensions)
     parentDomEl.appendChild(dimensionsTitleDiv)
     displayTabularData(dimensionsTitleDiv, dimensions)
 }

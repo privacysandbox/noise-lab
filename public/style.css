@@ -15,6 +15,8 @@ body {
     --x-light-grey: #e8e8e8;
     --orange: #ff6600;
     --red: red;
+    --label-width: 10.2rem;
+    --label-padding-right: 0.5rem;
 }
 
 /* TYPOGRAPHY + BASIC STYLES */
@@ -131,6 +133,7 @@ main {
     border-radius: 8px;
     box-shadow: rgba(75, 75, 85, 0.446) 0px 7px 29px 0px;
     background: white;
+    min-height: 20rem;
 }
 
 .average-noise {
@@ -221,16 +224,17 @@ button a {
 }
 
 label {
-    width: 10.2rem;
-    padding-right: 0.5rem;
+    width: var(--label-width);
+    padding-right: var(--label-padding-right);
     display: inline-block;
 }
 
 input,
 select {
+    min-width: 6rem;
     margin: 0.2rem 0;
-    cursor: pointer;
     padding: 0.3rem;
+    cursor: pointer;
     border: solid 1.5px grey;
     border-radius: 4px;
     outline: none;
@@ -241,6 +245,12 @@ input:focus,
 select:focus {
     border-color: var(--primary);
     background: var(--primary-transparent);
+}
+
+.input-hint {
+    margin-left: calc(var(--label-width) + var(--label-padding-right) + 0.2rem);
+    font-size: 0.8rem;
+    color: dimgrey;
 }
 
 /* HELPER BADGES */

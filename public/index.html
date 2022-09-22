@@ -10,7 +10,7 @@
         <script type="module" src="js/simple-mode.js" defer></script>
         <script type="module" src="js/tooltips.js" defer></script>
         <link rel="stylesheet" href="./style.css" />
-        <link href="./third_party/tabulator.min.css" rel="stylesheet">
+        <link href="./third_party/tabulator.min.css" rel="stylesheet" />
     </head>
 
     <body>
@@ -72,8 +72,10 @@
                                 min="0"
                                 value="10"
                                 id="eps"
+                                oninput="capEpsilon(event, this)"
                             />
                             <div class="help" id="help-epsilon"></div>
+                            <div class="input-hint">Min: 0, Max: 64</div>
                         </div>
                     </div>
                     <div>
@@ -98,7 +100,8 @@
                             <select
                                 name="key-strategy"
                                 id="key-strategy-select"
-                            disabled></select>
+                                disabled
+                            ></select>
                             <div class="help" id="help-key-strategy"></div>
                             <!-- Options are populated automatically -->
                         </div>
@@ -188,8 +191,10 @@
                                 min="0"
                                 value="10"
                                 id="eps"
+                                oninput="capEpsilon(event, this)"
                             />
                             <div class="help" id="help-epsilon"></div>
+                            <div class="input-hint">Min: 0, Max: 64</div>
                         </div>
                     </div>
                     <hr />

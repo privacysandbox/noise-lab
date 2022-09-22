@@ -863,6 +863,17 @@ export function getKeyCombinationString(names) {
     return names.join(' x ')
 }
 
+export function capEpsilon(event, inputEl) {
+    const currentValue = inputEl.value
+    if (currentValue < 0) {
+        inputEl.value = 0
+    }
+    if (currentValue > 64) {
+        inputEl.value = 64
+    }
+}
+
 window.createCustomMetricsInputs = createCustomMetricsInputs
 window.generateCustomMetrics = generateCustomMetrics
 window.generateKeyStrategies = generateKeyStrategies
+window.capEpsilon = capEpsilon

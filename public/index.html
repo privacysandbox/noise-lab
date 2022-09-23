@@ -12,27 +12,23 @@
         <link rel="stylesheet" href="./style.css" />
         <link href="./third_party/tabulator.min.css" rel="stylesheet" />
     </head>
-
     <body>
         <div id="menu">
             <nav id="nav">
                 <div>
                     🧪 Noise Lab
-                    <div class="version">v1.0.1</div>
+                    <div class="version">v1.0.2</div>
                 </div>
 
                 <!-- Populated automatically, see main.js -->
             </nav>
-            <div>
+            <div class="buttons-wrapper-nav">
                 <button class="secondary">
                     <a
                         target="_blank"
                         href="https://github.com/WICG/attribution-reporting-api/issues/485"
                     >
-                        <div class="feedback-hint">[external button]</div>
-
-                        Share your obervations <br />
-                        / Give feedback
+                        Give feedback
                     </a>
                 </button>
                 <button id="feedback-button" class="secondary">
@@ -41,10 +37,9 @@
                         href="https://docs.google.com/document/d/1svEf54Yra13oS76R8W6J5jrGs11dpj4sQan0Ps4Uoek/edit#"
                     >
                         <div class="feedback-hint">
-                            [internal button to gather Googler <br />
-                            feedback in the prototyping phase]
+                            [internal, for Googlers]
                         </div>
-                        Give feedback / Ask a question
+                        Give feedback
                     </a>
                 </button>
             </div>
@@ -328,6 +323,11 @@
                 <h2>Simulations</h2>
                 <div id="all-simulations-wrapper-advanced-mode"></div>
             </main>
+        </div>
+        <div class="save-section">
+            Make sure to download a copy of your simulations before closing
+            Noise Lab (or switching between modes). Simulations are not saved in
+            your browser or persisted in any way.
         </div>
     </body>
 </html>

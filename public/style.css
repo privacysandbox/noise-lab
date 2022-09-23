@@ -17,6 +17,12 @@ body {
     --red: red;
     --label-width: 10.2rem;
     --label-padding-right: 0.5rem;
+    --font-size-s: 0.8rem;
+    --save-section-height: 3.2vh;
+    --header-height: 10vh;
+    --main-height: calc(
+        100vh - var(--header-height) - var(--save-section-height)
+    );
 }
 
 /* TYPOGRAPHY + BASIC STYLES */
@@ -32,7 +38,7 @@ h2 {
 }
 
 h3 {
-    font-size: 0.8rem;
+    font-size: var(--font-size-s);
     letter-spacing: 0.8px;
     text-transform: uppercase;
     margin: 0.8rem 0 1.6rem 0;
@@ -48,13 +54,27 @@ a {
 
 /* MENU/NAVIGATION */
 
+.save-section {
+    color: #2b210db3;
+    z-index: 10000;
+    background-color: #ffda73;
+    box-sizing: border-box;
+    padding: 0.2rem;
+    display: block;
+    width: 100%;
+    padding: 0.4rem;
+    height: var(--save-section-height);
+    border-top: 1px solid;
+    font-size: var(--font-size-s);
+}
+
 #menu {
     display: flex;
     border-bottom: solid 1px;
     align-items: center;
     justify-content: space-between;
     padding: 0 1rem;
-    height: 10vh;
+    height: var(--header-height);
 }
 
 #nav {
@@ -82,7 +102,7 @@ nav a.current-menu-item {
 
 .mode-section {
     display: flex;
-    height: 90vh;
+    height: var(--main-height);
     width: 100%;
 }
 
@@ -91,7 +111,7 @@ main {
 }
 
 main {
-    height: calc(90vh - 2 * 1.4rem);
+    height: calc(var(--main-height) - 2 * 1.4rem);
     background: var(--x-light-grey);
     overflow-y: scroll;
 }
@@ -101,7 +121,7 @@ main {
     z-index: 100;
     border-bottom: solid 1px;
     width: 25rem !important;
-    height: 90vh;
+    height: var(--main-height);
     border-right: solid 1px black;
     overflow-y: scroll;
     display: flex;
@@ -141,8 +161,8 @@ main {
     font-weight: bold;
 }
 
-#dimensions-table {
-    max-width: 20rem;
+.simulation-id {
+    text-align: center;
 }
 
 /* BUTTONS */
@@ -150,13 +170,20 @@ main {
 button {
     font-size: inherit;
     background: var(--primary);
-    border: solid 1px;
+    border: solid 1px transparent;
     padding: 0.7rem 1.4rem;
     color: var(--text-inverted);
     border-radius: 4px;
     margin: 0.5rem;
     cursor: pointer;
     text-transform: uppercase;
+    transition: filter 0.1s linear, box-shadow 0.1s linear;
+}
+
+button:hover {
+    filter: brightness(0.86);
+    box-shadow: rgba(0, 0, 0, 0.243) 0px 1px 3px,
+        rgba(0, 0, 0, 0.24) 0px 1px 2px;
 }
 
 button.secondary {
@@ -185,7 +212,7 @@ div.ternary-xs {
 button.ternary-xs,
 div.ternary-xs {
     padding: 0 0.2rem;
-    font-size: 0.8rem;
+    font-size: var(--font-size-s);
 }
 
 button.destructive {
@@ -211,11 +238,15 @@ button a {
     color: white !important;
 }
 
+.buttons-wrapper-nav {
+    display: flex;
+}
+
 .buttons-wrapper-launch-panel {
     padding: 1rem;
-    border-top: solid 1px #c5c5c5;
+    border-top: solid 1px rgba(128, 128, 128, 0.635);
     position: sticky;
-    bottom: 1px;
+    bottom: 0;
     backdrop-filter: blur(6px);
 }
 
@@ -249,7 +280,7 @@ select:focus {
 
 .input-hint {
     margin-left: calc(var(--label-width) + var(--label-padding-right) + 0.2rem);
-    font-size: 0.8rem;
+    font-size: var(--font-size-s);
     color: dimgrey;
 }
 

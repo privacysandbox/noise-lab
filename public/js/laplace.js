@@ -30,6 +30,7 @@ import {
     getScalingFactorForMetric,
     calculateNoisePercentage,
     generateKeyCombinationArray,
+    generateAggregatedValue,
 } from './utils.noise.js'
 
 // global variables
@@ -37,7 +38,7 @@ var simulationNo = 1
 
 // define default metrics
 const defaultMetrics = [
-    { id: 1, name: 'purchaseValue', maxValue: 120, minValue: 1000 },
+    { id: 1, name: 'purchaseValue', maxValue: 1000 , minValue: 120 },
     { id: 2, name: 'purchaseCount', maxValue: 1, minValue: 1 },
 ]
 
@@ -76,7 +77,8 @@ function simulatePerMetric(mainDiv, keyCombinations, metricsNo, metric) {
             CONTRIBUTION_BUDGET,
             getEpsilonFromDom()
         )
-        const randCount = Math.floor(Math.random() * (max - min) + min)
+        //const randCount = Math.floor(Math.random() * (max - min) + min)
+        const randCount = generateAggregatedValue(metric, i, getDailyValue(), getFrequencyValue())
         const noisePercentage = calculateNoisePercentage(
             noise,
             randCount * scalingFactor + noise

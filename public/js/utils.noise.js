@@ -76,3 +76,15 @@ function cartesian(...args) {
     // return combinations
     return r
 }
+
+
+export function generateAggregatedValue(metric, deterministicValue, dailyConversionCount, batchingFrequency) {
+
+    var calculationValue = ((metric.maxValue == metric.minValue) || 
+        (metric.maxValue > (metric.minValue * 1 + deterministicValue * 1)) ?
+            (metric.minValue * 1 + deterministicValue * 1) : metric.maxValue)
+    return Math.floor(calculationValue *
+        dailyConversionCount *
+        batchingFrequency)
+
+}

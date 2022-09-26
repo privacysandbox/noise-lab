@@ -75,9 +75,9 @@
   dependencies:
     "@lezer/common" "^0.15.0"
 
-"@lmdb/lmdb-darwin-x64@2.5.2":
-  "integrity" "sha512-KvPH56KRLLx4KSfKBx0m1r7GGGUMXm0jrKmNE7plbHlesZMuPJICtn07HYgQhj1LNsK7Yqwuvnqh1QxhJnF1EA=="
-  "resolved" "https://registry.npmjs.org/@lmdb/lmdb-darwin-x64/-/lmdb-darwin-x64-2.5.2.tgz"
+"@lmdb/lmdb-linux-x64@2.5.2":
+  "integrity" "sha512-xUdUfwDJLGjOUPH3BuPBt0NlIrR7f/QHKgu3GZIXswMMIihAekj2i97oI0iWG5Bok/b+OBjHPfa8IU9velnP/Q=="
+  "resolved" "https://registry.npmjs.org/@lmdb/lmdb-linux-x64/-/lmdb-linux-x64-2.5.2.tgz"
   "version" "2.5.2"
 
 "@mischnic/json-sourcemap@^0.1.0":
@@ -89,9 +89,9 @@
     "@lezer/lr" "^0.15.4"
     "json5" "^2.2.1"
 
-"@msgpackr-extract/msgpackr-extract-darwin-x64@2.1.2":
-  "integrity" "sha512-YPXtcVkhmVNoMGlqp81ZHW4dMxK09msWgnxtsDpSiZwTzUBG2N+No2bsr7WMtBKCVJMSD6mbAl7YhKUqkp/Few=="
-  "resolved" "https://registry.npmjs.org/@msgpackr-extract/msgpackr-extract-darwin-x64/-/msgpackr-extract-darwin-x64-2.1.2.tgz"
+"@msgpackr-extract/msgpackr-extract-linux-x64@2.1.2":
+  "integrity" "sha512-RjRoRxg7Q3kPAdUSC5EUUPlwfMkIVhmaRTIe+cqHbKrGZ4M6TyCA/b5qMaukQ/1CHWrqYY2FbKOAU8Hg0pQFzg=="
+  "resolved" "https://registry.npmjs.org/@msgpackr-extract/msgpackr-extract-linux-x64/-/msgpackr-extract-linux-x64-2.1.2.tgz"
   "version" "2.1.2"
 
 "@parcel/bundler-default@2.7.0":
@@ -195,9 +195,14 @@
     "nullthrows" "^1.1.1"
     "semver" "^5.7.1"
 
-"@parcel/css-darwin-x64@1.12.2":
-  "integrity" "sha512-3J0/LrDvt5vevOisnrE0q5mEcuiAY+K7OZwIv84SAnrbjlL5sshmIaaNzL869kb4thza+RClEj0mS5XTm1IUEw=="
-  "resolved" "https://registry.npmjs.org/@parcel/css-darwin-x64/-/css-darwin-x64-1.12.2.tgz"
+"@parcel/css-linux-x64-gnu@1.12.2":
+  "integrity" "sha512-cJYVMHnQSGhDwQByyvjFZppjMBNlgxXl/R4cX5DwrQE0QZmK/42BYnMp92rvoprEG6LRyRoiGtCjyfYTPWajog=="
+  "resolved" "https://registry.npmjs.org/@parcel/css-linux-x64-gnu/-/css-linux-x64-gnu-1.12.2.tgz"
+  "version" "1.12.2"
+
+"@parcel/css-linux-x64-musl@1.12.2":
+  "integrity" "sha512-u9zdO/d831/74Tf+TdPUfaIuB9v6FD4Xz8UdWUDOXgQqaOlnJ9fAsAM39EkoWlMxPPljY3f4ay6irSe1a4XgSA=="
+  "resolved" "https://registry.npmjs.org/@parcel/css-linux-x64-musl/-/css-linux-x64-musl-1.12.2.tgz"
   "version" "1.12.2"
 
 "@parcel/css@^1.12.2":

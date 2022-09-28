@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>🧪 Noise Lab</title>
+        <title>Noise Lab</title>
         <meta charset="utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -11,6 +11,10 @@
         <script type="module" src="js/tooltips.js" defer></script>
         <link rel="stylesheet" href="./style.css" />
         <link href="./third_party/tabulator.min.css" rel="stylesheet" />
+        <link
+            rel="icon"
+            href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧪</text></svg>"
+        />
     </head>
     <body>
         <div id="menu">
@@ -50,7 +54,6 @@
                 <div class="launch-panel-content-wrapper">
                     <h2>Parameters</h2>
                     <div>
-                        <hr />
                         <h3>API parameters</h3>
                         <div>
                             <label for="contribution-budget"
@@ -74,7 +77,6 @@
                         </div>
                     </div>
                     <div>
-                        <hr />
                         <h3>Your Attribution Reporting strategy</h3>
                         <div>
                             <label for="batching-frequency"
@@ -114,7 +116,6 @@
                         </div>
                     </div>
                     <div>
-                        <hr />
                         <h3>Your conversion data</h3>
                         <div>
                             <label for="daily"
@@ -131,7 +132,6 @@
                         </div>
                     </div>
                     <div>
-                        <hr />
                         <h3>Data you want to track</h3>
                         <div>
                             <label for="metrics"
@@ -173,7 +173,6 @@
                 <div class="launch-panel-content-wrapper">
                     <h2>Parameters</h2>
                     <div>
-                        <hr />
                         <h3>API Parameters</h3>
                         <div>
                             <label for="contribution-budget"
@@ -196,7 +195,6 @@
                             <div class="input-hint">Min: 0, Max: 64</div>
                         </div>
                     </div>
-                    <hr />
                     <div>
                         <h3>Your Attribution Reporting strategy</h3>
                         <label for="frequency">Batching frequency:</label>
@@ -235,7 +233,6 @@
                         </select>
                         <div class="help" id="help-scaling"></div>
                     </div>
-                    <hr />
                     <div id="metrics-params">
                         <h3>Measurement goals</h3>
                         <details open>
@@ -259,9 +256,6 @@
                             </div>
                         </details>
                     </div>
-
-                    <hr />
-
                     <div id="dimensions">
                         <h3>Dimensions to track</h3>
                         <details open>
@@ -286,9 +280,7 @@
                         <br />
                     </div>
                     <br />
-
                     <div id="granular" hidden>
-                        <hr />
                         <h2>Key structures</h2>
 
                         <label
@@ -310,7 +302,9 @@
                     </div>
                 </div>
                 <div class="buttons-wrapper-launch-panel">
-                    <button onclick="triggerSimulation()">▶️ SIMULATE</button>
+                    <button onclick="simulateAndDisplayResultsAdvancedMode()">
+                        ▶️ SIMULATE
+                    </button>
                     <button
                         class="secondary destructive"
                         onclick="clearAllAdvancedMode()"
@@ -325,9 +319,10 @@
             </main>
         </div>
         <div class="save-section">
-            Make sure to download a copy of your simulations before closing
-            Noise Lab (or switching between modes). Simulations are not saved in
-            your browser or persisted in any way.
+            Make sure to <strong>⬇️ Download</strong> your simulations.
+            Simulations are not saved in your browser or persisted in any way,
+            so they'll be deleted when you switch between modes or when you
+            close Noise Lab.
         </div>
     </body>
 </html>

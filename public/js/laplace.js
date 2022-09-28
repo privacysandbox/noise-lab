@@ -5,12 +5,12 @@ import {
     getDailyValue,
     getAllDimensionSizes,
     displayAdvancedReports,
-    getMetricsArray,
+    getMetricsArrayFromDom,
     createSimulationDiv,
-    getDimensionsArray,
-    isGranular,
+    getDimensionsArrayFromDom,
+    getIsGranularFromDom,
     getStrategiesKeyCombinations,
-    getAllDimensionNames,
+    getAllDimensionNamesFromDom,
     displayMetrics,
     displayDimensions,
     addMetric,
@@ -21,7 +21,7 @@ import {
     getIsUseScalingFromDom,
     getKeyCombinationString,
 } from './dom.js'
-
+import { generateSimulationId } from './utils.misc'
 import { CONTRIBUTION_BUDGET } from './consts.js'
 
 import {
@@ -33,12 +33,9 @@ import {
     generateAggregatedValue,
 } from './utils.noise.js'
 
-// global variables
-var simulationNo = 1
-
 // define default metrics
 const defaultMetrics = [
-    { id: 1, name: 'purchaseValue', maxValue: 1000 , minValue: 120 },
+    { id: 1, name: 'purchaseValue', maxValue: 1000, minValue: 120 },
     { id: 2, name: 'purchaseCount', maxValue: 1, minValue: 1 },
 ]
 
@@ -57,28 +54,40 @@ export function initializeDisplayAdvancedModeWithParams() {
     )
 }
 
-function simulatePerMetric(mainDiv, keyCombinations, metricsNo, metric) {
-    const scalingFactor = getIsUseScalingFromDom()
-        ? getScalingFactorForMetric(metric, metricsNo, CONTRIBUTION_BUDGET)
+function simulatePerMetric(
+    mainDiv,
+    keyCombinations,
+    metricsNo,
+    metric,
+    simulationId,
+    epsilon,
+    contributionBudget,
+    isUseScaling,
+    batchingFrequency,
+    dailyCount
+) {
+    const scalingFactor = isUseScaling
+        ? getScalingFactorForMetric(metric, metricsNo, contributionBudget)
         : 1
     const keyCombinationString = getKeyCombinationString(keyCombinations.names)
 
-    const max = calculateMaximumCount(
-        getFrequencyValue(),
-        getDailyValue(),
-        metric.maxValue
-    )
-
-    const min = metric.minValue * getFrequencyValue()
+    // const max = calculateMaximumCount(
+    //     batchingFrequency,
+    //     dailyCount,
+    //     metric.maxValue
+    // )
+    // const min = metric.minValue * batchingFrequency
     const report = []
     var averageNoisePercentage = 0
     for (let i = 0; i < keyCombinations.combinations.length; i++) {
-        const noise = getRandomLaplacianNoise(
-            CONTRIBUTION_BUDGET,
-            getEpsilonFromDom()
+        const noise = getRandomLaplacianNoise(contributionBudget, epsilon)
+        // const randCount = Math.floor(Math.random() * (max - min) + min)
+        const randCount = generateAggregatedValue(
+            metric,
+            i,
+            dailyCount,
+            batchingFrequency
         )
-        //const randCount = Math.floor(Math.random() * (max - min) + min)
-        const randCount = generateAggregatedValue(metric, i, getDailyValue(), getFrequencyValue())
         const noisePercentage = calculateNoisePercentage(
             noise,
             randCount * scalingFactor + noise
@@ -87,9 +96,9 @@ function simulatePerMetric(mainDiv, keyCombinations, metricsNo, metric) {
 
         report.push({
             key: keyCombinations.combinations[i],
-            aggregatedValue: randCount,
-            scaledAggregatedValue: randCount * scalingFactor,
-            noisedScaledAggregatedValue: randCount * scalingFactor + noise,
+            summaryValue: randCount,
+            scaledSummaryValue: randCount * scalingFactor,
+            noisyScaledSummaryValue: randCount * scalingFactor + noise,
             noise: noise,
             noisePercentage: noisePercentage,
         })
@@ -108,7 +117,23 @@ function simulatePerMetric(mainDiv, keyCombinations, metricsNo, metric) {
         simulationReport,
         metric.name,
         scalingFactor,
-        keyCombinationString
+        keyCombinationString,
+        simulationId
+    )
+}
+
+export function simulateAndDisplayResultsAdvancedMode() {
+    triggerSimulation(
+        getMetricsArrayFromDom(),
+        getDimensionsArrayFromDom(),
+        getAllDimensionNamesFromDom(),
+        getAllDimensionSizes(),
+        getEpsilonFromDom(),
+        CONTRIBUTION_BUDGET,
+        getIsUseScalingFromDom(),
+        getIsGranularFromDom(),
+        getFrequencyValue(),
+        getDailyValue()
     )
 }
 
@@ -119,20 +144,30 @@ export function resetMetrics() {
 export function resetDimensions() {
     displayDimensions(defaultDimensions)
 }
+
 // generate dataset
-export function triggerSimulation() {
+export function triggerSimulation(
+    metrics,
+    dimensions,
+    dimensionNames,
+    dimensionSizes,
+    epsilon,
+    contributionBudget,
+    isUseScaling,
+    isGranular,
+    batchingFrequency,
+    dailyConversionCount
+) {
+    console.log(batchingFrequency)
     // declare array containing possible combinations for keys
     var r = []
     var keyCombList = []
 
-    var metrics = getMetricsArray()
-    var dimensions = getDimensionsArray()
-
     // logic for generating one dataset with all keys - string parameter 'all' is used
-    if (isGranular()) {
-        var keyComb = generateKeyCombinationArray(getAllDimensionSizes())
+    if (isGranular) {
+        var keyComb = generateKeyCombinationArray(dimensionSizes)
         keyCombList.push({
-            names: getAllDimensionNames(),
+            names: dimensionNames,
             combinations: keyComb,
         })
     } else {
@@ -148,7 +183,18 @@ export function triggerSimulation() {
         }
     }
 
-    var simulationDiv = createSimulationDiv(simulationNo, metrics, dimensions)
+    const simulationId = generateSimulationId()
+
+    var simulationDiv = createSimulationDiv(simulationId, {
+        metrics,
+        dimensions,
+        epsilon,
+        contributionBudget,
+        isUseScaling,
+        isGranular,
+        batchingFrequency,
+        dailyConversionCount,
+    })
 
     metrics.forEach((element) => {
         for (let i = 0; i < keyCombList.length; i++) {
@@ -156,12 +202,16 @@ export function triggerSimulation() {
                 simulationDiv,
                 keyCombList[i],
                 metrics.length,
-                element
+                element,
+                simulationId,
+                epsilon,
+                contributionBudget,
+                isUseScaling,
+                batchingFrequency,
+                dailyConversionCount
             )
         }
     })
-
-    simulationNo += 1
 }
 
 function clearAllAdvancedMode() {
@@ -170,6 +220,9 @@ function clearAllAdvancedMode() {
 }
 
 window.triggerSimulation = triggerSimulation
+window.simulateAndDisplayResultsAdvancedMode =
+    simulateAndDisplayResultsAdvancedMode
+
 window.clearDataDisplay = clearDataDisplay
 window.addMetric = addMetric
 window.removeMetric = removeMetric

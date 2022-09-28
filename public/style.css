@@ -1,11 +1,12 @@
 body {
     font-family: sans-serif;
-    font-size: 0.9rem;
+    font-size: 14px;
     padding: 0;
     margin: 0;
     height: 100vh;
     width: 100vw;
     overflow: hidden;
+    --blue-light: #cbd2ff;
     --primary: #001bc0;
     --primary-transparent: #001ac016;
     --link: #001bc0;
@@ -13,13 +14,14 @@ body {
     --text-inverted: #ffffffd8;
     --grey: #b9b9b9;
     --x-light-grey: #e8e8e8;
+    --border-color: #00000075;
     --orange: #ff6600;
     --red: red;
     --label-width: 10.2rem;
     --label-padding-right: 0.5rem;
     --font-size-s: 0.8rem;
-    --save-section-height: 3.2vh;
-    --header-height: 10vh;
+    --save-section-height: 1.8rem;
+    --header-height: 4rem;
     --main-height: calc(
         100vh - var(--header-height) - var(--save-section-height)
     );
@@ -41,11 +43,22 @@ h3 {
     font-size: var(--font-size-s);
     letter-spacing: 0.8px;
     text-transform: uppercase;
-    margin: 0.8rem 0 1.6rem 0;
+    margin: 2.2rem 0 1.3rem 0;
+    border-top: solid 1px var(--border-color);
+    padding-top: 0.6rem;
 }
 
 h4 {
-    margin: 0.2rem 0;
+    margin: 1rem 0;
+    font-size: 0.87rem;
+    padding: 0.2rem 0.4rem;
+    display: inline-block;
+    background: var(--blue-light);
+}
+
+h5 {
+    margin: 0.8rem 0 0.4rem 1rem;
+    font-size: 0.84rem;
 }
 
 a {
@@ -54,10 +67,24 @@ a {
 
 /* MENU/NAVIGATION */
 
+.tabulator-row .tabulator-cell,
+.tabulator-col-title {
+    overflow-x: scroll !important;
+}
+
+.tabulator
+    .tabulator-header
+    .tabulator-col
+    .tabulator-col-content
+    .tabulator-col-title {
+    white-space: normal !important;
+}
+
 .save-section {
-    color: #2b210db3;
+    animation: blink 2s 1 ease-out;
+    color: #201b11f1;
     z-index: 10000;
-    background-color: #ffda73;
+    background-color: #ffeeaf;
     box-sizing: border-box;
     padding: 0.2rem;
     display: block;
@@ -66,6 +93,18 @@ a {
     height: var(--save-section-height);
     border-top: 1px solid;
     font-size: var(--font-size-s);
+}
+
+@keyframes blink {
+    0% {
+        background-color: #ffeaaf;
+    }
+    10% {
+        background-color: #ff7300;
+    }
+    100% {
+        background-color: #ffeaaf;
+    }
 }
 
 #menu {
@@ -117,7 +156,7 @@ main {
 }
 
 .launch-panel {
-    background: #cbd2ff;
+    background: var(--blue-light);
     z-index: 100;
     border-bottom: solid 1px;
     width: 25rem !important;
@@ -135,10 +174,6 @@ main {
 }
 
 /* LAYOUT: DATA */
-
-.simulation-wrapper-simple-mode-output {
-    width: 80%;
-}
 
 #all-simulations-wrapper-simple-mode,
 #all-simulations-wrapper-advanced-mode {
@@ -159,6 +194,8 @@ main {
 .average-noise {
     color: var(--orange);
     font-weight: bold;
+    margin-left: 1rem;
+    font-family: monospace;
 }
 
 .simulation-id {
@@ -266,7 +303,7 @@ select {
     margin: 0.2rem 0;
     padding: 0.3rem;
     cursor: pointer;
-    border: solid 1.5px grey;
+    border: solid 1.5px var(--grey);
     border-radius: 4px;
     outline: none;
     transition: background-color 0.2s ease-out, border-color 0.2s ease-out;

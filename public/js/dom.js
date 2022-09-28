@@ -1,4 +1,5 @@
 import { TabulatorFull } from 'tabulator-tables'
+import { generateCsvFileName, generateSimulationTitle } from './utils.misc'
 
 export function displayContributionBudget(budget) {
     document.getElementById('contribution-budget').innerText = budget
@@ -45,11 +46,15 @@ export function getEpsilonFromDom() {
 export function displayTabularData(parentDomEl, tabularData) {
     // Create a wrapper div that will contain the table
     const inputTableId = `data-table-${Date.now()}`
-    const div = document.createElement('div')
-    div.setAttribute('id', inputTableId)
-    parentDomEl.appendChild(div)
-    console.log(tabularData)
-    new TabulatorFull(`#${inputTableId}`, {
+    const tableEl = document.createElement('div')
+    tableEl.setAttribute('id', inputTableId)
+    parentDomEl.appendChild(tableEl)
+    return new TabulatorFull(`#${inputTableId}`, {
+        columnDefaults: {
+            headerSort: false,
+            formatter: 'html',
+        },
+        selectable: false,
         data: tabularData,
         // Create columns from data field names
         autoColumns: true,
@@ -98,87 +103,173 @@ export function initializeDisplaySimpleMode(
     displayTabularData(document.getElementById('dimensions-table'), dimensions)
 }
 
-export function displayInputParametersSimpleMode(parentDomEl, inputParameters) {
-    // inputParameters = { dailyConversionCount, dimensions, epsilon, metrics, keyStrategy }
+export function displayInputParameters(
+    parentDomEl,
+    inputParameters,
+    simulationId
+) {
+    const parametersTitleDiv = document.createElement('h3')
+    parametersTitleDiv.innerText = 'Parameters (input)'
+    parentDomEl.appendChild(parametersTitleDiv)
 
-    const { dailyConversionCount, dimensions, epsilon, metrics, keyStrategy } =
-        inputParameters
+    const tableId = `data-table-${Date.now()}`
 
-    const dailyDiv = document.createElement('div')
-    dailyDiv.innerText = `Daily conversion count: ${dailyConversionCount}`
-    parentDomEl.appendChild(dailyDiv)
+    const testDiv = document.createElement('div')
+    testDiv.setAttribute('id', tableId)
+    parentDomEl.appendChild(testDiv)
 
-    const epsilonDiv = document.createElement('div')
-    epsilonDiv.innerText = `Epsilon: ${epsilon}`
-    parentDomEl.appendChild(epsilonDiv)
+    const {
+        dailyConversionCount,
+        dimensions,
+        epsilon,
+        metrics,
+        keyStrategy,
+        batchingFrequency,
+        isUseScaling,
+    } = inputParameters
 
-    const metricsDiv = document.createElement('div')
-    metricsDiv.innerText = `${metrics.length} metric(s): ${metrics.map(
-        (m) => m.name
-    )}`
-    parentDomEl.appendChild(metricsDiv)
+    const metricsDisplay = document.createElement('div')
+    metricsDisplay.innerText = metrics
+        .map((m) =>
+            Object.entries(m)
+                .map(([k, v]) => `${k}: ${v}`)
+                .join(' \n ')
+        )
+        .join('\n⏤⏤⏤\n ')
 
-    const keyStrategyDiv = document.createElement('div')
-    keyStrategyDiv.innerText = `Key Strategy: ${keyStrategy}`
-    parentDomEl.appendChild(keyStrategyDiv)
+    const dimensionsDisplay = document.createElement('div')
+    dimensionsDisplay.innerText = dimensions
+        .map((m) =>
+            Object.entries(m)
+                .map(([k, v]) => `${k}: ${v}`)
+                .join(' \n ')
+        )
+        .join('\n⏤⏤⏤\n ')
 
-    const dimensionsTitleDiv = document.createElement('div')
-    dimensionsTitleDiv.innerText = `Dimensions:` + JSON.stringify(dimensions)
-    parentDomEl.appendChild(dimensionsTitleDiv)
-    displayTabularData(dimensionsTitleDiv, dimensions)
+    // TODO move this out
+    const batchingFrequenciesMap = {
+        [1 / 24]: 'hourly',
+        1: 'daily',
+        7: 'weekly',
+        30: 'monthly',
+    }
+
+    // TODO move this out
+    const scalingMap = {
+        true: 'Yes',
+        false: 'No',
+    }
+
+    const table = displayTabularData(document.getElementById(tableId), [
+        {
+            Parameter: 'Epsilon',
+            'Value (raw)': epsilon,
+            'Value (formatted)': epsilon,
+        },
+        {
+            Parameter: 'Key Strategy',
+            'Value (raw)': keyStrategy,
+            'Value (formatted)': keyStrategy,
+        },
+        {
+            Parameter: 'Average daily attributable conversion count',
+            'Value (raw)': dailyConversionCount,
+            'Value (formatted)': dailyConversionCount,
+        },
+        {
+            Parameter: 'Dimensions',
+            'Value (raw)': JSON.stringify(dimensions),
+            'Value (formatted)': dimensionsDisplay,
+        },
+        {
+            Parameter: 'Metrics',
+            'Value (raw)': JSON.stringify(metrics),
+            'Value (formatted)': metricsDisplay,
+        },
+        {
+            Parameter: 'Batching frequency',
+            'Value (raw)': batchingFrequency,
+            'Value (formatted)': batchingFrequenciesMap[batchingFrequency],
+        },
+        {
+            Parameter: 'Scaling',
+            'Value (raw)': isUseScaling,
+            'Value (formatted)': scalingMap[isUseScaling],
+        },
+    ])
+
+    // Create download button
+    const downloadButton = document.createElement('button')
+    downloadButton.innerHTML = '⬇️ Download'
+    downloadButton.setAttribute('class', 'download')
+    parentDomEl.appendChild(downloadButton)
+
+    // Create eventListener for download of csv file
+    downloadButton.addEventListener('click', function () {
+        table.download('csv', generateCsvFileName(simulationId, 'params'))
+    })
 }
 
 export function displaySimulationResults(simulation) {
     const allSimulationsWrapper = document.getElementById(
         'all-simulations-wrapper-simple-mode'
     )
-    const { title, inputParameters, reports } = simulation
+    const { title, inputParameters, reports, simulationId } = simulation
 
     // Prepare wrapper div that will contain the simulation
-
     const simulationWrapperDiv = document.createElement('div')
-    simulationWrapperDiv.setAttribute('id', `simulation-wrapper-${Date.now()}`)
+    simulationWrapperDiv.setAttribute(
+        'id',
+        `simulation-wrapper-${simulationId}`
+    )
     simulationWrapperDiv.setAttribute('class', 'simulation-wrapper-simple-mode')
     allSimulationsWrapper.appendChild(simulationWrapperDiv)
-
-    const extraWrapperDiv = document.createElement('div')
     const simulationInputWrapperDiv = document.createElement('div')
-    simulationInputWrapperDiv.setAttribute(
-        'class',
-        'simulation-wrapper-simple-mode-input'
-    )
     const simulationOutputWrapperDiv = document.createElement('div')
-    simulationOutputWrapperDiv.setAttribute(
-        'class',
-        'simulation-wrapper-simple-mode-output'
-    )
 
     // Display simulation main info in the simulation wrapper div
     const simulationTitleDiv = document.createElement('h2')
     simulationTitleDiv.innerText = title
     simulationWrapperDiv.appendChild(simulationTitleDiv)
 
+    const simulationIdDiv = document.createElement('div')
+    simulationIdDiv.setAttribute('class', 'simulation-id')
+    simulationIdDiv.innerText = `Unique ID: ${simulationId}`
+    simulationWrapperDiv.appendChild(simulationIdDiv)
+
+    simulationWrapperDiv.appendChild(simulationInputWrapperDiv)
+    simulationWrapperDiv.appendChild(simulationOutputWrapperDiv)
+
     // Display input parameters in the input simulation wrapper div
-    const parametersTitleDiv = document.createElement('h3')
-    parametersTitleDiv.innerText = 'Parameters (input)'
-    simulationInputWrapperDiv.appendChild(parametersTitleDiv)
-    displayInputParametersSimpleMode(simulationInputWrapperDiv, inputParameters)
+    displayInputParameters(
+        simulationInputWrapperDiv,
+        inputParameters,
+        simulationId
+    )
 
     // Display reports in the output simulation wrapper div
     const reportsTitleDiv = document.createElement('h3')
     reportsTitleDiv.innerText = 'Summary reports (output)'
     simulationOutputWrapperDiv.appendChild(reportsTitleDiv)
 
-    extraWrapperDiv.appendChild(simulationInputWrapperDiv)
-    extraWrapperDiv.appendChild(simulationOutputWrapperDiv)
-    simulationWrapperDiv.appendChild(extraWrapperDiv)
-
     reports.forEach((report) => {
-        displayReport(simulationOutputWrapperDiv, report)
+        displayReport(simulationOutputWrapperDiv, report, simulationId)
     })
 }
 
-function displayReport(parentDomEl, report) {
+function displayNoiseAverage(parentDomEl, averageNoisePercentage) {
+    // Display average noise
+    const labelEl = document.createElement('h5')
+    const valueEl = document.createElement('div')
+    labelEl.innerText = '➡ Average noise ratio (%): '
+    valueEl.innerText = averageNoisePercentage
+    // Set a class to display noise in color
+    valueEl.setAttribute('class', 'average-noise')
+    parentDomEl.appendChild(labelEl)
+    parentDomEl.appendChild(valueEl)
+}
+
+function displayReport(parentDomEl, report, simulationId) {
     const { averageNoisePercentage, data, title } = report
 
     // Display report table title
@@ -186,30 +277,51 @@ function displayReport(parentDomEl, report) {
     titleDiv.innerText = title
     parentDomEl.appendChild(titleDiv)
 
+    // const metricTag = document.createElement('h4')
+    // metricTag.innerHTML = 'Measurement goal: ' + metricName
+    // allSimulationsWrapper.appendChild(metricTag)
+
+    // const dimensionsTag = document.createElement('h4')
+    // dimensionsTag.innerHTML = 'Dimensions: ' + keyCombinationString
+    // allSimulationsWrapper.appendChild(dimensionsTag)
+
+    // const scalingFactorTag = document.createElement('h4')
+    // scalingFactorTag.innerHTML = 'Scaling Factor: ' + scalingFactor
+    // allSimulationsWrapper.appendChild(scalingFactorTag)
+
+    // Display average noise
+    displayNoiseAverage(parentDomEl, averageNoisePercentage)
+
+    // TODO NoiseRatio vs NoisePercentage
+    const tableTitle = document.createElement('h5')
+    tableTitle.innerText = '➡ Detail of the data: '
+    parentDomEl.appendChild(tableTitle)
+
     // Display table containing report data
     const tableId = `output-data-table-${Date.now()}`
     const div = document.createElement('div')
     div.setAttribute('id', tableId)
     parentDomEl.appendChild(div)
-    new TabulatorFull(`#${tableId}`, {
+    const table = new TabulatorFull(`#${tableId}`, {
         data,
         // Create columns from data field names
         autoColumns: true,
         layout: 'fitColumns',
     })
 
-    // Display average noise
-    const avgNoiseTitleSpan = document.createElement('span')
-    const avgNoiseSpan = document.createElement('span')
-    avgNoiseTitleSpan.innerText = '→ Average noise ratio (%): '
-    avgNoiseSpan.innerText = averageNoisePercentage
-    // Set a class to display noise in color
-    avgNoiseSpan.setAttribute('class', 'average-noise')
-    parentDomEl.appendChild(avgNoiseTitleSpan)
-    parentDomEl.appendChild(avgNoiseSpan)
-    // Layout hack TODO fix
-    parentDomEl.appendChild(document.createElement('br'))
-    parentDomEl.appendChild(document.createElement('br'))
+    // Create download button
+    const downloadButton = document.createElement('button')
+    downloadButton.innerHTML = '⬇️ Download'
+    downloadButton.setAttribute('id', 'download-csv' + tableId)
+    downloadButton.setAttribute('class', 'download')
+    parentDomEl.appendChild(downloadButton)
+
+    // Create eventListener for download of csv file
+    document
+        .getElementById('download-csv' + tableId)
+        .addEventListener('click', function () {
+            table.download('csv', generateCsvFileName(simulationId, title))
+        })
 }
 
 // !!!!!!!!!!
@@ -274,7 +386,7 @@ export function getAllDimensionSizes() {
     return dimensions
 }
 
-export function getAllDimensionNames() {
+export function getAllDimensionNamesFromDom() {
     var keyNo = document.getElementById('dimensions-number').value
 
     var ids = []
@@ -289,11 +401,14 @@ export function displayAdvancedReports(
     simulation,
     metricName,
     scalingFactor,
-    keyCombinationString
+    keyCombinationString,
+    simulationId
 ) {
     const allSimulationsWrapper = mainDiv
 
     const { data, averageNoisePercentage } = simulation
+    // TODO make simulationID part of the sim object
+    // const { data, averageNoisePercentage, simulationId } = simulation
 
     // Prepare wrapper div that will contain the simulation
     const simulationWrapperDiv = document.createElement('div')
@@ -304,13 +419,19 @@ export function displayAdvancedReports(
     metricTag.innerHTML = 'Measurement goal: ' + metricName
     allSimulationsWrapper.appendChild(metricTag)
 
-    const dimensionsTag = document.createElement('h4')
+    const dimensionsTag = document.createElement('div')
     dimensionsTag.innerHTML = 'Dimensions: ' + keyCombinationString
     allSimulationsWrapper.appendChild(dimensionsTag)
 
-    const scalingFactorTag = document.createElement('h4')
+    const scalingFactorTag = document.createElement('div')
     scalingFactorTag.innerHTML = 'Scaling Factor: ' + scalingFactor
     allSimulationsWrapper.appendChild(scalingFactorTag)
+
+    displayNoiseAverage(allSimulationsWrapper, averageNoisePercentage)
+
+    const tableTitle = document.createElement('h5')
+    tableTitle.innerText = '➡ Detail of the data: '
+    allSimulationsWrapper.appendChild(tableTitle)
 
     // Add current report in the simulation wrapper div
     const tableId = `output-data-table-${Date.now()}`
@@ -324,81 +445,28 @@ export function displayAdvancedReports(
         layout: 'fitColumns',
     })
 
-    const avgNoiseTitleSpan = document.createElement('span')
-    const avgNoiseSpan = document.createElement('span')
-    avgNoiseTitleSpan.innerText = '→ Average noise ratio (%): '
-    avgNoiseSpan.innerText = averageNoisePercentage
-
-    avgNoiseSpan.setAttribute('class', 'average-noise')
-    simulationWrapperDiv.appendChild(avgNoiseTitleSpan)
-    simulationWrapperDiv.appendChild(avgNoiseSpan)
-
     simulationWrapperDiv.appendChild(document.createElement('br'))
 
     // Create download button
     const downloadButton = document.createElement('button')
     downloadButton.innerHTML = '⬇️ Download'
-    downloadButton.setAttribute('id', 'download-csv' + tableId)
+    downloadButton.setAttribute('class', 'download')
     simulationWrapperDiv.appendChild(downloadButton)
 
     //Create eventListener for download of csv file
-    document
-        .getElementById('download-csv' + tableId)
-        .addEventListener('click', function () {
-            table.download('csv', 'data-' + tableId + '.csv')
-        })
+    downloadButton.addEventListener('click', function () {
+        table.download('csv', generateCsvFileName(simulationId, metricName))
+    })
 
-    // Layout hack TODO fix
     allSimulationsWrapper.appendChild(simulationWrapperDiv)
-    allSimulationsWrapper.appendChild(document.createElement('br'))
-    allSimulationsWrapper.appendChild(document.createElement('br'))
 }
-
-// export function displayTabularDataEditable(tabularData) {
-//     // Create a wrapper div that will contain the table
-//     const parentDomEl = document.getElementById('metrics-div')
-//     const inputTableId = `metrics-table`
-//     const div = document.createElement('div')
-//     div.setAttribute('id', inputTableId)
-//     parentDomEl.appendChild(div)
-//     var table = new Tabulator(`#${inputTableId}`, {
-//         data: tabularData,
-//         // Create columns from data field names
-//         autoColumns: true,
-//         layout: 'fitData',
-//         autoColumnsDefinitions: function (definitions) {
-//             //definitions - array of column definition objects
-
-//             definitions.forEach((column) => {
-//                 column.editor = 'input' // add input editor to every column
-//             })
-
-//             return definitions
-//         },
-//     })
-
-//     const addButton = document.createElement('button')
-//     addButton.setAttribute('id', 'add-row')
-//     addButton.innerHTML = 'Add Row'
-//     parentDomEl.appendChild(addButton)
-
-//     const delButton = document.createElement('button')
-//     delButton.setAttribute('id', 'del-row')
-//     delButton.innerHTML = 'Delete Last Row'
-//     parentDomEl.appendChild(delButton)
-
-//     //Add row on "Add Row" button click
-//     document.getElementById('add-row').addEventListener('click', function () {
-//         table.addRow({})
-//     })
-// }
 
 export function resetDimensionsDiv() {
     const dimensionsConfigDiv = document.getElementById('dimensions-div')
     dimensionsConfigDiv.innerHTML = ''
 }
 
-export function getMetricsArray() {
+export function getMetricsArrayFromDom() {
     var len = document.getElementById('metrics-number').value
     var metrics = []
     for (let i = 1; i <= len; i++) {
@@ -413,57 +481,37 @@ export function getMetricsArray() {
     return metrics
 }
 
-export function createSimulationDiv(simulationNo, metrics, dimensions) {
+export function createSimulationDiv(simulationId, inputParameters) {
     var allSimulationsWrapper = document.getElementById(
         'all-simulations-wrapper-advanced-mode'
     )
 
     var simulationDiv = document.createElement('div')
-    simulationDiv.setAttribute('id', 'simulation-div' + simulationNo)
+    simulationDiv.setAttribute('id', 'simulation-div' + simulationId)
     simulationDiv.setAttribute('class', 'simulation-wrapper-advanced-mode')
 
     // Display simulation main info in the simulation wrapper div
-    const simulationDateTime = new Date(Date.now())
     const simulationTitleDiv = document.createElement('h2')
-    simulationTitleDiv.innerText = 'Simulation ' + simulationDateTime
+    simulationTitleDiv.innerText = generateSimulationTitle(new Date(Date.now()))
     simulationDiv.appendChild(simulationTitleDiv)
 
+    const simulationIdDiv = document.createElement('div')
+    simulationIdDiv.setAttribute('class', 'simulation-id')
+    simulationIdDiv.innerText = `Unique ID: ${simulationId}`
+    simulationDiv.appendChild(simulationIdDiv)
+
+    allSimulationsWrapper.appendChild(simulationDiv)
+
     // Display simulation parameters:
-    const simulationParams = document.createElement('div')
-    simulationParams.setAttribute('id', 'simulation-params-div' + simulationNo)
+    displayInputParameters(simulationDiv, inputParameters, simulationId)
 
-    const dailyDiv = document.createElement('div')
-    var dailyCount = document.getElementById('')
-    dailyDiv.innerText =
-        `Daily conversion count: ` + getElementValueById('daily')
-    simulationDiv.appendChild(dailyDiv)
-
-    const epsilonDiv = document.createElement('div')
-    epsilonDiv.innerText = `Epsilon: ` + getEpsilonFromDom()
-
-    simulationDiv.appendChild(epsilonDiv)
-
-    const metricsDiv = document.createElement('div')
-    metricsDiv.innerText = `${metrics.length} metric(s): ${metrics.map(
-        (m) => m.name
-    )}`
-    simulationDiv.appendChild(metricsDiv)
-
-    const keyStrategyDiv = document.createElement('div')
-    keyStrategyDiv.innerText =
-        `Key Strategy: ` + getElementValueById('granularity')
-    simulationDiv.appendChild(keyStrategyDiv)
-
-    const dimensionsTitleDiv = document.createElement('div')
-    dimensionsTitleDiv.innerText = `Dimensions:` + JSON.stringify(dimensions)
-    simulationDiv.appendChild(dimensionsTitleDiv)
+    // TODO BUG BATCHING FREQUENCY NOT DISPLAYED -> Should be done later as part of the field unification (populate options dynamically etc)
+    // TODO TWEAK isGranular VS keyStrategy
 
     // Start reports section in div
     const reportsTitleDiv = document.createElement('h3')
-    reportsTitleDiv.innerText = 'Output summary reports'
+    reportsTitleDiv.innerText = 'Summary reports (output)'
     simulationDiv.appendChild(reportsTitleDiv)
-
-    allSimulationsWrapper.appendChild(simulationDiv)
     return simulationDiv
 }
 
@@ -525,7 +573,7 @@ export function createCustomMetricsInputs() {
     }
 }
 
-export function getDimensionsArray() {
+export function getDimensionsArrayFromDom() {
     var len = document.getElementById('dimensions-number').value
     var dimensions = []
     for (let i = 1; i <= len; i++) {
@@ -573,7 +621,7 @@ function addCheckboxStrategy(id, parentDomEl) {
     strategyDiv.setAttribute('id', 'strategy' + id)
     parentDomEl.appendChild(strategyDiv)
 
-    var dimensions = getDimensionsArray()
+    var dimensions = getDimensionsArrayFromDom()
 
     dimensions.forEach((element) => {
         const checkBox = document.createElement('input')
@@ -590,7 +638,7 @@ function addCheckboxStrategy(id, parentDomEl) {
     })
 }
 
-export function isGranular() {
+export function getIsGranularFromDom() {
     return document.getElementById('granularity').value == 'A' ? true : false
 }
 

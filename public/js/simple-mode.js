@@ -13,6 +13,8 @@ import {
     calculateNoisePercentage,
     calculateAverageNoisePercentage,
 } from './utils.noise'
+import { generateSimulationId, generateSimulationTitle } from './utils.misc'
+
 import { CONTRIBUTION_BUDGET } from './consts.js'
 
 const keyStrategies = {
@@ -89,9 +91,9 @@ function simulate(
     budget,
     isUseScaling
 ) {
-    const simulationDateTime = new Date(Date.now())
     const simulation = {
-        title: `Simulation ${simulationDateTime.toLocaleTimeString()} ${simulationDateTime.toLocaleDateString()}`,
+        title: generateSimulationTitle(new Date(Date.now())),
+        simulationId: generateSimulationId(),
         inputParameters: {
             // Used later for display
             dailyConversionCount,
@@ -100,6 +102,7 @@ function simulate(
             keyStrategy,
             metrics,
             batchingFrequency,
+            isUseScaling,
         },
         reports: [],
     }
@@ -171,8 +174,8 @@ function generateNoisyReportFromUnnoisyKeyValuePairsReport(
         const aggregatedValuePostNoise = entry.aggregatedValue + noise
         return {
             key,
-            aggregatedValuePreNoise: aggregatedValue,
-            aggregatedValuePostNoise,
+            summaryValuePreNoise: aggregatedValue,
+            summaryValuePostNoise: aggregatedValuePostNoise,
             noise,
             noisePercentage: calculateNoisePercentage(
                 noise,
@@ -188,6 +191,7 @@ function clearAllSimpleMode() {
 }
 
 window.simulateAndDisplayResultsSimpleMode = simulateAndDisplayResultsSimpleMode
+
 window.clearAllSimpleMode = clearAllSimpleMode
 window.initializeDisplaySimpleModeWithParams =
     initializeDisplaySimpleModeWithParams

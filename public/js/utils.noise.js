@@ -23,7 +23,9 @@ export function getRandomLaplacianNoise(budget, epsilon) {
 }
 
 export function calculateNoisePercentage(noise, noisyAggregatedValue) {
-    return Math.abs(noise / noisyAggregatedValue) * 100
+    return Number.parseFloat(
+        (Math.abs(noise / noisyAggregatedValue) * 100).toFixed(3)
+    )
 }
 
 export function calculateAverageNoisePercentage(report) {
@@ -53,7 +55,7 @@ export function generateKeyCombinationArray(params) {
         keysArray.push(arr)
     }
 
-    var keysComb = cartesian(...keysArray);
+    var keysComb = cartesian(...keysArray)
 
     keysComb.forEach((element) => (element = element.join('')))
 

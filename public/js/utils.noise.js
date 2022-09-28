@@ -1,3 +1,17 @@
+/* Copyright 2022 Google LLC
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License. */
+
 import laplace from '@stdlib/random-base-laplace'
 
 export function getScalingFactorForMetric(
@@ -79,14 +93,18 @@ function cartesian(...args) {
     return r
 }
 
-
-export function generateAggregatedValue(metric, deterministicValue, dailyConversionCount, batchingFrequency) {
-
-    var calculationValue = ((metric.maxValue == metric.minValue) || 
-        (metric.maxValue > (metric.minValue * 1 + deterministicValue * 1)) ?
-            (metric.minValue * 1 + deterministicValue * 1) : metric.maxValue)
-    return Math.floor(calculationValue *
-        dailyConversionCount *
-        batchingFrequency)
-
+export function generateAggregatedValue(
+    metric,
+    deterministicValue,
+    dailyConversionCount,
+    batchingFrequency
+) {
+    var calculationValue =
+        metric.maxValue == metric.minValue ||
+        metric.maxValue > metric.minValue * 1 + deterministicValue * 1
+            ? metric.minValue * 1 + deterministicValue * 1
+            : metric.maxValue
+    return Math.floor(
+        calculationValue * dailyConversionCount * batchingFrequency
+    )
 }

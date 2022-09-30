@@ -312,10 +312,11 @@ function displayReport(parentDomEl, report, simulationId) {
     parentDomEl.appendChild(tableTitle)
 
     // Display table containing report data
-    const tableId = `output-data-table-${Date.now()}`
+    const tableId = `output-data-table-${simulationId}-${title}`
     const div = document.createElement('div')
     div.setAttribute('id', tableId)
     parentDomEl.appendChild(div)
+
     const table = new TabulatorFull(`#${tableId}`, {
         data,
         // Create columns from data field names
@@ -448,7 +449,7 @@ export function displayAdvancedReports(
     allSimulationsWrapper.appendChild(tableTitle)
 
     // Add current report in the simulation wrapper div
-    const tableId = `output-data-table-${Date.now()}`
+    const tableId = `output-data-table-${simulationId}-${metricName}`
     const div = document.createElement('div')
     div.setAttribute('id', tableId)
     simulationWrapperDiv.appendChild(div)

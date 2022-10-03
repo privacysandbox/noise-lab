@@ -79,3 +79,17 @@ tippy('#help-key-strategy', {
     </ul>`,
     ...options,
 })
+
+tippy('#help-key-strategy-number', {
+    content: `The number of coarse key structures that you want to use. Each includes a subset of your dimensions. \n
+    For example: 
+    <ul>
+    <li>
+    Key structure I: <em>Measurement goal type</em> x <em>Geo ID</em> x <em>Product category</em>.
+    </li>
+    <li>
+    Key structure II: <em>Measurement goal type</em> x <em>Campaign ID</em> x <em>Geo ID</em>.
+    </li>
+    </ul>`,
+    ...options,
+})

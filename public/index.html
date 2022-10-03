@@ -208,44 +208,7 @@ limitations under the License. -->
                             <div class="input-hint">Min: 0, Max: 64</div>
                         </div>
                     </div>
-                    <div>
-                        <h3>Your Attribution Reporting strategy</h3>
-                        <label for="frequency">Batching frequency:</label>
-                        <select name="frequency" id="frequency">
-                            <option value="0.04167">Hourly</option>
-                            <option value="1">Daily</option>
-                            <option value="7">Weekly</option>
-                            <option value="30">Monthly</option>
-                        </select>
-                        <div class="help" id="help-batching-frequency"></div>
-                        <br />
-                        <label for="daily"
-                            >Average daily attributable conversion count:</label
-                        >
-                        <select name="daily" id="daily">
-                            <option value="10">10</option>
-                            <option value="100" selected>100</option>
-                            <option value="1000">1000</option>
-                            <option value="10000">10000</option>
-                        </select>
-
-                        <div class="help" id="help-daily"></div>
-                        <br />
-                        <label for="granularity">Key strategy:</label>
-                        <select name="granularity" id="granularity">
-                            <option value="A">A</option>
-                            <option value="B">B</option>
-                        </select>
-                        <div class="help" id="help-key-strategy"></div>
-                        <br />
-
-                        <label for="scaling">Scaling:</label>
-                        <select name="scaling" id="scaling">
-                            <option value="1">Yes</option>
-                            <option value="0">No</option>
-                        </select>
-                        <div class="help" id="help-scaling"></div>
-                    </div>
+                    
                     <div id="metrics-params">
                         <h3>Measurement goals</h3>
                         <details open>
@@ -293,8 +256,46 @@ limitations under the License. -->
                         <br />
                     </div>
                     <br />
+                    <div>
+                        <h3>Your Attribution Reporting strategy</h3>
+                        <label for="frequency">Batching frequency:</label>
+                        <select name="frequency" id="frequency">
+                            <option value="0.041666666666666664">hourly</option>
+                            <option value="1" selected>daily</option>
+                            <option value="7">weekly</option>
+                            <option value="30">monthly</option>
+                        </select>
+                        <div class="help" id="help-batching-frequency"></div>
+                        <br />
+                        <label for="daily"
+                            >Average daily attributable conversion count:</label
+                        >
+                        <select name="daily" id="daily">
+                            <option value="10">10</option>
+                            <option value="100" selected>100</option>
+                            <option value="1000">1000</option>
+                            <option value="10000">10000</option>
+                        </select>
+
+                        <div class="help" id="help-daily"></div>
+                        <br />
+                        <label for="granularity">Key strategy:</label>
+                        <select name="granularity" id="granularity">
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                        </select>
+                        <div class="help" id="help-key-strategy"></div>
+                        <br />
+
+                        <label for="scaling">Scaling:</label>
+                        <select name="scaling" id="scaling">
+                            <option value="1">Yes</option>
+                            <option value="0">No</option>
+                        </select>
+                        <div class="help" id="help-scaling"></div>
+                    </div>
                     <div id="granular" hidden>
-                        <h2>Key structures</h2>
+                        <h4>Key structures</h4>
 
                         <label
                             >Enter number of key structures you want to
@@ -308,6 +309,7 @@ limitations under the License. -->
                             min="0"
                             value="1"
                         />
+                        <div class="help" id="help-key-strategy-number"></div>
                         <button onclick="generateKeyStrategies()">
                             Submit
                         </button>

@@ -20,6 +20,7 @@ import {
     removeDimension,
     getIsUseScalingFromDom,
     getKeyCombinationString,
+    validateInputsBeforeSimulation,
 } from './dom.js'
 import { generateSimulationId } from './utils.misc'
 import { CONTRIBUTION_BUDGET } from './consts.js'
@@ -78,24 +79,19 @@ function simulatePerMetric(
     contributionBudget,
     isUseScaling,
     batchingFrequency,
-    dailyCount
+    dailyCount,
+    simulationNo
 ) {
     const scalingFactor = isUseScaling
         ? getScalingFactorForMetric(metric, metricsNo, contributionBudget)
         : 1
     const keyCombinationString = getKeyCombinationString(keyCombinations.names)
 
-    // const max = calculateMaximumCount(
-    //     batchingFrequency,
-    //     dailyCount,
-    //     metric.maxValue
-    // )
-    // const min = metric.minValue * batchingFrequency
     const report = []
     var averageNoisePercentage = 0
     for (let i = 0; i < keyCombinations.combinations.length; i++) {
         const noise = getRandomLaplacianNoise(contributionBudget, epsilon)
-        // const randCount = Math.floor(Math.random() * (max - min) + min)
+
         const randCount = generateAggregatedValue(
             metric,
             i,
@@ -132,7 +128,8 @@ function simulatePerMetric(
         metric.name,
         scalingFactor,
         keyCombinationString,
-        simulationId
+        simulationId,
+        simulationNo
     )
 }
 
@@ -172,6 +169,9 @@ export function triggerSimulation(
     batchingFrequency,
     dailyConversionCount
 ) {
+    // Validate inputs are correct
+    if (!validateInputsBeforeSimulation(metrics, dimensions, isGranular)) return
+
     console.log(batchingFrequency)
     // declare array containing possible combinations for keys
     var r = []
@@ -222,7 +222,8 @@ export function triggerSimulation(
                 contributionBudget,
                 isUseScaling,
                 batchingFrequency,
-                dailyConversionCount
+                dailyConversionCount,
+                i
             )
         }
     })

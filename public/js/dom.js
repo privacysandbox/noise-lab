@@ -291,17 +291,6 @@ function displayReport(parentDomEl, report, simulationId) {
     titleDiv.innerText = title
     parentDomEl.appendChild(titleDiv)
 
-    // const metricTag = document.createElement('h4')
-    // metricTag.innerHTML = 'Measurement goal: ' + metricName
-    // allSimulationsWrapper.appendChild(metricTag)
-
-    // const dimensionsTag = document.createElement('h4')
-    // dimensionsTag.innerHTML = 'Dimensions: ' + keyCombinationString
-    // allSimulationsWrapper.appendChild(dimensionsTag)
-
-    // const scalingFactorTag = document.createElement('h4')
-    // scalingFactorTag.innerHTML = 'Scaling Factor: ' + scalingFactor
-    // allSimulationsWrapper.appendChild(scalingFactorTag)
 
     // Display average noise
     displayNoiseAverage(parentDomEl, averageNoisePercentage)
@@ -417,7 +406,8 @@ export function displayAdvancedReports(
     metricName,
     scalingFactor,
     keyCombinationString,
-    simulationId
+    simulationId,
+    simulationNo
 ) {
     const allSimulationsWrapper = mainDiv
 
@@ -449,7 +439,7 @@ export function displayAdvancedReports(
     allSimulationsWrapper.appendChild(tableTitle)
 
     // Add current report in the simulation wrapper div
-    const tableId = `output-data-table-${simulationId}-${metricName}`
+    const tableId = `output-data-table-${simulationId}-${metricName}-${simulationNo}`
     const div = document.createElement('div')
     div.setAttribute('id', tableId)
     simulationWrapperDiv.appendChild(div)
@@ -944,6 +934,52 @@ export function capEpsilon(event, inputEl) {
     }
     if (currentValue > 64) {
         inputEl.value = 64
+    }
+}
+
+
+// Validate the inputs are correct
+export function validateInputsBeforeSimulation(metrics, dimensions, isGranular, keyCombinationNumber){
+    var errors = []
+    validateMetrics(metrics,errors)
+    validateDimensions(dimensions,errors)
+    if(!isGranular) validateKeyStrategy(errors)
+
+    if(errors.length > 0) {
+        window.alert(errors.map(element => '* '+element+";").join("\n"))
+        return false
+    }
+    else return true
+
+}
+
+function validateMetrics(metrics, errors){
+    metrics.forEach(element => {
+        if(element.maxValue*1 <1 || element.maxValue == undefined) errors.push(element.name+" - maximum value must be >= 1")
+        if(element.minValue*1 <1 || element.minValue == undefined) errors.push(element.name+" - minimum value must be >= 1")
+        if(element.minValue*1 > element.maxValue*1 ) errors.push(element.name+" - maximum value cannot be smaller than minimum value")
+    })
+}
+
+function validateDimensions(dimensions, errors){
+    dimensions.forEach(element => {
+        if(element.size*1 < 1 || element.size == undefined) errors.push(element.name+ " - dimension size must be >=1 ")
+    })
+}
+
+function validateKeyStrategy(errors){
+    var keyStructNumber = getKeyStrategiesNumberFromDom()
+    if(keyStructNumber<=1) {
+        errors.push("When using key Strategy B (less granular) number of key structures must be >1 ")
+        return
+    }
+    for(var i = 1; i<= keyStructNumber ; i++ )
+    {
+        var checkboxes = document.getElementsByName('strategy' + i)
+        checkboxes = Array.prototype.slice.call(checkboxes, 0)
+        var noChecked = checkboxes.filter(element => element.checked).length
+        if(noChecked < 2) errors.push("Key Strategy "+i+": at least 2 dimensions should be checked for each key strategy")
+
     }
 }
 

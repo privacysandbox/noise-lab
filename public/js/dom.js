@@ -252,7 +252,7 @@ export function displaySimulationResults(simulation) {
 
     const simulationIdDiv = document.createElement('div')
     simulationIdDiv.setAttribute('class', 'simulation-id')
-    simulationIdDiv.innerText = `Unique ID: ${simulationId}`
+    simulationIdDiv.innerText = `Unique simulation ID: ${simulationId}`
     simulationWrapperDiv.appendChild(simulationIdDiv)
 
     simulationWrapperDiv.appendChild(simulationInputWrapperDiv)
@@ -291,9 +291,14 @@ function displayReport(parentDomEl, report, simulationId) {
     const { averageNoisePercentage, data, title } = report
 
     // Display report table title
-    const titleDiv = document.createElement('div')
-    titleDiv.innerText = title
+
+    const titleDiv = document.createElement('h4')
+    titleDiv.innerText = 'Measurement goal: ' + title
     parentDomEl.appendChild(titleDiv)
+
+    // const titleDiv = document.createElement('div')
+    // titleDiv.innerText = title + 'YO'
+    // parentDomEl.appendChild(titleDiv)
 
     // Display average noise
     displayNoiseAverage(parentDomEl, averageNoisePercentage)
@@ -424,15 +429,15 @@ export function displayAdvancedReports(
     allSimulationsWrapper.appendChild(simulationWrapperDiv)
 
     const metricTag = document.createElement('h4')
-    metricTag.innerHTML = 'Measurement goal: ' + metricName
+    metricTag.innerText = 'Measurement goal: ' + metricName
     allSimulationsWrapper.appendChild(metricTag)
 
     const dimensionsTag = document.createElement('div')
-    dimensionsTag.innerHTML = 'Dimensions: ' + keyCombinationString
+    dimensionsTag.innerText = 'Dimensions: ' + keyCombinationString
     allSimulationsWrapper.appendChild(dimensionsTag)
 
     const scalingFactorTag = document.createElement('div')
-    scalingFactorTag.innerHTML = 'Scaling Factor: ' + scalingFactor
+    scalingFactorTag.innerText = 'Scaling Factor: ' + scalingFactor
     allSimulationsWrapper.appendChild(scalingFactorTag)
 
     displayNoiseAverage(allSimulationsWrapper, averageNoisePercentage)
@@ -505,7 +510,7 @@ export function createSimulationDiv(simulationId, inputParameters) {
 
     const simulationIdDiv = document.createElement('div')
     simulationIdDiv.setAttribute('class', 'simulation-id')
-    simulationIdDiv.innerText = `Unique ID: ${simulationId}`
+    simulationIdDiv.innerText = `Unique simulation ID: ${simulationId}`
     simulationDiv.appendChild(simulationIdDiv)
 
     allSimulationsWrapper.appendChild(simulationDiv)

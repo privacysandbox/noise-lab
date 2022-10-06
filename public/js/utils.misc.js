@@ -23,3 +23,11 @@ export function generateSimulationTitle(dateTime) {
 export function generateCsvFileName(simulationId, tableName) {
     return `${simulationId}-${tableName}-noiseLab.csv`
 }
+
+export function generateRandomTableId() {
+    return `data-table-${crypto.randomUUID().substring(0, 5)}`
+}
+
+export function generateSimulationWrapperElId(simulationId) {
+    return `simulation-wrapper-${simulationId}`
+}

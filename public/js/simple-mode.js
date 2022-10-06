@@ -18,7 +18,7 @@ import {
     getDailyConversionCountFromDom,
     getEpsilonFromDom,
     getKeyStrategyFromDom,
-    displaySimulationResults,
+    displaySimulationResults_simpleMode,
     getIsUseScalingFromDom,
 } from './dom'
 import {
@@ -85,7 +85,7 @@ export function simulateAndDisplayResultsSimpleMode() {
         CONTRIBUTION_BUDGET,
         getIsUseScalingFromDom()
     )
-    displaySimulationResults(simulation)
+    displaySimulationResults_simpleMode(simulation)
     console.table(simulation.reports)
 }
 

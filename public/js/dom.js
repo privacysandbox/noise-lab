@@ -13,7 +13,12 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import { TabulatorFull } from 'tabulator-tables'
-import { generateCsvFileName, generateSimulationTitle } from './utils.misc'
+import {
+    generateCsvFileName,
+    generateSimulationTitle,
+    generateRandomTableId,
+    generateSimulationWrapperElId,
+} from './utils.misc'
 
 export function displayContributionBudget(budget) {
     document.getElementById('contribution-budget').innerText = budget
@@ -63,7 +68,7 @@ function getFormValidationElFromDom() {
 
 export function displayTabularData(parentDomEl, tabularData) {
     // Create a wrapper div that will contain the table
-    const inputTableId = `data-table-${Date.now()}`
+    const inputTableId = generateRandomTableId()
     const tableEl = document.createElement('div')
     tableEl.setAttribute('id', inputTableId)
     parentDomEl.appendChild(tableEl)
@@ -129,9 +134,7 @@ export function displayInputParameters(
     const parametersTitleDiv = document.createElement('h3')
     parametersTitleDiv.innerText = 'Parameters (input)'
     parentDomEl.appendChild(parametersTitleDiv)
-
-    const tableId = `data-table-${Date.now()}`
-
+    const tableId = generateRandomTableId()
     const testDiv = document.createElement('div')
     testDiv.setAttribute('id', tableId)
     parentDomEl.appendChild(testDiv)
@@ -228,7 +231,7 @@ export function displayInputParameters(
     })
 }
 
-export function displaySimulationResults(simulation) {
+export function displaySimulationResults_simpleMode(simulation) {
     const allSimulationsWrapper = document.getElementById(
         'all-simulations-wrapper-simple-mode'
     )
@@ -238,7 +241,7 @@ export function displaySimulationResults(simulation) {
     const simulationWrapperDiv = document.createElement('div')
     simulationWrapperDiv.setAttribute(
         'id',
-        `simulation-wrapper-${simulationId}`
+        generateSimulationWrapperElId(simulationId)
     )
     simulationWrapperDiv.setAttribute('class', 'simulation-wrapper-simple-mode')
     allSimulationsWrapper.appendChild(simulationWrapperDiv)
@@ -273,6 +276,11 @@ export function displaySimulationResults(simulation) {
     reports.forEach((report) => {
         displayReport(simulationOutputWrapperDiv, report, simulationId)
     })
+
+    const simulationWrapper = document.getElementById(
+        generateSimulationWrapperElId(simulationId)
+    )
+    simulationWrapper.scrollIntoView({ block: 'end' })
 }
 
 function displayNoiseAverage(parentDomEl, averageNoisePercentage) {
@@ -408,7 +416,7 @@ export function getAllDimensionNamesFromDom() {
     return ids
 }
 
-export function displayAdvancedReports(
+export function displaySimulationResults_advancedMode(
     mainDiv,
     simulation,
     metricName,
@@ -425,7 +433,10 @@ export function displayAdvancedReports(
 
     // Prepare wrapper div that will contain the simulation
     const simulationWrapperDiv = document.createElement('div')
-    simulationWrapperDiv.setAttribute('id', `simulation-wrapper-${Date.now()}`)
+    simulationWrapperDiv.setAttribute(
+        'id',
+        generateSimulationWrapperElId(simulationId)
+    )
     allSimulationsWrapper.appendChild(simulationWrapperDiv)
 
     const metricTag = document.createElement('h4')
@@ -472,6 +483,11 @@ export function displayAdvancedReports(
     })
 
     allSimulationsWrapper.appendChild(simulationWrapperDiv)
+
+    const simulationWrapper = document.getElementById(
+        generateSimulationWrapperElId(simulationId)
+    )
+    simulationWrapper.scrollIntoView({ block: 'end' })
 }
 
 export function resetDimensionsDiv() {

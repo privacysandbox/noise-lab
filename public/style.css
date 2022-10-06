@@ -58,15 +58,15 @@ h3 {
     font-size: var(--font-size-s);
     letter-spacing: 0.8px;
     text-transform: uppercase;
-    margin: 2.2rem 0 1.3rem 0;
+    margin: 1.5rem 0 1.3rem 0;
     border-top: solid 1px var(--border-color);
-    padding-top: 0.6rem;
+    padding-top: 0.8rem;
 }
 
 h4 {
     margin: 1rem 0;
     font-size: 0.87rem;
-    padding: 0.2rem 0.4rem;
+    padding: 0.2rem 0rem;
     background: var(--blue-light);
 }
 
@@ -382,10 +382,10 @@ select:focus {
 /* DETAILS */
 
 .details-wrapper {
-    padding: 1rem 0;
+    padding: 0.8rem 0;
 }
 
-/* LAYOUT HELPERS */
+/* LAYOUT/DISPLAY HELPERS */
 
 .flex {
     display: flex;
@@ -401,16 +401,6 @@ hr {
 .hidden {
     display: none;
 }
-
-/* @keyframes disappear {
-    0% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 0;
-        display: hidden;
-    }
-} */
 
 @keyframes appear {
     0% {
@@ -430,7 +420,7 @@ hr {
     color: var(--red);
     background: var(--red-light);
     height: 10ch;
-    padding: 2ch;
+    padding: 1.2ch;
     position: absolute;
     bottom: calc(var(--save-section-height) + 1ch);
     z-index: 1000000000;

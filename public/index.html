@@ -89,6 +89,35 @@ limitations under the License. -->
                             <div class="input-hint">Min: 0, Max: 64</div>
                         </div>
                     </div>
+
+                    <div>
+                        <h3>Your conversion data</h3>
+                        <div>
+                            <label for="daily"
+                                >Average daily attributable conversion
+                                count:</label
+                            >
+                            <select name="daily" id="daily">
+                                <option value="10">10</option>
+                                <option value="100" selected>100</option>
+                                <option value="1000">1000</option>
+                                <option value="10000">10000</option>
+                            </select>
+                            <div class="help" id="help-daily"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>Data you want to track: Measurement goals</h3>
+                        <div>
+                            <div id="metrics"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>Data you want to track: Dimensions</h3>
+                        <div>
+                            <div id="dimensions-table"></div>
+                        </div>
+                    </div>
                     <div>
                         <h3>Your Attribution Reporting strategy</h3>
                         <div>
@@ -126,35 +155,6 @@ limitations under the License. -->
                                 <option value="0">No</option>
                             </select>
                             <div class="help" id="help-scaling"></div>
-                        </div>
-                    </div>
-                    <div>
-                        <h3>Your conversion data</h3>
-                        <div>
-                            <label for="daily"
-                                >Average daily attributable conversion
-                                count:</label
-                            >
-                            <select name="daily" id="daily">
-                                <option value="10">10</option>
-                                <option value="100" selected>100</option>
-                                <option value="1000">1000</option>
-                                <option value="10000">10000</option>
-                            </select>
-                            <div class="help" id="help-daily"></div>
-                        </div>
-                    </div>
-                    <div>
-                        <h3>Data you want to track</h3>
-                        <div>
-                            <label for="metrics"
-                                >Measurement goals to track:</label
-                            >
-                            <div id="metrics"></div>
-                        </div>
-                        <div>
-                            <label for="dimensions">Dimensions to track:</label>
-                            <div id="dimensions-table"></div>
                         </div>
                     </div>
                 </div>
@@ -209,7 +209,7 @@ limitations under the License. -->
                         </div>
                     </div>
                     <div id="metrics-params">
-                        <h3>Measurement goals</h3>
+                        <h3>Data you want to track: Measurement goals</h3>
                         <details open>
                             <summary>
                                 <div class="ternary-xs">
@@ -232,7 +232,7 @@ limitations under the License. -->
                         </details>
                     </div>
                     <div id="dimensions">
-                        <h3>Dimensions to track</h3>
+                        <h3>Data you want to track: Dimensions</h3>
                         <details open>
                             <summary>
                                 <div class="ternary-xs">
@@ -252,9 +252,7 @@ limitations under the License. -->
                                 <div id="dimensions-buttons-div"></div>
                             </div>
                         </details>
-                        <br />
                     </div>
-                    <br />
                     <div>
                         <h3>Your Attribution Reporting strategy</h3>
                         <label for="frequency">Batching frequency:</label>

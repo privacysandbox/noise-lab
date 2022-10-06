@@ -57,6 +57,10 @@ export function getEpsilonFromDom() {
     return document.getElementById('eps').value
 }
 
+function getFormValidationElFromDom() {
+    return document.getElementById('form-validation-wrapper')
+}
+
 export function displayTabularData(parentDomEl, tabularData) {
     // Create a wrapper div that will contain the table
     const inputTableId = `data-table-${Date.now()}`
@@ -290,7 +294,6 @@ function displayReport(parentDomEl, report, simulationId) {
     const titleDiv = document.createElement('div')
     titleDiv.innerText = title
     parentDomEl.appendChild(titleDiv)
-
 
     // Display average noise
     displayNoiseAverage(parentDomEl, averageNoisePercentage)
@@ -605,7 +608,7 @@ export function addKeyStrategyListener() {
     })
 }
 
-export function generateKeyStrategies() {
+export function generateKeyStructures() {
     const strategiesDiv = document.getElementById('strategies')
     strategiesDiv.innerHTML = ''
     const keyStrayegies = document.getElementById('structures-number').value
@@ -617,7 +620,7 @@ export function generateKeyStrategies() {
 
 function addCheckboxStrategy(id, parentDomEl) {
     const strategyTitle = document.createElement('h4')
-    strategyTitle.innerHTML = 'Key Strategy ' + id
+    strategyTitle.innerHTML = 'Key structure ' + id
 
     parentDomEl.appendChild(strategyTitle)
 
@@ -937,53 +940,82 @@ export function capEpsilon(event, inputEl) {
     }
 }
 
+export function resetFormValidation() {
+    const formValidationWrapperEl = getFormValidationElFromDom()
+    formValidationWrapperEl.innerText = ''
+    formValidationWrapperEl.className = 'hidden'
+}
 
 // Validate the inputs are correct
-export function validateInputsBeforeSimulation(metrics, dimensions, isGranular, keyCombinationNumber){
+export function validateInputsBeforeSimulation(
+    metrics,
+    dimensions,
+    isGranular,
+    keyCombinationNumber
+) {
     var errors = []
-    validateMetrics(metrics,errors)
-    validateDimensions(dimensions,errors)
-    if(!isGranular) validateKeyStrategy(errors)
+    validateMetrics(metrics, errors)
+    validateDimensions(dimensions, errors)
+    if (!isGranular) validateKeyStrategy(errors)
 
-    if(errors.length > 0) {
-        window.alert(errors.map(element => '* '+element+";").join("\n"))
-        return false
+    const formValidationWrapperEl = getFormValidationElFromDom()
+
+    if (errors.length <= 0) {
+        resetFormValidation()
+        return true
     }
-    else return true
 
+    formValidationWrapperEl.className = ''
+    const suffix = errors.length > 1 ? 's' : ''
+    const title = `❌ Could not simulate. ${errors.length} error${suffix}: \n`
+    const errorListAsString = errors.map((e) => `• ${e}.`).join('\n')
+    formValidationWrapperEl.innerText = `${title} \n ${errorListAsString}`
+    return false
 }
 
-function validateMetrics(metrics, errors){
-    metrics.forEach(element => {
-        if(element.maxValue*1 <1 || element.maxValue == undefined) errors.push(element.name+" - maximum value must be >= 1")
-        if(element.minValue*1 <1 || element.minValue == undefined) errors.push(element.name+" - minimum value must be >= 1")
-        if(element.minValue*1 > element.maxValue*1 ) errors.push(element.name+" - maximum value cannot be smaller than minimum value")
+function validateMetrics(metrics, errors) {
+    metrics.forEach((element) => {
+        if (element.maxValue * 1 < 1 || element.maxValue == undefined)
+            errors.push(element.name + ' - maximum value must be >= 1')
+        if (element.minValue * 1 < 1 || element.minValue == undefined)
+            errors.push(element.name + ' - minimum value must be >= 1')
+        if (element.minValue * 1 > element.maxValue * 1)
+            errors.push(
+                element.name +
+                    ' - maximum value cannot be smaller than minimum value'
+            )
     })
 }
 
-function validateDimensions(dimensions, errors){
-    dimensions.forEach(element => {
-        if(element.size*1 < 1 || element.size == undefined) errors.push(element.name+ " - dimension size must be >=1 ")
+function validateDimensions(dimensions, errors) {
+    dimensions.forEach((element) => {
+        if (element.size * 1 < 1 || element.size == undefined)
+            errors.push(element.name + ' - dimension size must be >=1 ')
     })
 }
 
-function validateKeyStrategy(errors){
+function validateKeyStrategy(errors) {
     var keyStructNumber = getKeyStrategiesNumberFromDom()
-    if(keyStructNumber<=1) {
-        errors.push("When using key Strategy B (less granular) number of key structures must be >1 ")
+    if (keyStructNumber <= 1) {
+        errors.push(
+            'When using Key Strategy B (less granular), the number of key structures must be >1 '
+        )
         return
     }
-    for(var i = 1; i<= keyStructNumber ; i++ )
-    {
+    for (var i = 1; i <= keyStructNumber; i++) {
         var checkboxes = document.getElementsByName('strategy' + i)
         checkboxes = Array.prototype.slice.call(checkboxes, 0)
-        var noChecked = checkboxes.filter(element => element.checked).length
-        if(noChecked < 2) errors.push("Key Strategy "+i+": at least 2 dimensions should be checked for each key strategy")
-
+        var noChecked = checkboxes.filter((element) => element.checked).length
+        if (noChecked < 2)
+            errors.push(
+                'Key structure ' +
+                    i +
+                    ': at least 2 dimensions should be checked for each key structure'
+            )
     }
 }
 
 window.createCustomMetricsInputs = createCustomMetricsInputs
 window.generateCustomMetrics = generateCustomMetrics
-window.generateKeyStrategies = generateKeyStrategies
+window.generateKeyStructures = generateKeyStructures
 window.capEpsilon = capEpsilon

@@ -21,6 +21,7 @@ import {
     getIsUseScalingFromDom,
     getKeyCombinationString,
     validateInputsBeforeSimulation,
+    resetFormValidation
 } from './dom.js'
 import { generateSimulationId } from './utils.misc'
 import { CONTRIBUTION_BUDGET } from './consts.js'
@@ -230,6 +231,7 @@ export function triggerSimulation(
 }
 
 function clearAllAdvancedMode() {
+    resetFormValidation()
     document.getElementById('all-simulations-wrapper-advanced-mode').innerHTML =
         ''
 }

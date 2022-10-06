@@ -34,7 +34,7 @@ limitations under the License. -->
             <nav id="nav">
                 <div>
                     🧪 Noise Lab
-                    <div class="version">v1.0.3</div>
+                    <div class="version">v1.0.4</div>
                 </div>
 
                 <!-- Populated automatically, see main.js -->
@@ -208,7 +208,6 @@ limitations under the License. -->
                             <div class="input-hint">Min: 0, Max: 64</div>
                         </div>
                     </div>
-                    
                     <div id="metrics-params">
                         <h3>Measurement goals</h3>
                         <details open>
@@ -305,13 +304,12 @@ limitations under the License. -->
                             type="number"
                             id="structures-number"
                             name="structures-number"
-                            max="64"
-                            min="0"
-                            value="1"
+                            min="2"
+                            value="2"
                         />
                         <div class="help" id="help-key-strategy-number"></div>
-                        <button onclick="generateKeyStrategies()">
-                            Submit
+                        <button onclick="generateKeyStructures()">
+                            Generate key structures
                         </button>
                         <div id="strategies"></div>
                     </div>
@@ -329,6 +327,7 @@ limitations under the License. -->
                 </div>
             </div>
             <main>
+                <div id="form-validation-wrapper" class="hidden"></div>
                 <h2>Simulations</h2>
                 <div id="all-simulations-wrapper-advanced-mode"></div>
             </main>

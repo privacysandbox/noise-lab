@@ -30,7 +30,8 @@ body {
     --x-light-grey: #e8e8e8;
     --border-color: #00000075;
     --orange: #ff6600;
-    --red: red;
+    --red: rgb(222, 0, 0);
+    --red-light: #ffecef;
     --label-width: 10.2rem;
     --label-padding-right: 0.5rem;
     --font-size-s: 0.8rem;
@@ -395,4 +396,44 @@ hr {
     outline: none;
     border: solid 0.2px #00000054;
     margin: 1.4rem 0 0.6rem 0;
+}
+
+.hidden {
+    display: none;
+}
+
+/* @keyframes disappear {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        display: hidden;
+    }
+} */
+
+@keyframes appear {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+        display: block;
+    }
+}
+
+/* FORM VALIDATION */
+
+#form-validation-wrapper {
+    animation: appear 0.5s forwards;
+    box-shadow: rgba(75, 75, 85, 0.446) 0px 7px 29px 0px;
+    color: var(--red);
+    background: var(--red-light);
+    height: 10ch;
+    padding: 2ch;
+    position: absolute;
+    bottom: calc(var(--save-section-height) + 1ch);
+    z-index: 1000000000;
+    overflow-y: scroll;
+    right: 1rem;
 }

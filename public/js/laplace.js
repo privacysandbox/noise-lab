@@ -4,7 +4,7 @@ import {
     getFrequencyValue,
     getDailyValue,
     getAllDimensionSizes,
-    displayAdvancedReports,
+    displaySimulationResults_advancedMode,
     getMetricsArrayFromDom,
     createSimulationDiv,
     getDimensionsArrayFromDom,
@@ -21,7 +21,7 @@ import {
     getIsUseScalingFromDom,
     getKeyCombinationString,
     validateInputsBeforeSimulation,
-    resetFormValidation
+    resetFormValidation,
 } from './dom.js'
 import { generateSimulationId } from './utils.misc'
 import { CONTRIBUTION_BUDGET } from './consts.js'
@@ -123,7 +123,7 @@ function simulatePerMetric(
         averageNoisePercentage: averageNoisePercentage,
     }
 
-    displayAdvancedReports(
+    displaySimulationResults_advancedMode(
         mainDiv,
         simulationReport,
         metric.name,

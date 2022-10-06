@@ -17,7 +17,7 @@ export function generateSimulationId() {
 }
 
 export function generateSimulationTitle(dateTime) {
-    return `Simulation ${dateTime} ${dateTime.toLocaleDateString()}`
+    return `Simulation ${dateTime.toLocaleTimeString()} ${dateTime.toLocaleDateString()}`
 }
 
 export function generateCsvFileName(simulationId, tableName) {

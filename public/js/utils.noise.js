@@ -99,10 +99,13 @@ export function generateAggregatedValue(
     dailyConversionCount,
     batchingFrequency
 ) {
+    // Calculate deterministic Number
+    var deterministicNumber = metric.avgValue * 1 + deterministicValue * 1 * (deterministicValue % 2 == 0 ? 1 : -1)
+
     var calculationValue =
-        metric.maxValue == metric.minValue ||
-        metric.maxValue > metric.minValue * 1 + deterministicValue * 1
-            ? metric.minValue * 1 + deterministicValue * 1
+        deterministicNumber > 0 && 
+        (metric.maxValue == metric.avgValue || metric.maxValue > deterministicNumber)
+            ? deterministicNumber
             : metric.maxValue
     return Math.floor(
         calculationValue * dailyConversionCount * batchingFrequency

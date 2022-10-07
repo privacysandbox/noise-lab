@@ -502,7 +502,7 @@ export function getMetricsArrayFromDom() {
         metrics.push({
             id: i,
             maxValue: document.getElementById('metric' + i + '-max').value,
-            minValue: document.getElementById('metric' + i + '-def').value,
+            avgValue: document.getElementById('metric' + i + '-def').value,
             name: document.getElementById('metric' + i + '-name').value,
         })
     }
@@ -584,10 +584,10 @@ export function createCustomMetricsInputs() {
         var maxInputLabel = document.createElement('div')
         maxInputLabel.innerText = 'Maximum value'
 
-        var minInput = document.createElement('input')
-        minInput.setAttribute('id', 'metric' + i + '-def')
-        minInput.setAttribute('type', 'number')
-        minInput.setAttribute(
+        var avgInput = document.createElement('input')
+        avgInput.setAttribute('id', 'metric' + i + '-def')
+        avgInput.setAttribute('type', 'number')
+        avgInput.setAttribute(
             'placeholder',
             'Minimum/default value for the metric'
         )
@@ -598,7 +598,7 @@ export function createCustomMetricsInputs() {
         metricsDiv.appendChild(maxInput)
         metricsDiv.appendChild(maxInputLabel)
         metricsDiv.appendChild(document.createElement('br'))
-        metricsDiv.appendChild(minInput)
+        metricsDiv.appendChild(avgInput)
     }
 }
 
@@ -741,15 +741,15 @@ export function displayMetrics(metrics) {
         metricDiv.appendChild(metricMax)
         metricDiv.appendChild(document.createElement('br'))
 
-        var metricMin = document.createElement('input')
-        metricMin.setAttribute('id', 'metric' + element.id + '-def')
-        metricMin.setAttribute('type', 'number')
-        metricMin.setAttribute('placeholder', 'Minimum value')
-        metricMin.value = element.minValue
-        const metricMinLabel = document.createElement('label')
-        metricMinLabel.innerText = 'Min value:'
-        metricDiv.appendChild(metricMinLabel)
-        metricDiv.appendChild(metricMin)
+        var metricAvg = document.createElement('input')
+        metricAvg.setAttribute('id', 'metric' + element.id + '-def')
+        metricAvg.setAttribute('type', 'number')
+        metricAvg.setAttribute('placeholder', 'Average value')
+        metricAvg.value = element.avgValue
+        const metricAvgLabel = document.createElement('label')
+        metricAvgLabel.innerText = 'Average value:'
+        metricDiv.appendChild(metricAvgLabel)
+        metricDiv.appendChild(metricAvg)
         metricDiv.appendChild(document.createElement('br'))
         metricDiv.appendChild(document.createElement('br'))
     })
@@ -810,11 +810,11 @@ export function addMetric() {
     metricDiv.appendChild(metricMax)
     metricDiv.appendChild(document.createElement('br'))
 
-    var metricMin = document.createElement('input')
-    metricMin.setAttribute('id', 'metric' + metricsNo + '-def')
-    metricMin.setAttribute('type', 'number')
-    metricMin.setAttribute('placeholder', 'Minimum value')
-    metricDiv.appendChild(metricMin)
+    var metricAvg = document.createElement('input')
+    metricAvg.setAttribute('id', 'metric' + metricsNo + '-def')
+    metricAvg.setAttribute('type', 'number')
+    metricAvg.setAttribute('placeholder', 'Average value')
+    metricDiv.appendChild(metricAvg)
 
     metricsMainDiv.appendChild(metricDiv)
 }
@@ -998,12 +998,12 @@ function validateMetrics(metrics, errors) {
     metrics.forEach((element) => {
         if (element.maxValue * 1 < 1 || element.maxValue == undefined)
             errors.push(element.name + ' - maximum value must be >= 1')
-        if (element.minValue * 1 < 1 || element.minValue == undefined)
-            errors.push(element.name + ' - minimum value must be >= 1')
-        if (element.minValue * 1 > element.maxValue * 1)
+        if (element.avgValue * 1 < 1 || element.avgValue == undefined)
+            errors.push(element.name + ' - average value must be >= 1')
+        if (element.avgValue * 1 > element.maxValue * 1)
             errors.push(
                 element.name +
-                    ' - maximum value cannot be smaller than minimum value'
+                    ' - maximum value cannot be smaller than average value'
             )
     })
 }

@@ -37,8 +37,8 @@ import {
 
 // define default metrics
 const defaultMetrics = [
-    { id: 1, name: 'purchaseValue', maxValue: 1000, minValue: 120 },
-    { id: 2, name: 'purchaseCount', maxValue: 1, minValue: 1 },
+    { id: 1, name: 'purchaseValue', maxValue: 1000, avgValue: 120 },
+    { id: 2, name: 'purchaseCount', maxValue: 1, avgValue: 1 },
 ]
 
 // define default dimensions

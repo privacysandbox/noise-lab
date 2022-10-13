@@ -106,18 +106,28 @@ tippy('#help-key-strategy-number', {
 tippy('#feedback', {
     content: `
     <div class="feedback-links-wrapper">
+        To give public feedback on this tool (ask a question, report a bug, request a feature): 
         <a
             target="_blank"
             href="https://github.com/GoogleChromeLabs/privacy-sandbox-dev-support/issues"
         >
-            Give public feedback on this tool: Ask a question, report a bug, request a feature
+            Create a new issue here
         </a>
-        <a
+        <br/>
+        To give public feedback on utility/privacy of the API (epsilon) and your observations when simulating with this tool: <a
             target="_blank"
             href="https://github.com/WICG/attribution-reporting-api/issues/485"
         >
-            Give public feedback on utility/privacy of the API (epsilon)
+            Comment on this issue
         </a>
+        <br/>
+        To give public feedback on another aspect of the API (use cases...):
+        <a
+        target="_blank"
+        href="https://github.com/WICG/attribution-reporting-api/issues/"
+    >
+        Create a new issue here
+    </a>
     </div>`,
     ...bottomOptions,
 })

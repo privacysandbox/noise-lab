@@ -16,9 +16,12 @@ import { TabulatorFull } from 'tabulator-tables'
 import {
     generateCsvFileName,
     generateSimulationTitle,
-    generateRandomTableId,
     generateSimulationWrapperElId,
+    generateConfirmMessage,
 } from './utils.misc'
+import { MODES } from './config'
+import { tempSaveTable_simpleMode } from './simple-mode'
+import { tempSaveTable_advancedMode } from './laplace'
 
 export function displayContributionBudget(budget) {
     document.getElementById('contribution-budget').innerText = budget
@@ -26,11 +29,6 @@ export function displayContributionBudget(budget) {
 
 export function displayNoise(l) {
     document.getElementById('laplace').innerText += ' ' + l
-}
-
-export function clearDataDisplay() {
-    var tablesDiv = document.getElementById('tables')
-    tablesDiv.innerHTML = ''
 }
 
 export function displayEpsilon(epsilon) {
@@ -68,11 +66,9 @@ function getFormValidationElFromDom() {
 
 export function displayTabularData(parentDomEl, tabularData) {
     // Create a wrapper div that will contain the table
-    const inputTableId = generateRandomTableId()
     const tableEl = document.createElement('div')
-    tableEl.setAttribute('id', inputTableId)
     parentDomEl.appendChild(tableEl)
-    return new TabulatorFull(`#${inputTableId}`, {
+    return new TabulatorFull(tableEl, {
         columnDefaults: {
             headerSort: false,
             formatter: 'html',
@@ -95,6 +91,14 @@ export function populateSelectDomElement(selectDomElement, options) {
         }
         selectDomElement.appendChild(optEl)
     })
+}
+
+export function clearAll(mode) {
+    if (window.confirm(generateConfirmMessage())) {
+        document.getElementById(
+            `all-simulations-wrapper-${mode}-mode`
+        ).innerHTML = ''
+    }
 }
 
 export function initializeDisplayAdvancedMode(metrics, dimensions, budget) {
@@ -129,15 +133,14 @@ export function initializeDisplaySimpleMode(
 export function displayInputParameters(
     parentDomEl,
     inputParameters,
-    simulationId
+    simulationId,
+    mode
 ) {
     const parametersTitleDiv = document.createElement('h3')
     parametersTitleDiv.innerText = 'Parameters (input)'
     parentDomEl.appendChild(parametersTitleDiv)
-    const tableId = generateRandomTableId()
-    const testDiv = document.createElement('div')
-    testDiv.setAttribute('id', tableId)
-    parentDomEl.appendChild(testDiv)
+    const tableContainerEl = document.createElement('div')
+    parentDomEl.appendChild(tableContainerEl)
 
     const {
         dailyConversionCount,
@@ -181,7 +184,7 @@ export function displayInputParameters(
         false: 'No',
     }
 
-    const table = displayTabularData(document.getElementById(tableId), [
+    const table = displayTabularData(tableContainerEl, [
         {
             Parameter: 'Epsilon',
             'Value (raw)': epsilon,
@@ -218,11 +221,16 @@ export function displayInputParameters(
             'Value (formatted)': scalingMap[isUseScaling],
         },
     ])
+    if (mode === MODES.simple.name) {
+        tempSaveTable_simpleMode(table, `${simulationId}-params`)
+    } else if (mode === MODES.advanced.name) {
+        tempSaveTable_advancedMode(table, `${simulationId}-params`)
+    }
 
     // Create download button
     const downloadButton = document.createElement('button')
-    downloadButton.innerHTML = '⬇️ Download'
-    downloadButton.setAttribute('class', 'download')
+    downloadButton.innerHTML = '⬇️ Download table (CSV)'
+    downloadButton.setAttribute('class', 'ternary')
     parentDomEl.appendChild(downloadButton)
 
     // Create eventListener for download of csv file
@@ -265,7 +273,8 @@ export function displaySimulationResults_simpleMode(simulation) {
     displayInputParameters(
         simulationInputWrapperDiv,
         inputParameters,
-        simulationId
+        simulationId,
+        MODES.simple.name
     )
 
     // Display reports in the output simulation wrapper div
@@ -304,10 +313,6 @@ function displayReport(parentDomEl, report, simulationId) {
     titleDiv.innerText = 'Measurement goal: ' + title
     parentDomEl.appendChild(titleDiv)
 
-    // const titleDiv = document.createElement('div')
-    // titleDiv.innerText = title + 'YO'
-    // parentDomEl.appendChild(titleDiv)
-
     // Display average noise
     displayNoiseAverage(parentDomEl, averageNoisePercentage)
 
@@ -320,6 +325,8 @@ function displayReport(parentDomEl, report, simulationId) {
     const tableId = `output-data-table-${simulationId}-${title}`
     const div = document.createElement('div')
     div.setAttribute('id', tableId)
+    div.setAttribute('class', 'offset-left')
+
     parentDomEl.appendChild(div)
 
     const table = new TabulatorFull(`#${tableId}`, {
@@ -329,19 +336,20 @@ function displayReport(parentDomEl, report, simulationId) {
         layout: 'fitColumns',
     })
 
+    tempSaveTable_simpleMode(table, `${simulationId}-${title}`)
+
     // Create download button
     const downloadButton = document.createElement('button')
-    downloadButton.innerHTML = '⬇️ Download'
+    downloadButton.innerHTML = '⬇️ Download table (CSV)'
     downloadButton.setAttribute('id', 'download-csv' + tableId)
-    downloadButton.setAttribute('class', 'download')
+    downloadButton.setAttribute('class', 'ternary offset-left')
     parentDomEl.appendChild(downloadButton)
 
     // Create eventListener for download of csv file
-    document
-        .getElementById('download-csv' + tableId)
-        .addEventListener('click', function () {
-            table.download('csv', generateCsvFileName(simulationId, title))
-        })
+    downloadButton.addEventListener('click', function () {
+        console.log(table)
+        table.download('csv', generateCsvFileName(simulationId, title))
+    })
 }
 
 // !!!!!!!!!!
@@ -370,11 +378,9 @@ export function displayDimensionInputFields(id) {
     dimensionName.id = 'dimension' + id + '-name'
     dimensionName.setAttribute('placeholder', 'Dimension name')
 
-    // dimensionId.appendChild(document.createElement('br'))
     dimensionId.appendChild(dimensionSize)
     dimensionId.appendChild(document.createElement('br'))
     dimensionId.appendChild(dimensionName)
-    //dimensionId.appendChild(document.createElement('br'))
     dimensionsConfigDiv.appendChild(dimensionId)
 }
 
@@ -443,13 +449,21 @@ export function displaySimulationResults_advancedMode(
     metricTag.innerText = 'Measurement goal: ' + metricName
     allSimulationsWrapper.appendChild(metricTag)
 
-    const dimensionsTag = document.createElement('div')
-    dimensionsTag.innerText = 'Dimensions: ' + keyCombinationString
-    allSimulationsWrapper.appendChild(dimensionsTag)
+    const dimensionsTitle = document.createElement('h5')
+    dimensionsTitle.innerText = 'Dimensions:'
+    const dimensionsValue = document.createElement('div')
+    dimensionsValue.setAttribute('class', 'offset-left')
+    dimensionsValue.innerText = keyCombinationString
+    allSimulationsWrapper.appendChild(dimensionsTitle)
+    allSimulationsWrapper.appendChild(dimensionsValue)
 
-    const scalingFactorTag = document.createElement('div')
-    scalingFactorTag.innerText = 'Scaling Factor: ' + scalingFactor
-    allSimulationsWrapper.appendChild(scalingFactorTag)
+    const scalingFactorTitle = document.createElement('h5')
+    scalingFactorTitle.innerText = 'Scaling factor:'
+    const scalingFactorValue = document.createElement('div')
+    scalingFactorValue.setAttribute('class', 'offset-left')
+    scalingFactorValue.innerText = scalingFactor
+    allSimulationsWrapper.appendChild(scalingFactorTitle)
+    allSimulationsWrapper.appendChild(scalingFactorValue)
 
     displayNoiseAverage(allSimulationsWrapper, averageNoisePercentage)
 
@@ -461,6 +475,8 @@ export function displaySimulationResults_advancedMode(
     const tableId = `output-data-table-${simulationId}-${metricName}-${simulationNo}`
     const div = document.createElement('div')
     div.setAttribute('id', tableId)
+    div.setAttribute('class', 'offset-left')
+
     simulationWrapperDiv.appendChild(div)
     var table = new TabulatorFull(`#${tableId}`, {
         data: data,
@@ -468,16 +484,18 @@ export function displaySimulationResults_advancedMode(
         autoColumns: true,
         layout: 'fitColumns',
     })
-
-    simulationWrapperDiv.appendChild(document.createElement('br'))
+    tempSaveTable_advancedMode(
+        table,
+        `${simulationId}-${metricName}-${simulationNo}`
+    )
 
     // Create download button
     const downloadButton = document.createElement('button')
-    downloadButton.innerHTML = '⬇️ Download'
-    downloadButton.setAttribute('class', 'download')
+    downloadButton.innerHTML = '⬇️ Download table (CSV)'
+    downloadButton.setAttribute('class', 'ternary offset-left')
     simulationWrapperDiv.appendChild(downloadButton)
 
-    //Create eventListener for download of csv file
+    // Create eventListener for download of csv file
     downloadButton.addEventListener('click', function () {
         table.download('csv', generateCsvFileName(simulationId, metricName))
     })
@@ -532,7 +550,12 @@ export function createSimulationDiv(simulationId, inputParameters) {
     allSimulationsWrapper.appendChild(simulationDiv)
 
     // Display simulation parameters:
-    displayInputParameters(simulationDiv, inputParameters, simulationId)
+    displayInputParameters(
+        simulationDiv,
+        inputParameters,
+        simulationId,
+        MODES.advanced.name
+    )
 
     // TODO BUG BATCHING FREQUENCY NOT DISPLAYED -> Should be done later as part of the field unification (populate options dynamically etc)
     // TODO TWEAK isGranular VS keyStrategy
@@ -855,7 +878,7 @@ export function displayDimensions(dimensions) {
         dimensionName.value = element.name
 
         const dimensionNameLabel = document.createElement('label')
-        dimensionNameLabel.innerText = 'Name'
+        dimensionNameLabel.innerText = 'Name:'
         dimensionDiv.appendChild(dimensionNameLabel)
 
         dimensionDiv.appendChild(dimensionName)
@@ -869,7 +892,7 @@ export function displayDimensions(dimensions) {
 
         const dimensionSizeLabel = document.createElement('label')
         dimensionSizeLabel.innerText =
-            'Number of possible different values for this dimension'
+            'Number of possible different values for this dimension:'
         dimensionDiv.appendChild(dimensionSizeLabel)
 
         dimensionDiv.appendChild(dimensionSize)

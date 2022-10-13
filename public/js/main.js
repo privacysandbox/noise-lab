@@ -12,54 +12,52 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-const modes = {
-    simple: {
-        searchQueryParam: 'simple',
-        displayName: 'simple mode',
-    },
-    advanced: {
-        searchQueryParam: 'advanced',
-        displayName: 'advanced mode',
-    },
-}
-
-const modeSearchQueryParam = Object.values(modes).map(
-    (mode) => mode.searchQueryParam
-)
-
-generateMenu()
+import { generateConfirmMessage } from './utils.misc'
+import { APP_VERSION, MODES, modeSearchQueryParams } from './config'
 
 // Generate navigation menu automatically based on the available modes
-export function generateMenu() {
+function generateMenu() {
     const navWrapper = document.getElementById('nav')
-    Object.values(modes).forEach((mode) => {
+    Object.values(MODES).forEach((mode) => {
         const { searchQueryParam, displayName } = mode
         const a = document.createElement('a')
         a.setAttribute(
-            'href',
+            'data-href',
             `${location.origin}${location.pathname}?mode=${mode.searchQueryParam}`
         )
         a.setAttribute('id', searchQueryParam)
+        a.addEventListener('click', () => {
+            if (window.confirm(generateConfirmMessage())) {
+                window.location = `${location.origin}${location.pathname}?mode=${mode.searchQueryParam}`
+            }
+        })
         a.innerText = displayName
         navWrapper.appendChild(a)
     })
 }
 
-export function getCurrentMode() {
+function displayVersionNumber() {
+    document.getElementById('app-version').innerText = APP_VERSION
+}
+
+function getCurrentModeFromUrl() {
     const urlParams = new URLSearchParams(window.location.search)
     let mode = urlParams.get('mode')
     return mode
 }
 
 window.addEventListener('load', function (event) {
+    generateMenu()
+    displayVersionNumber()
+
     // If the mode is unknown, redirect to simple mode (= fallback mode)
-    if (!modeSearchQueryParam.includes(getCurrentMode())) {
-        window.location.href = `${location.origin}${location.pathname}?mode=${modes.simple.searchQueryParam}`
+    if (!modeSearchQueryParams.includes(getCurrentModeFromUrl())) {
+        window.location.href = `${location.origin}${location.pathname}?mode=${MODES.simple.searchQueryParam}`
     }
 
     // Highlight current menu item
     document.querySelectorAll('nav a').forEach((navItem) => {
-        if (navItem.href === document.URL) {
+        if (navItem.getAttribute('data-href') === document.URL) {
             navItem.className = 'current-menu-item'
         }
     })
@@ -67,17 +65,17 @@ window.addEventListener('load', function (event) {
     // Display correct section and hide the other ones
     const allSections = document.querySelectorAll('.mode-section')
     allSections.forEach((section) => {
-        if (section.id !== `${getCurrentMode()}-mode`) {
+        if (section.id !== `${getCurrentModeFromUrl()}-mode`) {
             // Mode isn't selected => remove it from the DOM
             section.parentElement.removeChild(section)
         }
     })
 
     // Initialize parameters and fields for the current mode
-    const mode = getCurrentMode()
-    if (mode === modes.simple.searchQueryParam) {
+    const mode = getCurrentModeFromUrl()
+    if (mode === MODES.simple.searchQueryParam) {
         initializeDisplaySimpleModeWithParams()
-    } else if (mode === modes.advanced.searchQueryParam) {
+    } else if (mode === MODES.advanced.searchQueryParam) {
         initializeDisplayAdvancedModeWithParams()
     } else {
         throw new Error('mode unkown')

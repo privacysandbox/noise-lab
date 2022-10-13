@@ -20,6 +20,7 @@ import {
     getKeyStrategyFromDom,
     displaySimulationResults_simpleMode,
     getIsUseScalingFromDom,
+    clearAll,
 } from './dom'
 import {
     getScalingFactorForMetric,
@@ -27,8 +28,13 @@ import {
     calculateNoisePercentage,
     calculateAverageNoisePercentage,
 } from './utils.noise'
-import { generateSimulationId, generateSimulationTitle } from './utils.misc'
-
+import {
+    generateSimulationId,
+    generateSimulationTitle,
+    downloadAll,
+    tempSaveTable,
+} from './utils.misc'
+import { MODES } from './config'
 import { CONTRIBUTION_BUDGET } from './consts.js'
 
 const keyStrategies = {
@@ -44,10 +50,12 @@ const batchingFrequencies = {
     monthly: { name: 'monthly', value: 30 },
 }
 
+let allSimulationDataTables_simpleMode = {}
+
 const dimensions = [
     {
-        name: 'campaignID',
-        numberOfDistinctValues: 2,
+        name: 'campaignId',
+        numberOfDistinctValues: 4,
     },
     {
         name: 'geography',
@@ -72,6 +80,18 @@ function initializeDisplaySimpleModeWithParams() {
         dimensions,
         CONTRIBUTION_BUDGET
     )
+}
+
+export function tempSaveTable_simpleMode(table, tableTitle) {
+    allSimulationDataTables_simpleMode = tempSaveTable(
+        table,
+        tableTitle,
+        allSimulationDataTables_simpleMode
+    )
+}
+
+export function downloadAll_simpleMode() {
+    downloadAll(allSimulationDataTables_simpleMode)
 }
 
 export function simulateAndDisplayResultsSimpleMode() {
@@ -200,9 +220,10 @@ function generateNoisyReportFromUnnoisyKeyValuePairsReport(
 }
 
 function clearAllSimpleMode() {
-    document.getElementById('all-simulations-wrapper-simple-mode').innerHTML =
-        ''
+    clearAll(MODES.simple.name)
 }
+
+window.downloadAll_simpleMode = downloadAll_simpleMode
 
 window.simulateAndDisplayResultsSimpleMode = simulateAndDisplayResultsSimpleMode
 

@@ -1,5 +1,4 @@
 import {
-    clearDataDisplay,
     getEpsilonFromDom,
     getFrequencyValue,
     getDailyValue,
@@ -22,13 +21,14 @@ import {
     getKeyCombinationString,
     validateInputsBeforeSimulation,
     resetFormValidation,
+    clearAll,
 } from './dom.js'
-import { generateSimulationId } from './utils.misc'
+import { generateSimulationId, tempSaveTable, downloadAll } from './utils.misc'
 import { CONTRIBUTION_BUDGET } from './consts.js'
+import { MODES } from './config'
 
 import {
     getRandomLaplacianNoise,
-    calculateMaximumCount,
     getScalingFactorForMetric,
     calculateNoisePercentage,
     generateKeyCombinationArray,
@@ -41,10 +41,25 @@ const defaultMetrics = [
     { id: 2, name: 'purchaseCount', maxValue: 1, avgValue: 1 },
 ]
 
+let allSimulationDataTables_advancedMode = {}
+
+export function tempSaveTable_advancedMode(table, tableTitle) {
+    allSimulationDataTables_advancedMode = tempSaveTable(
+        table,
+        tableTitle,
+        allSimulationDataTables_advancedMode
+    )
+    console.log(allSimulationDataTables_advancedMode)
+}
+
+export function downloadAll_advancedMode() {
+    downloadAll(allSimulationDataTables_advancedMode)
+}
+
 // define default dimensions
 const defaultDimensions = [
     { id: '1', size: '3', name: 'geography' },
-    { id: '2', size: '2', name: 'campaignId' },
+    { id: '2', size: '4', name: 'campaignId' },
     { id: '3', size: '2', name: 'productCategory' },
 ]
 
@@ -232,15 +247,15 @@ export function triggerSimulation(
 
 function clearAllAdvancedMode() {
     resetFormValidation()
-    document.getElementById('all-simulations-wrapper-advanced-mode').innerHTML =
-        ''
+    clearAll(MODES.advanced.name)
 }
 
 window.triggerSimulation = triggerSimulation
 window.simulateAndDisplayResultsAdvancedMode =
     simulateAndDisplayResultsAdvancedMode
 
-window.clearDataDisplay = clearDataDisplay
+window.downloadAll_advancedMode = downloadAll_advancedMode
+
 window.addMetric = addMetric
 window.removeMetric = removeMetric
 window.resetMetrics = resetMetrics

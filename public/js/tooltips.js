@@ -16,34 +16,43 @@ import tippy from 'tippy.js'
 import 'tippy.js/dist/tippy.css' // optional for styling
 import 'tippy.js/themes/light.css'
 
-const options = {
+const mainOptions = {
     allowHTML: true,
     duration: 0,
-    placement: 'right',
     animation: 'fade',
     theme: 'light',
     trigger: 'click',
     interactive: true,
 }
 
+const defaultOptions = {
+    ...mainOptions,
+    placement: 'right',
+}
+
+const bottomOptions = {
+    ...mainOptions,
+    placement: 'bottom',
+}
+
 const docUrl =
     'https://docs.google.com/document/d/1bU0a_njpDcRd9vDR0AJjwJjrf3Or8vAzyfuK8JZDEfo/view'
 
-const learnMoreHtml = `<br/><a href=${docUrl}>Learn more</a>`
+const learnMoreHtml = `<br/>Learn more:<br/><a href=${docUrl}>Quick guide</a> · <a href=${docUrl}>Detailed guide</a>`
 
 tippy('#help-epsilon', {
     content: `A higher epsilon leads to lower noise. Its maximum value for the aggregation service is 64. Epsilon can be altered by adtechs during the origin trial to evaluate various utility/privacy adjustments.<strong><br/>This impacts signal-to-noise ratios in the final summary reports.</strong><br/>${learnMoreHtml}`,
-    ...options,
+    ...defaultOptions,
 })
 
 tippy('#help-budget', {
-    content: `The contribution budget is an upper limit to individual users' contributions to protect user privacy. Its value is a constant, set by the API.<br/> Adtechs can use this value to define their scaling strategy, in order to maximize signal-to-noise ratio on the final reports.<br/><strong>This impacts signal-to-noise ratios in the final summary reports, but is a constant of the API (can't be configured by adtechs).</strong><br/>${learnMoreHtml}`,
-    ...options,
+    content: `The contribution budget is an upper limit to individual users' contributions to protect user privacy. Its value is a constant, set by the API.<br/> Adtechs can use this value to define their scaling strategy, in order to increase signal-to-noise ratio on the final reports.<br/><strong>This impacts signal-to-noise ratios in the final summary reports, but is a constant of the API (can't be configured by adtechs).</strong><br/>${learnMoreHtml}`,
+    ...defaultOptions,
 })
 
 tippy('#help-scaling', {
-    content: `Adtechs can decide to use scaling, in order to maximize signal-to-noise ratio on the final reports. <br/><strong>This impacts signal-to-noise ratios in the final summary reports.</strong><br/> ${learnMoreHtml}`,
-    ...options,
+    content: `Adtechs can decide to use scaling, in order to increase signal-to-noise ratio on the final reports. <br/><strong>This impacts signal-to-noise ratios in the final summary reports.</strong><br/> ${learnMoreHtml}`,
+    ...defaultOptions,
 })
 
 tippy('#help-daily', {
@@ -55,12 +64,12 @@ tippy('#help-daily', {
     dimensions combined</em>: For a set of dimensions <em>Campaign Id</em> x <em>Geography</em> x <em>Product category</em>, the average daily conversion count is the average daily conversion count for a given <em>Campaign Id</em> AND <em>Geography</em> AND <em>Product category</em>. This is a naive approach. Check out the advanced mode for more elaborate approaches. </li>
     </ul>
     <strong>This impacts signal-to-noise ratios in the final summary reports.</strong><br/> ${learnMoreHtml} <br/> Tip: Try and experiment with different conversion counts based on different campaign variables: campaign budget, user reach, ad efficiencies, etc. For example, all else being equal, what happens when your advertiser's budget is $10K vs. $100K? $10K will have less attributed conversions than $100K. Maybe the signal-to-noise ratio will be too high at $10K, but acceptable at $100K.`,
-    ...options,
+    ...defaultOptions,
 })
 
 tippy('#help-batching-frequency', {
     content: `Frequency at which the adtech decides to batch the aggregatable reports, for aggregation by the aggregation service. <br/><strong>This impacts signal-to-noise ratios in the final summary reports.</strong> Batching less frequently leads to a higher value per bucket (key), leading to typically higher signal-to-noise ratios.<br/>${learnMoreHtml}`,
-    ...options,
+    ...defaultOptions,
 })
 
 tippy('#help-key-strategy', {
@@ -77,7 +86,7 @@ tippy('#help-key-strategy', {
     Key structure II: <em>Measurement goal type</em> x <em>Campaign ID</em> x <em>Geo ID</em>.
     </li>
     </ul>`,
-    ...options,
+    ...defaultOptions,
 })
 
 tippy('#help-key-strategy-number', {
@@ -91,5 +100,35 @@ tippy('#help-key-strategy-number', {
     Key structure II: <em>Measurement goal type</em> x <em>Campaign ID</em> x <em>Geo ID</em>.
     </li>
     </ul>`,
-    ...options,
+    ...defaultOptions,
+})
+
+tippy('#feedback', {
+    content: `
+    <div class="feedback-links-wrapper">
+        <a
+            target="_blank"
+            href="https://github.com/GoogleChromeLabs/privacy-sandbox-dev-support/issues"
+        >
+            Give public feedback on this tool: Ask a question, report a bug, request a feature
+        </a>
+        <a
+            target="_blank"
+            href="https://github.com/WICG/attribution-reporting-api/issues/485"
+        >
+            Give public feedback on utility/privacy of the API (epsilon)
+        </a>
+    </div>`,
+    ...bottomOptions,
+})
+
+tippy('#about-info', {
+    content:
+        '<strong>Noise Lab is experimental!</strong> Expect quirks. Your feedback is needed and welcome.<br/><br/>Simulations are not saved in your browser, not persisted to a database, and not exposed to any site other than this one. You can download them.<br/><br/>Noise Lab code is open source: Link to repo coming soon',
+    ...bottomOptions,
+})
+
+tippy('#user-guide', {
+    content: 'User guide coming soon.',
+    ...bottomOptions,
 })

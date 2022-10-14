@@ -122,7 +122,7 @@ export function updateTooltips() {
     })
 
     tippy('.help-data', {
-        content: `Baed on your input, Noise Lab generates dummy data⏤but applies to it noise in the exact same way as the aggregation service. key and noisyScaledSummaryValue in the table below represent a noisy summary report (for this measurement goal) you would typically get from a real system.
+        content: `Based on your input, Noise Lab generates dummy data⏤but applies to it noise in the exact same way as the aggregation service. key and noisyScaledSummaryValue in the table below represent a noisy summary report (for this measurement goal) you would typically get from a real system.
         <br/>
         Each row in this table represents an {aggregation key, noisy post-aggregation summary value} pair. Noise Lab generates that data as follows:
         <ol>

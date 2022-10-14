@@ -389,12 +389,17 @@ function displayReport(
 
     // Display average noise
     displayNoiseAverage(parentDomEl, averageNoisePercentage)
-
     // TODO NoiseRatio vs NoisePercentage
+
+    parentDomEl.appendChild(document.createElement('br'))
 
     const tableTitle = document.createElement('h5')
     tableTitle.innerText = 'Details of the data: '
+    tableTitle.setAttribute('class', 'has-helper')
+    const dataTableHelper = document.createElement('div')
+    dataTableHelper.setAttribute('class', 'help help-data')
     parentDomEl.appendChild(tableTitle)
+    parentDomEl.appendChild(dataTableHelper)
 
     // Display table containing report data
     const tableId = `output-data-table-${simulationId}-${title}`

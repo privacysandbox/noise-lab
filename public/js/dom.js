@@ -22,6 +22,7 @@ import {
 import { MODES } from './config'
 import { tempSaveTable_simpleMode } from './simple-mode'
 import { tempSaveTable_advancedMode } from './laplace'
+import { updateTooltips } from './tooltips'
 
 export function displayContributionBudget(budget) {
     document.getElementById('contribution-budget').innerText = budget
@@ -64,10 +65,18 @@ function getFormValidationElFromDom() {
     return document.getElementById('form-validation-wrapper')
 }
 
-export function displayTabularData(parentDomEl, tabularData) {
+export function displayTabularData(
+    parentDomEl,
+    tabularData,
+    collapsable = false
+) {
     // Create a wrapper div that will contain the table
-    const tableEl = document.createElement('div')
+    const tableEl = collapsable
+        ? document.createElement('details')
+        : document.createElement('div')
+
     parentDomEl.appendChild(tableEl)
+
     return new TabulatorFull(tableEl, {
         columnDefaults: {
             headerSort: false,
@@ -126,8 +135,12 @@ export function initializeDisplaySimpleMode(
         document.getElementById('batching-frequency-select'),
         batchingFrequencies
     )
-    displayTabularData(document.getElementById('metrics'), metrics)
-    displayTabularData(document.getElementById('dimensions-table'), dimensions)
+    displayTabularData(document.getElementById('metrics'), metrics, false)
+    displayTabularData(
+        document.getElementById('dimensions-table'),
+        dimensions,
+        false
+    )
 }
 
 export function displayInputParameters(
@@ -180,47 +193,51 @@ export function displayInputParameters(
 
     // TODO move this out
     const scalingMap = {
-        true: 'Yes',
+        true: 'Yes (recommended)',
         false: 'No',
     }
 
-    const table = displayTabularData(tableContainerEl, [
-        {
-            Parameter: 'Epsilon',
-            'Value (raw)': epsilon,
-            'Value (formatted)': epsilon,
-        },
-        {
-            Parameter: 'Key Strategy',
-            'Value (raw)': keyStrategy,
-            'Value (formatted)': keyStrategy,
-        },
-        {
-            Parameter: 'Average daily attributable conversion count',
-            'Value (raw)': dailyConversionCount,
-            'Value (formatted)': dailyConversionCount,
-        },
-        {
-            Parameter: 'Dimensions',
-            'Value (raw)': JSON.stringify(dimensions),
-            'Value (formatted)': dimensionsDisplay,
-        },
-        {
-            Parameter: 'Metrics',
-            'Value (raw)': JSON.stringify(metrics),
-            'Value (formatted)': metricsDisplay,
-        },
-        {
-            Parameter: 'Batching frequency',
-            'Value (raw)': batchingFrequency,
-            'Value (formatted)': batchingFrequenciesMap[batchingFrequency],
-        },
-        {
-            Parameter: 'Scaling',
-            'Value (raw)': isUseScaling,
-            'Value (formatted)': scalingMap[isUseScaling],
-        },
-    ])
+    const table = displayTabularData(
+        tableContainerEl,
+        [
+            {
+                Parameter: 'Epsilon',
+                'Value (raw)': epsilon,
+                'Value (formatted)': epsilon,
+            },
+            {
+                Parameter: 'Key Strategy',
+                'Value (raw)': keyStrategy,
+                'Value (formatted)': keyStrategy,
+            },
+            {
+                Parameter: 'Average daily attributable conversion count',
+                'Value (raw)': dailyConversionCount,
+                'Value (formatted)': dailyConversionCount,
+            },
+            {
+                Parameter: 'Dimensions',
+                'Value (raw)': JSON.stringify(dimensions),
+                'Value (formatted)': dimensionsDisplay,
+            },
+            {
+                Parameter: 'Metrics',
+                'Value (raw)': JSON.stringify(metrics),
+                'Value (formatted)': metricsDisplay,
+            },
+            {
+                Parameter: 'Batching frequency',
+                'Value (raw)': batchingFrequency,
+                'Value (formatted)': batchingFrequenciesMap[batchingFrequency],
+            },
+            {
+                Parameter: 'Scaling',
+                'Value (raw)': isUseScaling,
+                'Value (formatted)': scalingMap[isUseScaling],
+            },
+        ],
+        true
+    )
     if (mode === MODES.simple.name) {
         tempSaveTable_simpleMode(table, `${simulationId}-params`)
     } else if (mode === MODES.advanced.name) {
@@ -239,7 +256,10 @@ export function displayInputParameters(
     })
 }
 
-export function displaySimulationResults_simpleMode(simulation) {
+export function displaySimulationResults_simpleMode(
+    simulation,
+    keyCombinationDisplay
+) {
     const allSimulationsWrapper = document.getElementById(
         'all-simulations-wrapper-simple-mode'
     )
@@ -283,7 +303,12 @@ export function displaySimulationResults_simpleMode(simulation) {
     simulationOutputWrapperDiv.appendChild(reportsTitleDiv)
 
     reports.forEach((report) => {
-        displayReport(simulationOutputWrapperDiv, report, simulationId)
+        displayReport(
+            simulationOutputWrapperDiv,
+            report,
+            simulationId,
+            keyCombinationDisplay
+        )
     })
 
     const simulationWrapper = document.getElementById(
@@ -292,43 +317,93 @@ export function displaySimulationResults_simpleMode(simulation) {
     simulationWrapper.scrollIntoView({ block: 'end' })
 }
 
+function getNoiseBadgeType(noiseValue) {
+    if (noiseValue >= 20) {
+        return 'over-20'
+    } else if (noiseValue >= 5) {
+        return 'between-5-20'
+    } else if (noiseValue >= 1) {
+        return 'under-5'
+    } else {
+        return 'under-1'
+    }
+}
+
 function displayNoiseAverage(parentDomEl, averageNoisePercentage) {
     // Display average noise
     const labelEl = document.createElement('h5')
     const valueEl = document.createElement('div')
-    labelEl.innerText = '➡ Average noise ratio (%): '
-    valueEl.innerText = averageNoisePercentage
+    labelEl.innerText = 'Average noise ratio: '
     // Set a class to display noise in color
-    valueEl.setAttribute('class', 'average-noise')
+    valueEl.setAttribute(
+        'class',
+        `average-noise ${getNoiseBadgeType(averageNoisePercentage)} has-helper`
+    )
+
+    const exactValueEl = document.createElement('div')
+    exactValueEl.setAttribute('class', 'has-helper mono')
+    exactValueEl.innerText = `(Exact value = ${averageNoisePercentage}%)`
+
+    const noiseRatioHelper = document.createElement('div')
+    noiseRatioHelper.setAttribute('class', 'help help-noise-value')
+
     parentDomEl.appendChild(labelEl)
     parentDomEl.appendChild(valueEl)
+    parentDomEl.appendChild(exactValueEl)
+    parentDomEl.appendChild(noiseRatioHelper)
 }
 
-function displayReport(parentDomEl, report, simulationId) {
-    const { averageNoisePercentage, data, title } = report
+function displayReport(
+    parentDomEl,
+    report,
+    simulationId,
+    keyCombinationDisplay
+) {
+    const { averageNoisePercentage, data, title, scalingFactor } = report
 
     // Display report table title
-
     const titleDiv = document.createElement('h4')
     titleDiv.innerText = 'Measurement goal: ' + title
     parentDomEl.appendChild(titleDiv)
+
+    // Display dimensions
+    const dimensionsTitle = document.createElement('h5')
+    dimensionsTitle.innerText = 'Dimensions:'
+    const dimensionsValue = document.createElement('div')
+    dimensionsValue.setAttribute('class', 'offset-left mono')
+    dimensionsValue.innerText = keyCombinationDisplay
+    parentDomEl.appendChild(dimensionsTitle)
+    parentDomEl.appendChild(dimensionsValue)
+
+    // Display scaling factor
+    const scalingFactorTitle = document.createElement('h5')
+    scalingFactorTitle.innerText = 'Scaling factor:'
+    const scalingFactorValue = document.createElement('div')
+    scalingFactorValue.setAttribute('class', 'offset-left has-helper mono')
+    const scalingFactorHelper = document.createElement('div')
+    scalingFactorHelper.setAttribute('class', 'help help-scaling-factor-value')
+    scalingFactorValue.innerText = scalingFactor
+    parentDomEl.appendChild(scalingFactorTitle)
+    parentDomEl.appendChild(scalingFactorValue)
+    parentDomEl.appendChild(scalingFactorHelper)
 
     // Display average noise
     displayNoiseAverage(parentDomEl, averageNoisePercentage)
 
     // TODO NoiseRatio vs NoisePercentage
+
     const tableTitle = document.createElement('h5')
-    tableTitle.innerText = '➡ Detail of the data: '
+    tableTitle.innerText = 'Details of the data: '
     parentDomEl.appendChild(tableTitle)
 
     // Display table containing report data
     const tableId = `output-data-table-${simulationId}-${title}`
-    const div = document.createElement('div')
+    const div = document.createElement('details')
     div.setAttribute('id', tableId)
     div.setAttribute('class', 'offset-left')
-
     parentDomEl.appendChild(div)
 
+    // Generate data table
     const table = new TabulatorFull(`#${tableId}`, {
         data,
         // Create columns from data field names
@@ -336,6 +411,7 @@ function displayReport(parentDomEl, report, simulationId) {
         layout: 'fitColumns',
     })
 
+    // Save table temporarily; used for XLSX multi-table download
     tempSaveTable_simpleMode(table, `${simulationId}-${title}`)
 
     // Create download button
@@ -347,9 +423,11 @@ function displayReport(parentDomEl, report, simulationId) {
 
     // Create eventListener for download of csv file
     downloadButton.addEventListener('click', function () {
-        console.log(table)
         table.download('csv', generateCsvFileName(simulationId, title))
     })
+
+    // Update tooltips
+    updateTooltips()
 }
 
 // !!!!!!!!!!
@@ -452,7 +530,7 @@ export function displaySimulationResults_advancedMode(
     const dimensionsTitle = document.createElement('h5')
     dimensionsTitle.innerText = 'Dimensions:'
     const dimensionsValue = document.createElement('div')
-    dimensionsValue.setAttribute('class', 'offset-left')
+    dimensionsValue.setAttribute('class', 'offset-left mono')
     dimensionsValue.innerText = keyCombinationString
     allSimulationsWrapper.appendChild(dimensionsTitle)
     allSimulationsWrapper.appendChild(dimensionsValue)
@@ -460,24 +538,33 @@ export function displaySimulationResults_advancedMode(
     const scalingFactorTitle = document.createElement('h5')
     scalingFactorTitle.innerText = 'Scaling factor:'
     const scalingFactorValue = document.createElement('div')
-    scalingFactorValue.setAttribute('class', 'offset-left')
+    scalingFactorValue.setAttribute('class', 'offset-left has-helper mono')
+    const scalingFactorHelper = document.createElement('div')
+    scalingFactorHelper.setAttribute('class', 'help help-scaling-factor-value')
     scalingFactorValue.innerText = scalingFactor
     allSimulationsWrapper.appendChild(scalingFactorTitle)
     allSimulationsWrapper.appendChild(scalingFactorValue)
+    allSimulationsWrapper.appendChild(scalingFactorHelper)
 
     displayNoiseAverage(allSimulationsWrapper, averageNoisePercentage)
 
+    allSimulationsWrapper.appendChild(document.createElement('br'))
+
     const tableTitle = document.createElement('h5')
-    tableTitle.innerText = '➡ Detail of the data: '
+    tableTitle.innerText = 'Details of the data: '
+    tableTitle.setAttribute('class', 'has-helper')
+    const dataTableHelper = document.createElement('div')
+    dataTableHelper.setAttribute('class', 'help help-data')
     allSimulationsWrapper.appendChild(tableTitle)
+    allSimulationsWrapper.appendChild(dataTableHelper)
 
     // Add current report in the simulation wrapper div
     const tableId = `output-data-table-${simulationId}-${metricName}-${simulationNo}`
-    const div = document.createElement('div')
-    div.setAttribute('id', tableId)
-    div.setAttribute('class', 'offset-left')
+    const tableWrapperEl = document.createElement('details')
+    tableWrapperEl.setAttribute('id', tableId)
+    tableWrapperEl.setAttribute('class', 'offset-left')
 
-    simulationWrapperDiv.appendChild(div)
+    simulationWrapperDiv.appendChild(tableWrapperEl)
     var table = new TabulatorFull(`#${tableId}`, {
         data: data,
         // Create columns from data field names
@@ -506,6 +593,9 @@ export function displaySimulationResults_advancedMode(
         generateSimulationWrapperElId(simulationId)
     )
     simulationWrapper.scrollIntoView({ block: 'end' })
+
+    // Update tooltips
+    updateTooltips()
 }
 
 export function resetDimensionsDiv() {

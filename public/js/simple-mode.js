@@ -27,6 +27,7 @@ import {
     getRandomLaplacianNoise,
     calculateNoisePercentage,
     calculateAverageNoisePercentage,
+    generateKeyCombinationArray,
 } from './utils.noise'
 import {
     generateSimulationId,
@@ -105,7 +106,10 @@ export function simulateAndDisplayResultsSimpleMode() {
         CONTRIBUTION_BUDGET,
         getIsUseScalingFromDom()
     )
-    displaySimulationResults_simpleMode(simulation)
+    displaySimulationResults_simpleMode(
+        simulation,
+        dimensions.map((d) => d.name).join(' x ')
+    )
     console.table(simulation.reports)
 }
 
@@ -143,14 +147,15 @@ function simulate(
     const numberOfMetrics = metrics.length
     for (let i = 0; i < numberOfMetrics; i++) {
         const metric = metrics[i]
+        const scalingFactorForThisMetric = isUseScaling
+            ? getScalingFactorForMetric(metric, numberOfMetrics, budget)
+            : 1
         const dailyReportPreNoise = generateUnnoisyKeyValuePairsReport(
             metric,
-            numberOfMetrics,
-            budget,
             dailyConversionCount,
             batchingFrequency,
             dimensions,
-            isUseScaling
+            scalingFactorForThisMetric
         )
         const dailyReportWithNoise =
             generateNoisyReportFromUnnoisyKeyValuePairsReport(
@@ -163,6 +168,7 @@ function simulate(
             averageNoisePercentage:
                 calculateAverageNoisePercentage(dailyReportWithNoise),
             data: dailyReportWithNoise,
+            scalingFactor: scalingFactorForThisMetric,
         })
     }
     return simulation
@@ -170,30 +176,28 @@ function simulate(
 
 function generateUnnoisyKeyValuePairsReport(
     metric,
-    numberOfMetrics,
-    budget,
     dailyConversionCount,
     batchingFrequency,
     dimensions,
-    isUseScaling
+    scalingFactorForThisMetric
 ) {
-    const report = []
-    const scalingFactorForThisMetric = isUseScaling
-        ? getScalingFactorForMetric(metric, numberOfMetrics, budget)
-        : 1
+    const keyCombinations = generateKeyCombinationArray(
+        dimensions.map((dim) => dim.numberOfDistinctValues)
+    )
 
-    for (let j = 0; j < getNumberOfDistinctKeyValuesPerKey(dimensions); j++) {
+    const report = []
+    keyCombinations.forEach((k, idx) => {
         report.push({
             // TODO, though the exact key doesn't really matter
-            key: '--',
+            key: k,
             aggregatedValue:
                 // TODO fix - right now we're using j to add a deterministic variation to the numbers, so that they remain the same across simulations. It does the job but is clunky.
-                (metric.defaultValuePerConversion + j) *
+                (metric.defaultValuePerConversion + idx) *
                 scalingFactorForThisMetric *
                 dailyConversionCount *
                 batchingFrequency,
         })
-    }
+    })
     return report
 }
 

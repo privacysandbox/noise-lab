@@ -63,18 +63,18 @@ h3 {
     letter-spacing: 0.8px;
     text-transform: uppercase;
     margin: 1.5rem 0 1.3rem 0;
-    border-top: solid 1px var(--border-color);
+    border-top: solid 1.4px var(--border-color);
     padding-top: 0.8rem;
     color: var(--text-color-x-lighter);
 }
 
 h4 {
-    margin: 2rem 0 0.5rem 0;
+    margin: 1.8rem 0 0.5rem 0;
 }
 
 h5 {
     margin: var(--margin-helper);
-    padding: 0.4rem 0 0 0;
+    padding: 0.8rem 0 0.2rem 0;
     font-size: 0.84rem;
     font-weight: 500;
 }
@@ -83,7 +83,11 @@ a {
     color: var(--link);
 }
 
-/* HEADER/MENU/NAVIGATION */
+.mono {
+    font-family: monospace;
+}
+
+/* DATA TABLES */
 
 .tabulator-row .tabulator-cell,
 .tabulator-col-title {
@@ -98,17 +102,13 @@ a {
     white-space: normal !important;
 }
 
-@keyframes blink {
-    0% {
-        background-color: #ffeaaf;
-    }
-    10% {
-        background-color: #ff7300;
-    }
-    100% {
-        background-color: #ffeaaf;
-    }
+details.tabulator {
+    background: white;
+    cursor: pointer;
+    border: none;
 }
+
+/* HEADER, MENU, NAVIGATION, MAIN LAYOUT */
 
 #menu {
     display: flex;
@@ -164,13 +164,11 @@ nav a.current-menu-item {
 }
 
 main {
-    flex: 1;
-}
-
-main {
     height: calc(var(--main-height) - 2 * 1.4rem);
     background: var(--x-light-grey);
     overflow-y: scroll;
+    flex: 1;
+    padding: 1.4rem;
 }
 
 .launch-panel {
@@ -195,10 +193,6 @@ main {
     padding: 1.4rem;
 }
 
-main {
-    padding: 1.4rem;
-}
-
 /* LAYOUT: DATA */
 
 .all-simulations-wrapper {
@@ -218,11 +212,40 @@ main {
 }
 
 .average-noise {
-    color: var(--orange);
-    font-weight: bold;
     margin: var(--margin-helper);
     padding: 0.4rem 0;
     font-family: monospace;
+}
+
+.average-noise::after {
+    border-radius: 3px;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+        Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue',
+        sans-serif;
+    padding: 0.2rem;
+    color: white;
+    font-weight: bold;
+    font-size: 110%;
+}
+
+.over-20::after {
+    background-color: rgb(255, 111, 0);
+    content: '> 20%';
+}
+
+.between-5-20::after {
+    background-color: rgb(137, 59, 0);
+    content: '5% - 20%';
+}
+
+.under-5::after {
+    background-color: rgb(80, 35, 0);
+    content: '1% - 5%';
+}
+
+.under-1::after {
+    background-color: black;
+    content: '< 1%';
 }
 
 .simulation-id {
@@ -262,6 +285,8 @@ button.secondary {
     background: none;
     border: solid 1px;
     color: var(--primary);
+    background: rgba(255, 255, 255, 0.656);
+    backdrop-filter: blur(2px);
 }
 
 button.ternary,
@@ -354,14 +379,26 @@ label {
 
 input,
 select {
-    min-width: 6rem;
     margin: 0.2rem 0;
-    padding: 0.3rem;
     cursor: pointer;
     border: solid 1.5px var(--grey);
     border-radius: 4px;
     outline: none;
     transition: background-color 0.2s ease-out, border-color 0.2s ease-out;
+}
+
+input {
+    min-width: 5rem;
+    max-width: 9.5rem;
+    padding: 0.3rem;
+    box-sizing: border-box;
+}
+
+select {
+    min-width: 4.94rem;
+    max-width: 9.5rem;
+    padding: 0.3rem 0.1rem;
+    text-transform: capitalize;
 }
 
 input:focus,
@@ -403,6 +440,11 @@ select:focus {
 
 .help::after {
     content: '?';
+}
+
+.has-helper {
+    display: inline-block;
+    padding-right: 0.4rem;
 }
 
 /* VERSION */
@@ -457,6 +499,10 @@ hr {
 
 .offset-left {
     margin: var(--margin-helper);
+}
+
+#contribution-budget {
+    margin-left: 0.4rem;
 }
 
 /* FORM VALIDATION */

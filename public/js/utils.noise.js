@@ -43,10 +43,14 @@ export function calculateNoisePercentage(noise, noisyAggregatedValue) {
 }
 
 export function calculateAverageNoisePercentage(report) {
-    const averageNoisePercentage =
-        report
-            .map((entry) => entry.noisePercentage)
-            .reduce((prev, curr) => prev + curr, 0) / report.length
+    const sum = report
+        .map((entry) => entry.noisePercentage)
+        .reduce((prev, curr) => prev + curr, 0)
+    return calculateAverageNoisePercentageRaw(sum, report.length)
+}
+
+export function calculateAverageNoisePercentageRaw(sum, count) {
+    const averageNoisePercentage = sum / count
     // Only display 3 decimal digits
     return Number.parseFloat(averageNoisePercentage).toFixed(3)
 }
@@ -58,6 +62,8 @@ export function calculateMaximumCount(frequency, daily, count) {
 }
 
 export function generateKeyCombinationArray(params) {
+    console.log(params)
+
     var keysArray = []
 
     for (var i = 0; i < params.length; i++) {
@@ -73,6 +79,7 @@ export function generateKeyCombinationArray(params) {
 
     keysComb.forEach((element) => (element = element.join('')))
 
+    console.log(keysComb)
     return keysComb
 }
 
@@ -100,11 +107,14 @@ export function generateAggregatedValue(
     batchingFrequency
 ) {
     // Calculate deterministic Number
-    var deterministicNumber = metric.avgValue * 1 + deterministicValue * 1 * (deterministicValue % 2 == 0 ? 1 : -1)
+    var deterministicNumber =
+        metric.avgValue * 1 +
+        deterministicValue * 1 * (deterministicValue % 2 == 0 ? 1 : -1)
 
     var calculationValue =
-        deterministicNumber > 0 && 
-        (metric.maxValue == metric.avgValue || metric.maxValue > deterministicNumber)
+        deterministicNumber > 0 &&
+        (metric.maxValue == metric.avgValue ||
+            metric.maxValue > deterministicNumber)
             ? deterministicNumber
             : metric.maxValue
     return Math.floor(

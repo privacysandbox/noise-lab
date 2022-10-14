@@ -35,10 +35,12 @@ const bottomOptions = {
     placement: 'bottom',
 }
 
-const docUrl =
+const quickGuideUrl = ''
+
+const detailedGuideUrl =
     'https://docs.google.com/document/d/1bU0a_njpDcRd9vDR0AJjwJjrf3Or8vAzyfuK8JZDEfo/view'
 
-const learnMoreHtml = `<br/>Learn more:<br/><a href=${docUrl}>Quick guide</a> · <a href=${docUrl}>Detailed guide</a>`
+const learnMoreHtml = `<br/>Learn more:<br/>Quick guide (coming soon) · <a href='${detailedGuideUrl}'>Detailed guide</a>`
 
 tippy('#help-epsilon', {
     content: `A higher epsilon leads to lower noise. Its maximum value for the aggregation service is 64. Epsilon can be altered by adtechs during the origin trial to evaluate various utility/privacy adjustments.<strong><br/>This impacts signal-to-noise ratios in the final summary reports.</strong><br/>${learnMoreHtml}`,
@@ -73,7 +75,7 @@ tippy('#help-batching-frequency', {
 })
 
 tippy('#help-key-strategy', {
-    content: `<strong>A = one granular key structure. B = several coarse key structures.</strong><br />In Strategy A, you have "one deep tree": each summary value in summary reports is associated to all of the dimensions you're tracking. You can then roll up these values yourself as needed. In Strategy B, you have "several shallow threes": the summary values in summary reports map to one of several sets of dimensions. <br/><strong>Your key strategy impacts signal-to-noise ratios in the final summary reports.</strong><br/>${learnMoreHtml}<br/><br/>
+    content: `<strong>A = one granular key structure. B = several coarse key structures.</strong><br />In Strategy A, you have "one deep tree": each summary value in summary reports is associated to all of the dimensions you're tracking. You can then roll up these values yourself as needed, after aggregation. In Strategy B, you have "several shallow threes": the summary values in summary reports map to one of several sets of dimensions. <br/><strong>Your key strategy impacts signal-to-noise ratios in the final summary reports.</strong><br/>${learnMoreHtml}<br/><br/>
     Example:<br/>
     Let's consider this set of dimensions: <em>Measurement goal type</em> x <em>Campaign ID</em> x <em>Geo ID</em> x <em>Product category</em>
     <ul>
@@ -102,6 +104,36 @@ tippy('#help-key-strategy-number', {
     </ul>`,
     ...defaultOptions,
 })
+
+tippy('#help-budget-split', {
+    content: `[Not implemented yet, coming in the future]<br/><br/>When scaling, adtechs can decide to split their contribution budget equally across measurement goals⏤this is the more basic approach⏤,or to split it inequally⏤this is more elaborate and leads to higher signal-to-noise ratios.`,
+    ...defaultOptions,
+})
+
+export function updateTooltips() {
+    tippy('.help-scaling-factor-value', {
+        content: `Noise Lab calculates the scaling factor based on your input parameters; for testing with end-users, you would implement that calculation yourself.<br/><br/>The scaling factor is calculated as follows:<br/>Scaling factor for one measurement goal = contribution budget for this measurement goal / max value for this measuremnt goal.<br/><br/>For an equal budget split, the contribution budget per measurement goal is the same for all measurement goals, and equals: 65,536 / number of measurement goals.`,
+        ...defaultOptions,
+    })
+
+    tippy('.help-noise-value', {
+        content: `This represents the average signal-to-noise ratio for this summary report. This is the average noise of all entries in this report, i.e. of all summary values (each associated with an aggregation key), i.e. of all values in the last column of the data table below.<br/><br/>For an individual summary value⏤that is for an individual row in the table⏤the noise ratio is calculated as follows:<br/>absolute(noise / noisy summary value) * 100, where absolute is required because the noise can be negative.`,
+        ...defaultOptions,
+    })
+
+    tippy('.help-data', {
+        content: `Baed on your input, Noise Lab generates dummy data⏤but applies to it noise in the exact same way as the aggregation service. key and noisyScaledSummaryValue in the table below represent a noisy summary report (for this measurement goal) you would typically get from a real system.
+        <br/>
+        Each row in this table represents an {aggregation key, noisy post-aggregation summary value} pair. Noise Lab generates that data as follows:
+        <ol>
+        <li>Noise Lab generates dummy data for summary values, by multiplying the average value for that measurement goal with: the average attributable conversion count, a multiplier based on your selected batching frequency, and a scaling factor (if scaling is enabled).</li>
+        <li>Noise Lab adds some variability to that data, so that each aggregation key is associated with slightly different summary values, for realism. This variability is  deterministic: if you run two simulations with the same conversion parameters, you'll see the same summary values. This is intentional: it helps you compare the impact of an aggregation strategy parameter in an isolated fashion.</li>
+        <li>Laplace noise⏤drawn from a distribution with a scale parameter of b = CONTRIBUTION_BUDGET / epsilon⏤is then added to each summary value. Noise can be negative or positive, just like in the real aggregation service.</li>
+        </ol>
+        Parts of this flow that carry over to a real testing system would be the Scaling bit of 1., as well as 3.`,
+        ...defaultOptions,
+    })
+}
 
 tippy('#feedback', {
     content: `
@@ -134,7 +166,7 @@ tippy('#feedback', {
 
 tippy('#about-info', {
     content:
-        '<strong>Noise Lab is experimental!</strong> Expect quirks. Your feedback is needed and welcome.<br/><br/>Simulations are not saved in your browser, not persisted to a database, and not exposed to any site other than this one. You can download them.<br/><br/>Noise Lab code is open source: Link to repo coming soon',
+        '<strong>Noise Lab is experimental!</strong> Expect quirks. Your feedback is needed and welcome.<br/><br/>Simulations are not saved in your browser, not persisted to a database, and not exposed to any site other than this one. You can download them.<br/><br/>Noise Lab code is open source: Link to open-source repository coming soon.',
     ...bottomOptions,
 })
 

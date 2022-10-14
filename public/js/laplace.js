@@ -33,6 +33,7 @@ import {
     calculateNoisePercentage,
     generateKeyCombinationArray,
     generateAggregatedValue,
+    calculateAverageNoisePercentageRaw,
 } from './utils.noise.js'
 
 // define default metrics
@@ -49,7 +50,6 @@ export function tempSaveTable_advancedMode(table, tableTitle) {
         tableTitle,
         allSimulationDataTables_advancedMode
     )
-    console.log(allSimulationDataTables_advancedMode)
 }
 
 export function downloadAll_advancedMode() {
@@ -104,7 +104,7 @@ function simulatePerMetric(
     const keyCombinationString = getKeyCombinationString(keyCombinations.names)
 
     const report = []
-    var averageNoisePercentage = 0
+    var noisePercentageSum = 0
     for (let i = 0; i < keyCombinations.combinations.length; i++) {
         const noise = getRandomLaplacianNoise(contributionBudget, epsilon)
 
@@ -118,7 +118,7 @@ function simulatePerMetric(
             noise,
             randCount * scalingFactor + noise
         )
-        averageNoisePercentage += noisePercentage
+        noisePercentageSum += noisePercentage
 
         report.push({
             key: keyCombinations.combinations[i],
@@ -130,12 +130,12 @@ function simulatePerMetric(
         })
     }
 
-    averageNoisePercentage =
-        averageNoisePercentage / keyCombinations.combinations.length
-
     const simulationReport = {
         data: report,
-        averageNoisePercentage: averageNoisePercentage,
+        averageNoisePercentage: calculateAverageNoisePercentageRaw(
+            noisePercentageSum,
+            keyCombinations.combinations.length
+        ),
     }
 
     displaySimulationResults_advancedMode(
@@ -188,7 +188,6 @@ export function triggerSimulation(
     // Validate inputs are correct
     if (!validateInputsBeforeSimulation(metrics, dimensions, isGranular)) return
 
-    console.log(batchingFrequency)
     // declare array containing possible combinations for keys
     var r = []
     var keyCombList = []

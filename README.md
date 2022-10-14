@@ -1,6 +1,6 @@
 # Noise Lab
 
-Noise Lab is a tool to quickly understand and experiment with summary reports and noise in [Privacy Sandbox Measurement APIs](https://developer.chrome.com/docs/privacy-sandbox/#measure-digital-ads).
+Noise Lab is a tool to onboard and experiment with summary reports and noise in [Privacy Sandbox Measurement APIs](https://developer.chrome.com/docs/privacy-sandbox/#measure-digital-ads).
 
 ## Live deployed version
 

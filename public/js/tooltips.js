@@ -106,7 +106,7 @@ tippy('#help-key-strategy-number', {
 })
 
 tippy('#help-budget-split', {
-    content: `[Not implemented yet, coming in the future]<br/><br/>When scaling, adtechs can decide to split their contribution budget in various ways. This control helps you confugrre this. You can split the budget equally across measurement goals⏤this is the more basic approach, and the default Noise Lab uses⏤, or to split it inequally⏤this is more elaborate and leads to higher signal-to-noise ratios.`,
+    content: `[Not implemented yet, coming in the future]<br/><br/>When scaling, adtechs can decide to split their contribution budget in various ways. This control helps you configure this. You can split the budget equally across measurement goals⏤this is the more basic approach, and the default Noise Lab uses⏤, or to split it inequally⏤this is more elaborate and leads to higher signal-to-noise ratios.`,
     ...defaultOptions,
 })
 

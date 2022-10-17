@@ -111,6 +111,7 @@ export function clearAll(mode) {
 }
 
 export function initializeDisplayAdvancedMode(metrics, dimensions, budget) {
+    updateDailyPerBucket()
     displayContributionBudget(budget)
     addKeyStrategyListener()
     displayMetrics(metrics)

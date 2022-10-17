@@ -311,10 +311,7 @@ export function displaySimulationResults_simpleMode(
         )
     })
 
-    const simulationWrapper = document.getElementById(
-        generateSimulationWrapperElId(simulationId)
-    )
-    simulationWrapper.scrollIntoView({ block: 'end' })
+    simulationWrapperDiv.scrollIntoView({ block: 'end' })
 }
 
 function getNoiseBadgeType(noiseValue) {
@@ -353,6 +350,46 @@ function displayNoiseAverage(parentDomEl, averageNoisePercentage) {
     parentDomEl.appendChild(noiseRatioHelper)
 }
 
+function displayDataDetailsTitle(parentDomEl) {
+    const dataDetailsTitle = document.createElement('h5')
+    dataDetailsTitle.innerText = 'Details of the data: '
+    dataDetailsTitle.setAttribute('class', 'has-helper')
+    const dataTableHelper = document.createElement('div')
+    dataTableHelper.setAttribute('class', 'help help-data')
+    parentDomEl.appendChild(dataDetailsTitle)
+    parentDomEl.appendChild(dataTableHelper)
+}
+
+function displayDimensionsInOutput(parentDomEl, keyCombinationDisplay) {
+    const dimensionsTitle = document.createElement('h6')
+    dimensionsTitle.innerText = 'Dimensions:'
+    const dimensionsValue = document.createElement('div')
+    dimensionsValue.setAttribute('class', 'offset-left mono')
+    dimensionsValue.innerText = keyCombinationDisplay
+    parentDomEl.appendChild(dimensionsTitle)
+    parentDomEl.appendChild(dimensionsValue)
+}
+
+function displayScalingFactor(parentDomEl, scalingFactor) {
+    const scalingFactorTitle = document.createElement('h6')
+    scalingFactorTitle.innerText = 'Scaling factor:'
+    const scalingFactorValue = document.createElement('div')
+    scalingFactorValue.setAttribute('class', 'offset-left has-helper mono')
+    const scalingFactorHelper = document.createElement('div')
+    scalingFactorHelper.setAttribute('class', 'help help-scaling-factor-value')
+    scalingFactorValue.innerText = scalingFactor
+    parentDomEl.appendChild(scalingFactorTitle)
+    parentDomEl.appendChild(scalingFactorValue)
+    parentDomEl.appendChild(scalingFactorHelper)
+}
+
+function displayNoise(parentDomEl, averageNoisePercentage) {
+    const noiseWrapperDiv = document.createElement('div')
+    noiseWrapperDiv.setAttribute('class', 'noise-wrapper')
+    parentDomEl.appendChild(noiseWrapperDiv)
+    displayNoiseAverage(noiseWrapperDiv, averageNoisePercentage)
+}
+
 function displayReport(
     parentDomEl,
     report,
@@ -365,48 +402,25 @@ function displayReport(
     const titleDiv = document.createElement('h4')
     titleDiv.innerText = 'Measurement goal: ' + title
     parentDomEl.appendChild(titleDiv)
-
-    // Display dimensions
-    const dimensionsTitle = document.createElement('h5')
-    dimensionsTitle.innerText = 'Dimensions:'
-    const dimensionsValue = document.createElement('div')
-    dimensionsValue.setAttribute('class', 'offset-left mono')
-    dimensionsValue.innerText = keyCombinationDisplay
-    parentDomEl.appendChild(dimensionsTitle)
-    parentDomEl.appendChild(dimensionsValue)
-
-    // Display scaling factor
-    const scalingFactorTitle = document.createElement('h5')
-    scalingFactorTitle.innerText = 'Scaling factor:'
-    const scalingFactorValue = document.createElement('div')
-    scalingFactorValue.setAttribute('class', 'offset-left has-helper mono')
-    const scalingFactorHelper = document.createElement('div')
-    scalingFactorHelper.setAttribute('class', 'help help-scaling-factor-value')
-    scalingFactorValue.innerText = scalingFactor
-    parentDomEl.appendChild(scalingFactorTitle)
-    parentDomEl.appendChild(scalingFactorValue)
-    parentDomEl.appendChild(scalingFactorHelper)
-
-    // Display average noise
-    displayNoiseAverage(parentDomEl, averageNoisePercentage)
-    // TODO NoiseRatio vs NoisePercentage
-
+    // Display noise
+    displayNoise(parentDomEl, averageNoisePercentage)
+    // Display details section title
+    displayDataDetailsTitle(parentDomEl)
     parentDomEl.appendChild(document.createElement('br'))
-
-    const tableTitle = document.createElement('h5')
-    tableTitle.innerText = 'Details of the data: '
-    tableTitle.setAttribute('class', 'has-helper')
-    const dataTableHelper = document.createElement('div')
-    dataTableHelper.setAttribute('class', 'help help-data')
-    parentDomEl.appendChild(tableTitle)
-    parentDomEl.appendChild(dataTableHelper)
+    // Display dimensions
+    displayDimensionsInOutput(parentDomEl, keyCombinationDisplay)
+    // Display scaling factor
+    displayScalingFactor(parentDomEl, scalingFactor)
 
     // Display table containing report data
+    const dataTableTitle = document.createElement('h6')
+    dataTableTitle.innerText = 'Data table:'
+    parentDomEl.appendChild(dataTableTitle)
     const tableId = `output-data-table-${simulationId}-${title}`
-    const div = document.createElement('details')
-    div.setAttribute('id', tableId)
-    div.setAttribute('class', 'offset-left')
-    parentDomEl.appendChild(div)
+    const detailsDiv = document.createElement('details')
+    detailsDiv.setAttribute('id', tableId)
+    detailsDiv.setAttribute('class', 'offset-left')
+    parentDomEl.appendChild(detailsDiv)
 
     // Generate data table
     const table = new TabulatorFull(`#${tableId}`, {
@@ -414,6 +428,8 @@ function displayReport(
         // Create columns from data field names
         autoColumns: true,
         layout: 'fitColumns',
+        pagination: true,
+        paginationSize: 5,
     })
 
     // Save table temporarily; used for XLSX multi-table download
@@ -512,7 +528,8 @@ export function displaySimulationResults_advancedMode(
     scalingFactor,
     keyCombinationString,
     simulationId,
-    simulationNo
+    simulationNo,
+    metricsNo
 ) {
     const allSimulationsWrapper = mainDiv
 
@@ -524,7 +541,7 @@ export function displaySimulationResults_advancedMode(
     const simulationWrapperDiv = document.createElement('div')
     simulationWrapperDiv.setAttribute(
         'id',
-        generateSimulationWrapperElId(simulationId)
+        generateSimulationWrapperElId(`${simulationId}-${metricsNo}`)
     )
     allSimulationsWrapper.appendChild(simulationWrapperDiv)
 
@@ -532,50 +549,36 @@ export function displaySimulationResults_advancedMode(
     metricTag.innerText = 'Measurement goal: ' + metricName
     allSimulationsWrapper.appendChild(metricTag)
 
-    const dimensionsTitle = document.createElement('h5')
-    dimensionsTitle.innerText = 'Dimensions:'
-    const dimensionsValue = document.createElement('div')
-    dimensionsValue.setAttribute('class', 'offset-left mono')
-    dimensionsValue.innerText = keyCombinationString
-    allSimulationsWrapper.appendChild(dimensionsTitle)
-    allSimulationsWrapper.appendChild(dimensionsValue)
-
-    const scalingFactorTitle = document.createElement('h5')
-    scalingFactorTitle.innerText = 'Scaling factor:'
-    const scalingFactorValue = document.createElement('div')
-    scalingFactorValue.setAttribute('class', 'offset-left has-helper mono')
-    const scalingFactorHelper = document.createElement('div')
-    scalingFactorHelper.setAttribute('class', 'help help-scaling-factor-value')
-    scalingFactorValue.innerText = scalingFactor
-    allSimulationsWrapper.appendChild(scalingFactorTitle)
-    allSimulationsWrapper.appendChild(scalingFactorValue)
-    allSimulationsWrapper.appendChild(scalingFactorHelper)
-
-    displayNoiseAverage(allSimulationsWrapper, averageNoisePercentage)
-
+    // Display noise
+    displayNoise(allSimulationsWrapper, averageNoisePercentage)
+    // Display details section title
+    displayDataDetailsTitle(allSimulationsWrapper)
     allSimulationsWrapper.appendChild(document.createElement('br'))
-
-    const tableTitle = document.createElement('h5')
-    tableTitle.innerText = 'Details of the data: '
-    tableTitle.setAttribute('class', 'has-helper')
-    const dataTableHelper = document.createElement('div')
-    dataTableHelper.setAttribute('class', 'help help-data')
-    allSimulationsWrapper.appendChild(tableTitle)
-    allSimulationsWrapper.appendChild(dataTableHelper)
+    // Display dimensions
+    displayDimensionsInOutput(allSimulationsWrapper, keyCombinationString)
+    // Display scaling factor
+    displayScalingFactor(allSimulationsWrapper, scalingFactor)
 
     // Add current report in the simulation wrapper div
+    // Display table containing report data
+    const dataTableTitle = document.createElement('h6')
+    dataTableTitle.innerText = 'Data table:'
+    simulationWrapperDiv.appendChild(dataTableTitle)
     const tableId = `output-data-table-${simulationId}-${metricName}-${simulationNo}`
     const tableWrapperEl = document.createElement('details')
     tableWrapperEl.setAttribute('id', tableId)
     tableWrapperEl.setAttribute('class', 'offset-left')
-
     simulationWrapperDiv.appendChild(tableWrapperEl)
+
     var table = new TabulatorFull(`#${tableId}`, {
         data: data,
         // Create columns from data field names
         autoColumns: true,
         layout: 'fitColumns',
+        pagination: true,
+        paginationSize: 5,
     })
+
     tempSaveTable_advancedMode(
         table,
         `${simulationId}-${metricName}-${simulationNo}`
@@ -597,7 +600,7 @@ export function displaySimulationResults_advancedMode(
     const simulationWrapper = document.getElementById(
         generateSimulationWrapperElId(simulationId)
     )
-    simulationWrapper.scrollIntoView({ block: 'end' })
+    simulationWrapperDiv.scrollIntoView({ block: 'end' })
 
     // Update tooltips
     updateTooltips()

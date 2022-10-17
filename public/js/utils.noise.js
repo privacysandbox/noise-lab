@@ -62,8 +62,6 @@ export function calculateMaximumCount(frequency, daily, count) {
 }
 
 export function generateKeyCombinationArray(params) {
-    console.log(params)
-
     var keysArray = []
 
     for (var i = 0; i < params.length; i++) {
@@ -79,7 +77,6 @@ export function generateKeyCombinationArray(params) {
 
     keysComb.forEach((element) => (element = element.join('')))
 
-    console.log(keysComb)
     return keysComb
 }
 

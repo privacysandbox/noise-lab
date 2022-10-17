@@ -42,7 +42,7 @@ body {
     --text-color-lighter: rgb(44, 45, 46);
     --text-color-x-lighter: rgb(28, 29, 30);
     --main-height: calc(100vh - var(--header-height));
-    --margin-helper: 0 0 0 2rem;
+    --margin-helper: 0;
 }
 
 /* TYPOGRAPHY + BASIC STYLES */
@@ -70,13 +70,22 @@ h3 {
 
 h4 {
     margin: 1.8rem 0 0.5rem 0;
+    font-size: 1rem;
 }
 
 h5 {
     margin: var(--margin-helper);
     padding: 0.8rem 0 0.2rem 0;
-    font-size: 0.84rem;
-    font-weight: 500;
+    font-size: 0.9rem;
+    display: block;
+}
+
+h6 {
+    margin: var(--margin-helper);
+    font-weight: initial;
+    padding: 0.5rem 0 0.1rem 0;
+    font-size: 0.8rem;
+    color: var(--grey);
 }
 
 a {
@@ -92,6 +101,10 @@ a {
 .tabulator-row .tabulator-cell,
 .tabulator-col-title {
     overflow-x: scroll !important;
+}
+
+.tabulator {
+    overflow-y: scroll !important;
 }
 
 .tabulator
@@ -174,8 +187,7 @@ main {
 .launch-panel {
     background: var(--blue-light);
     z-index: 100;
-    /* border-bottom: solid 1px; */
-    width: 25rem !important;
+    width: 27rem !important;
     background: var(--x-light-grey);
     height: var(--main-height);
     border-right: solid 1px var(--border-color);
@@ -211,10 +223,14 @@ main {
     min-height: 20rem;
 }
 
+.noise-wrapper {
+    background: #ffe5c8;
+    padding: 0 0.8rem 0.8rem 0.8rem;
+}
+
 .average-noise {
     margin: var(--margin-helper);
     padding: 0.4rem 0;
-    font-family: monospace;
 }
 
 .average-noise::after {
@@ -475,6 +491,7 @@ select:focus {
 .flex {
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 
 hr {
@@ -515,8 +532,7 @@ hr {
     height: 10ch;
     padding: 1.2ch;
     position: absolute;
-    top: calc(var(--header-height) + 1.2rem);
     z-index: 10000;
     overflow-y: scroll;
-    right: 1rem;
+    bottom: 1.2rem;
 }

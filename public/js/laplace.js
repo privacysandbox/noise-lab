@@ -145,7 +145,8 @@ function simulatePerMetric(
         scalingFactor,
         keyCombinationString,
         simulationId,
-        simulationNo
+        simulationNo,
+        metricsNo
     )
 }
 

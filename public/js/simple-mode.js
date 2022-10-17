@@ -110,7 +110,6 @@ export function simulateAndDisplayResultsSimpleMode() {
         simulation,
         dimensions.map((d) => d.name).join(' x ')
     )
-    console.table(simulation.reports)
 }
 
 function getNumberOfDistinctKeyValuesPerKey(dimensions) {

@@ -225,17 +225,29 @@ limitations under the License. -->
                         </div>
                         <div>
                             <h3>Your conversion data</h3>
-                            <label for="daily"
-                                >Average daily attributable conversion
+                            <label for="event-count"
+                                >TOTAL daily attributable conversion
                                 count:</label
                             >
-                            <select name="daily" id="daily">
+                            <select
+                                name="event-count"
+                                id="event-count"
+                                oninput="updateDailyPerBucket()"
+                            >
                                 <option value="5">5</option>
                                 <option value="10">10</option>
                                 <option value="100" selected>100</option>
                                 <option value="1000">1000</option>
                                 <option value="10000">10000</option>
+                                <option value="100000">100000</option>
                             </select>
+                            <div class="help" id="help-daily-total"></div>
+                            <label for="daily"
+                                >Average daily attributable conversion
+                                count PER BUCKET:</label
+                            >
+                            <input name="daily" id="daily" disabled>
+                            </input>
                             <div class="help" id="help-daily"></div>
                         </div>
                         <div id="metrics-params">
@@ -252,7 +264,6 @@ limitations under the License. -->
                                         type="number"
                                         value="2"
                                         id="metrics-number"
-                                        max="64"
                                         min="0"
                                     />
                                     <br />
@@ -277,8 +288,6 @@ limitations under the License. -->
                                         type="number"
                                         id="dimensions-number"
                                         name="dimensions-number"
-                                        max="64"
-                                        min="0"
                                     />
                                     <div id="dimensions-div"></div>
                                     <div id="dimensions-buttons-div"></div>

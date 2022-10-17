@@ -114,6 +114,32 @@ export function generateAggregatedValue(
             metric.maxValue > deterministicNumber)
             ? deterministicNumber
             : metric.maxValue
+
+    return Math.floor(
+        calculationValue * dailyConversionCount * batchingFrequency
+    )
+}
+
+export function generateAggregatedValueTemp(
+    metric,
+    deterministicValue,
+    dailyConversionCount,
+    batchingFrequency
+) {
+    // Calculate deterministic Number
+    var deterministicNumber =
+        metric.avgValue * 1 +
+        deterministicValue * 1 * (deterministicValue % 2 == 0 ? 1 : -1)
+
+    var calculationValue =
+        deterministicNumber > 0 &&
+        (metric.maxValue == metric.avgValue ||
+            metric.maxValue > deterministicNumber)
+            ? deterministicNumber
+            : metric.maxValue
+
+    console.log('deter', deterministicNumber)
+    console.log('calcVal', calculationValue)
     return Math.floor(
         calculationValue * dailyConversionCount * batchingFrequency
     )

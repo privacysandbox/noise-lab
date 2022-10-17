@@ -57,6 +57,11 @@ tippy('#help-scaling', {
     ...defaultOptions,
 })
 
+tippy('#help-daily-total', {
+    content: `Average daily count of attributable conversions over all buckets (keys).`,
+    ...defaultOptions,
+})
+
 tippy('#help-daily', {
     content: `Average daily count of <em>attributable</em> conversions for one bucket (key) <em>with all
     dimensions combined</em>. 
@@ -65,7 +70,7 @@ tippy('#help-daily', {
     <li><em>with all
     dimensions combined</em>: For a set of dimensions <em>Campaign Id</em> x <em>Geography</em> x <em>Product category</em>, the average daily conversion count is the average daily conversion count for a given <em>Campaign Id</em> AND <em>Geography</em> AND <em>Product category</em>. This is a naive approach. Check out the advanced mode for more elaborate approaches. </li>
     </ul>
-    <strong>This impacts signal-to-noise ratios in the final summary reports.</strong><br/> ${learnMoreHtml} <br/> Tip: Try and experiment with different conversion counts based on different campaign variables: campaign budget, user reach, ad efficiencies, etc. For example, all else being equal, what happens when your advertiser's budget is $10K vs. $100K? $10K will have less attributed conversions than $100K. Maybe the signal-to-noise ratio will be too high at $10K, but acceptable at $100K.`,
+    <strong>This impacts signal-to-noise ratios in the final summary reports.</strong><br/> ${learnMoreHtml} <br/><br/> Tip: Try and experiment with different conversion counts based on different campaign variables: campaign budget, user reach, ad efficiencies, etc. For example, all else being equal, what happens when your advertiser's budget is $10K vs. $100K? $10K will have less attributed conversions than $100K. Maybe the signal-to-noise ratio will be too high at $10K, but acceptable at $100K.`,
     ...defaultOptions,
 })
 

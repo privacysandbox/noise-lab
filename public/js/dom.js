@@ -471,6 +471,7 @@ export function displayDimensionInputFields(id) {
     dimensionSize.type = 'number'
     dimensionSize.id = 'dimension' + id + '-size'
     dimensionSize.setAttribute('placeholder', 'Dimension size')
+    dimensionSize.setAttribute('class', 'dimension-size')
 
     const dimensionName = document.createElement('input')
     dimensionName.type = 'text'
@@ -481,6 +482,8 @@ export function displayDimensionInputFields(id) {
     dimensionId.appendChild(document.createElement('br'))
     dimensionId.appendChild(dimensionName)
     dimensionsConfigDiv.appendChild(dimensionId)
+
+    updateDailyPerBucket()
 }
 
 export function getFrequencyValue() {
@@ -597,9 +600,6 @@ export function displaySimulationResults_advancedMode(
 
     allSimulationsWrapper.appendChild(simulationWrapperDiv)
 
-    const simulationWrapper = document.getElementById(
-        generateSimulationWrapperElId(simulationId)
-    )
     simulationWrapperDiv.scrollIntoView({ block: 'end' })
 
     // Update tooltips
@@ -981,11 +981,15 @@ export function displayDimensions(dimensions) {
 
         dimensionDiv.appendChild(dimensionName)
         dimensionDiv.appendChild(document.createElement('br'))
+        dimensionDiv.addEventListener('change', () => {
+            updateDailyPerBucket()
+        })
 
         var dimensionSize = document.createElement('input')
         dimensionSize.setAttribute('id', 'dimension' + element.id + '-size')
         dimensionSize.setAttribute('type', 'number')
         dimensionSize.setAttribute('placeholder', 'Dimension size')
+        dimensionSize.setAttribute('class', 'dimension-size')
         dimensionSize.value = element.size
 
         const dimensionSizeLabel = document.createElement('label')
@@ -997,6 +1001,8 @@ export function displayDimensions(dimensions) {
         dimensionDiv.appendChild(document.createElement('br'))
 
         dimensionsMainDiv.appendChild(dimensionDiv)
+
+        updateDailyPerBucket()
     })
 }
 
@@ -1057,6 +1063,8 @@ export function addDimension() {
     dimensionDiv.appendChild(document.createElement('br'))
 
     dimensionsMainDiv.appendChild(dimensionDiv)
+
+    updateDailyPerBucket()
 }
 
 export function removeDimension() {
@@ -1066,6 +1074,8 @@ export function removeDimension() {
 
     dimensionsNo = dimensionsNo * 1 - 1
     document.getElementById('dimensions-number').value = dimensionsNo
+
+    updateDailyPerBucket()
 }
 
 export function getKeyCombinationString(names) {
@@ -1080,6 +1090,22 @@ export function capEpsilon(event, inputEl) {
     if (currentValue > 64) {
         inputEl.value = 64
     }
+}
+
+export function getNumberOfBuckets() {
+    const allDimensionSizes = document.querySelectorAll('.dimension-size')
+    let nbOfBuckets = 1
+    allDimensionSizes.forEach((dimSize) => {
+        nbOfBuckets = nbOfBuckets * dimSize.value
+    })
+    return nbOfBuckets
+}
+
+export function updateDailyPerBucket() {
+    const dailyTotal = document.getElementById('event-count').value
+    const nbOfBuckets = getNumberOfBuckets()
+    const d = document.getElementById('daily')
+    d.value = Math.floor(dailyTotal / nbOfBuckets)
 }
 
 export function resetFormValidation() {
@@ -1161,3 +1187,4 @@ window.createCustomMetricsInputs = createCustomMetricsInputs
 window.generateCustomMetrics = generateCustomMetrics
 window.generateKeyStructures = generateKeyStructures
 window.capEpsilon = capEpsilon
+window.updateDailyPerBucket = updateDailyPerBucket

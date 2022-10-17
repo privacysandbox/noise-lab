@@ -114,6 +114,7 @@ function simulatePerMetric(
             dailyCount,
             batchingFrequency
         )
+
         const noisePercentage = calculateNoisePercentage(
             noise,
             randCount * scalingFactor + noise

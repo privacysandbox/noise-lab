@@ -20,15 +20,22 @@ import {
     getKeyStrategyFromDom,
     displaySimulationResults_simpleMode,
     getIsUseScalingFromDom,
+    clearAll,
 } from './dom'
 import {
     getScalingFactorForMetric,
     getRandomLaplacianNoise,
     calculateNoisePercentage,
     calculateAverageNoisePercentage,
+    generateKeyCombinationArray,
 } from './utils.noise'
-import { generateSimulationId, generateSimulationTitle } from './utils.misc'
-
+import {
+    generateSimulationId,
+    generateSimulationTitle,
+    downloadAll,
+    tempSaveTable,
+} from './utils.misc'
+import { MODES } from './config'
 import { CONTRIBUTION_BUDGET } from './consts.js'
 
 const keyStrategies = {
@@ -44,10 +51,12 @@ const batchingFrequencies = {
     monthly: { name: 'monthly', value: 30 },
 }
 
+let allSimulationDataTables_simpleMode = {}
+
 const dimensions = [
     {
-        name: 'campaignID',
-        numberOfDistinctValues: 2,
+        name: 'campaignId',
+        numberOfDistinctValues: 4,
     },
     {
         name: 'geography',
@@ -74,6 +83,18 @@ function initializeDisplaySimpleModeWithParams() {
     )
 }
 
+export function tempSaveTable_simpleMode(table, tableTitle) {
+    allSimulationDataTables_simpleMode = tempSaveTable(
+        table,
+        tableTitle,
+        allSimulationDataTables_simpleMode
+    )
+}
+
+export function downloadAll_simpleMode() {
+    downloadAll(allSimulationDataTables_simpleMode)
+}
+
 export function simulateAndDisplayResultsSimpleMode() {
     const simulation = simulate(
         getDailyConversionCountFromDom(),
@@ -85,7 +106,10 @@ export function simulateAndDisplayResultsSimpleMode() {
         CONTRIBUTION_BUDGET,
         getIsUseScalingFromDom()
     )
-    displaySimulationResults_simpleMode(simulation)
+    displaySimulationResults_simpleMode(
+        simulation,
+        dimensions.map((d) => d.name).join(' x ')
+    )
     console.table(simulation.reports)
 }
 
@@ -123,14 +147,15 @@ function simulate(
     const numberOfMetrics = metrics.length
     for (let i = 0; i < numberOfMetrics; i++) {
         const metric = metrics[i]
+        const scalingFactorForThisMetric = isUseScaling
+            ? getScalingFactorForMetric(metric, numberOfMetrics, budget)
+            : 1
         const dailyReportPreNoise = generateUnnoisyKeyValuePairsReport(
             metric,
-            numberOfMetrics,
-            budget,
             dailyConversionCount,
             batchingFrequency,
             dimensions,
-            isUseScaling
+            scalingFactorForThisMetric
         )
         const dailyReportWithNoise =
             generateNoisyReportFromUnnoisyKeyValuePairsReport(
@@ -143,6 +168,7 @@ function simulate(
             averageNoisePercentage:
                 calculateAverageNoisePercentage(dailyReportWithNoise),
             data: dailyReportWithNoise,
+            scalingFactor: scalingFactorForThisMetric,
         })
     }
     return simulation
@@ -150,30 +176,28 @@ function simulate(
 
 function generateUnnoisyKeyValuePairsReport(
     metric,
-    numberOfMetrics,
-    budget,
     dailyConversionCount,
     batchingFrequency,
     dimensions,
-    isUseScaling
+    scalingFactorForThisMetric
 ) {
-    const report = []
-    const scalingFactorForThisMetric = isUseScaling
-        ? getScalingFactorForMetric(metric, numberOfMetrics, budget)
-        : 1
+    const keyCombinations = generateKeyCombinationArray(
+        dimensions.map((dim) => dim.numberOfDistinctValues)
+    )
 
-    for (let j = 0; j < getNumberOfDistinctKeyValuesPerKey(dimensions); j++) {
+    const report = []
+    keyCombinations.forEach((k, idx) => {
         report.push({
             // TODO, though the exact key doesn't really matter
-            key: '--',
+            key: k,
             aggregatedValue:
                 // TODO fix - right now we're using j to add a deterministic variation to the numbers, so that they remain the same across simulations. It does the job but is clunky.
-                (metric.defaultValuePerConversion + j) *
+                (metric.defaultValuePerConversion + idx) *
                 scalingFactorForThisMetric *
                 dailyConversionCount *
                 batchingFrequency,
         })
-    }
+    })
     return report
 }
 
@@ -200,9 +224,10 @@ function generateNoisyReportFromUnnoisyKeyValuePairsReport(
 }
 
 function clearAllSimpleMode() {
-    document.getElementById('all-simulations-wrapper-simple-mode').innerHTML =
-        ''
+    clearAll(MODES.simple.name)
 }
+
+window.downloadAll_simpleMode = downloadAll_simpleMode
 
 window.simulateAndDisplayResultsSimpleMode = simulateAndDisplayResultsSimpleMode
 

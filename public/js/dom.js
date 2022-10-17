@@ -16,9 +16,13 @@ import { TabulatorFull } from 'tabulator-tables'
 import {
     generateCsvFileName,
     generateSimulationTitle,
-    generateRandomTableId,
     generateSimulationWrapperElId,
+    generateConfirmMessage,
 } from './utils.misc'
+import { MODES } from './config'
+import { tempSaveTable_simpleMode } from './simple-mode'
+import { tempSaveTable_advancedMode } from './laplace'
+import { updateTooltips } from './tooltips'
 
 export function displayContributionBudget(budget) {
     document.getElementById('contribution-budget').innerText = budget
@@ -26,11 +30,6 @@ export function displayContributionBudget(budget) {
 
 export function displayNoise(l) {
     document.getElementById('laplace').innerText += ' ' + l
-}
-
-export function clearDataDisplay() {
-    var tablesDiv = document.getElementById('tables')
-    tablesDiv.innerHTML = ''
 }
 
 export function displayEpsilon(epsilon) {
@@ -66,13 +65,19 @@ function getFormValidationElFromDom() {
     return document.getElementById('form-validation-wrapper')
 }
 
-export function displayTabularData(parentDomEl, tabularData) {
+export function displayTabularData(
+    parentDomEl,
+    tabularData,
+    collapsable = false
+) {
     // Create a wrapper div that will contain the table
-    const inputTableId = generateRandomTableId()
-    const tableEl = document.createElement('div')
-    tableEl.setAttribute('id', inputTableId)
+    const tableEl = collapsable
+        ? document.createElement('details')
+        : document.createElement('div')
+
     parentDomEl.appendChild(tableEl)
-    return new TabulatorFull(`#${inputTableId}`, {
+
+    return new TabulatorFull(tableEl, {
         columnDefaults: {
             headerSort: false,
             formatter: 'html',
@@ -95,6 +100,14 @@ export function populateSelectDomElement(selectDomElement, options) {
         }
         selectDomElement.appendChild(optEl)
     })
+}
+
+export function clearAll(mode) {
+    if (window.confirm(generateConfirmMessage())) {
+        document.getElementById(
+            `all-simulations-wrapper-${mode}-mode`
+        ).innerHTML = ''
+    }
 }
 
 export function initializeDisplayAdvancedMode(metrics, dimensions, budget) {
@@ -122,22 +135,25 @@ export function initializeDisplaySimpleMode(
         document.getElementById('batching-frequency-select'),
         batchingFrequencies
     )
-    displayTabularData(document.getElementById('metrics'), metrics)
-    displayTabularData(document.getElementById('dimensions-table'), dimensions)
+    displayTabularData(document.getElementById('metrics'), metrics, false)
+    displayTabularData(
+        document.getElementById('dimensions-table'),
+        dimensions,
+        false
+    )
 }
 
 export function displayInputParameters(
     parentDomEl,
     inputParameters,
-    simulationId
+    simulationId,
+    mode
 ) {
     const parametersTitleDiv = document.createElement('h3')
     parametersTitleDiv.innerText = 'Parameters (input)'
     parentDomEl.appendChild(parametersTitleDiv)
-    const tableId = generateRandomTableId()
-    const testDiv = document.createElement('div')
-    testDiv.setAttribute('id', tableId)
-    parentDomEl.appendChild(testDiv)
+    const tableContainerEl = document.createElement('div')
+    parentDomEl.appendChild(tableContainerEl)
 
     const {
         dailyConversionCount,
@@ -177,52 +193,61 @@ export function displayInputParameters(
 
     // TODO move this out
     const scalingMap = {
-        true: 'Yes',
+        true: 'Yes (recommended)',
         false: 'No',
     }
 
-    const table = displayTabularData(document.getElementById(tableId), [
-        {
-            Parameter: 'Epsilon',
-            'Value (raw)': epsilon,
-            'Value (formatted)': epsilon,
-        },
-        {
-            Parameter: 'Key Strategy',
-            'Value (raw)': keyStrategy,
-            'Value (formatted)': keyStrategy,
-        },
-        {
-            Parameter: 'Average daily attributable conversion count',
-            'Value (raw)': dailyConversionCount,
-            'Value (formatted)': dailyConversionCount,
-        },
-        {
-            Parameter: 'Dimensions',
-            'Value (raw)': JSON.stringify(dimensions),
-            'Value (formatted)': dimensionsDisplay,
-        },
-        {
-            Parameter: 'Metrics',
-            'Value (raw)': JSON.stringify(metrics),
-            'Value (formatted)': metricsDisplay,
-        },
-        {
-            Parameter: 'Batching frequency',
-            'Value (raw)': batchingFrequency,
-            'Value (formatted)': batchingFrequenciesMap[batchingFrequency],
-        },
-        {
-            Parameter: 'Scaling',
-            'Value (raw)': isUseScaling,
-            'Value (formatted)': scalingMap[isUseScaling],
-        },
-    ])
+    const table = displayTabularData(
+        tableContainerEl,
+        [
+            {
+                Parameter: 'Epsilon',
+                'Value (raw)': epsilon,
+                'Value (formatted)': epsilon,
+            },
+            {
+                Parameter: 'Key Strategy',
+                'Value (raw)': keyStrategy,
+                'Value (formatted)': keyStrategy,
+            },
+            {
+                Parameter: 'Average daily attributable conversion count',
+                'Value (raw)': dailyConversionCount,
+                'Value (formatted)': dailyConversionCount,
+            },
+            {
+                Parameter: 'Dimensions',
+                'Value (raw)': JSON.stringify(dimensions),
+                'Value (formatted)': dimensionsDisplay,
+            },
+            {
+                Parameter: 'Metrics',
+                'Value (raw)': JSON.stringify(metrics),
+                'Value (formatted)': metricsDisplay,
+            },
+            {
+                Parameter: 'Batching frequency',
+                'Value (raw)': batchingFrequency,
+                'Value (formatted)': batchingFrequenciesMap[batchingFrequency],
+            },
+            {
+                Parameter: 'Scaling',
+                'Value (raw)': isUseScaling,
+                'Value (formatted)': scalingMap[isUseScaling],
+            },
+        ],
+        true
+    )
+    if (mode === MODES.simple.name) {
+        tempSaveTable_simpleMode(table, `${simulationId}-params`)
+    } else if (mode === MODES.advanced.name) {
+        tempSaveTable_advancedMode(table, `${simulationId}-params`)
+    }
 
     // Create download button
     const downloadButton = document.createElement('button')
-    downloadButton.innerHTML = '⬇️ Download'
-    downloadButton.setAttribute('class', 'download')
+    downloadButton.innerHTML = '⬇️ Download table (CSV)'
+    downloadButton.setAttribute('class', 'ternary')
     parentDomEl.appendChild(downloadButton)
 
     // Create eventListener for download of csv file
@@ -231,7 +256,10 @@ export function displayInputParameters(
     })
 }
 
-export function displaySimulationResults_simpleMode(simulation) {
+export function displaySimulationResults_simpleMode(
+    simulation,
+    keyCombinationDisplay
+) {
     const allSimulationsWrapper = document.getElementById(
         'all-simulations-wrapper-simple-mode'
     )
@@ -265,7 +293,8 @@ export function displaySimulationResults_simpleMode(simulation) {
     displayInputParameters(
         simulationInputWrapperDiv,
         inputParameters,
-        simulationId
+        simulationId,
+        MODES.simple.name
     )
 
     // Display reports in the output simulation wrapper div
@@ -274,7 +303,12 @@ export function displaySimulationResults_simpleMode(simulation) {
     simulationOutputWrapperDiv.appendChild(reportsTitleDiv)
 
     reports.forEach((report) => {
-        displayReport(simulationOutputWrapperDiv, report, simulationId)
+        displayReport(
+            simulationOutputWrapperDiv,
+            report,
+            simulationId,
+            keyCombinationDisplay
+        )
     })
 
     const simulationWrapper = document.getElementById(
@@ -283,45 +317,98 @@ export function displaySimulationResults_simpleMode(simulation) {
     simulationWrapper.scrollIntoView({ block: 'end' })
 }
 
+function getNoiseBadgeType(noiseValue) {
+    if (noiseValue >= 20) {
+        return 'over-20'
+    } else if (noiseValue >= 5) {
+        return 'between-5-20'
+    } else if (noiseValue >= 1) {
+        return 'under-5'
+    } else {
+        return 'under-1'
+    }
+}
+
 function displayNoiseAverage(parentDomEl, averageNoisePercentage) {
     // Display average noise
     const labelEl = document.createElement('h5')
     const valueEl = document.createElement('div')
-    labelEl.innerText = '➡ Average noise ratio (%): '
-    valueEl.innerText = averageNoisePercentage
+    labelEl.innerText = 'Average noise ratio: '
     // Set a class to display noise in color
-    valueEl.setAttribute('class', 'average-noise')
+    valueEl.setAttribute(
+        'class',
+        `average-noise ${getNoiseBadgeType(averageNoisePercentage)} has-helper`
+    )
+
+    const exactValueEl = document.createElement('div')
+    exactValueEl.setAttribute('class', 'has-helper mono')
+    exactValueEl.innerText = `(Exact value = ${averageNoisePercentage}%)`
+
+    const noiseRatioHelper = document.createElement('div')
+    noiseRatioHelper.setAttribute('class', 'help help-noise-value')
+
     parentDomEl.appendChild(labelEl)
     parentDomEl.appendChild(valueEl)
+    parentDomEl.appendChild(exactValueEl)
+    parentDomEl.appendChild(noiseRatioHelper)
 }
 
-function displayReport(parentDomEl, report, simulationId) {
-    const { averageNoisePercentage, data, title } = report
+function displayReport(
+    parentDomEl,
+    report,
+    simulationId,
+    keyCombinationDisplay
+) {
+    const { averageNoisePercentage, data, title, scalingFactor } = report
 
     // Display report table title
-
     const titleDiv = document.createElement('h4')
     titleDiv.innerText = 'Measurement goal: ' + title
     parentDomEl.appendChild(titleDiv)
 
-    // const titleDiv = document.createElement('div')
-    // titleDiv.innerText = title + 'YO'
-    // parentDomEl.appendChild(titleDiv)
+    // Display dimensions
+    const dimensionsTitle = document.createElement('h5')
+    dimensionsTitle.innerText = 'Dimensions:'
+    const dimensionsValue = document.createElement('div')
+    dimensionsValue.setAttribute('class', 'offset-left mono')
+    dimensionsValue.innerText = keyCombinationDisplay
+    parentDomEl.appendChild(dimensionsTitle)
+    parentDomEl.appendChild(dimensionsValue)
+
+    // Display scaling factor
+    const scalingFactorTitle = document.createElement('h5')
+    scalingFactorTitle.innerText = 'Scaling factor:'
+    const scalingFactorValue = document.createElement('div')
+    scalingFactorValue.setAttribute('class', 'offset-left has-helper mono')
+    const scalingFactorHelper = document.createElement('div')
+    scalingFactorHelper.setAttribute('class', 'help help-scaling-factor-value')
+    scalingFactorValue.innerText = scalingFactor
+    parentDomEl.appendChild(scalingFactorTitle)
+    parentDomEl.appendChild(scalingFactorValue)
+    parentDomEl.appendChild(scalingFactorHelper)
 
     // Display average noise
     displayNoiseAverage(parentDomEl, averageNoisePercentage)
-
     // TODO NoiseRatio vs NoisePercentage
+
+    parentDomEl.appendChild(document.createElement('br'))
+
     const tableTitle = document.createElement('h5')
-    tableTitle.innerText = '➡ Detail of the data: '
+    tableTitle.innerText = 'Details of the data: '
+    tableTitle.setAttribute('class', 'has-helper')
+    const dataTableHelper = document.createElement('div')
+    dataTableHelper.setAttribute('class', 'help help-data')
     parentDomEl.appendChild(tableTitle)
+    parentDomEl.appendChild(dataTableHelper)
 
     // Display table containing report data
     const tableId = `output-data-table-${simulationId}-${title}`
-    const div = document.createElement('div')
+    const div = document.createElement('details')
     div.setAttribute('id', tableId)
+    div.setAttribute('class', 'offset-left')
     parentDomEl.appendChild(div)
 
+    // Generate data table
     const table = new TabulatorFull(`#${tableId}`, {
         data,
         // Create columns from data field names
@@ -329,19 +416,23 @@ function displayReport(parentDomEl, report, simulationId) {
         layout: 'fitColumns',
     })
 
+    // Save table temporarily; used for XLSX multi-table download
+    tempSaveTable_simpleMode(table, `${simulationId}-${title}`)
+
     // Create download button
     const downloadButton = document.createElement('button')
-    downloadButton.innerHTML = '⬇️ Download'
+    downloadButton.innerHTML = '⬇️ Download table (CSV)'
     downloadButton.setAttribute('id', 'download-csv' + tableId)
-    downloadButton.setAttribute('class', 'download')
+    downloadButton.setAttribute('class', 'ternary offset-left')
     parentDomEl.appendChild(downloadButton)
 
     // Create eventListener for download of csv file
-    document
-        .getElementById('download-csv' + tableId)
-        .addEventListener('click', function () {
-            table.download('csv', generateCsvFileName(simulationId, title))
-        })
+    downloadButton.addEventListener('click', function () {
+        table.download('csv', generateCsvFileName(simulationId, title))
+    })
+
+    // Update tooltips
+    updateTooltips()
 }
 
 // !!!!!!!!!!
@@ -370,11 +461,9 @@ export function displayDimensionInputFields(id) {
     dimensionName.id = 'dimension' + id + '-name'
     dimensionName.setAttribute('placeholder', 'Dimension name')
 
-    // dimensionId.appendChild(document.createElement('br'))
     dimensionId.appendChild(dimensionSize)
     dimensionId.appendChild(document.createElement('br'))
     dimensionId.appendChild(dimensionName)
-    //dimensionId.appendChild(document.createElement('br'))
     dimensionsConfigDiv.appendChild(dimensionId)
 }
 
@@ -443,41 +532,62 @@ export function displaySimulationResults_advancedMode(
     metricTag.innerText = 'Measurement goal: ' + metricName
     allSimulationsWrapper.appendChild(metricTag)
 
-    const dimensionsTag = document.createElement('div')
-    dimensionsTag.innerText = 'Dimensions: ' + keyCombinationString
-    allSimulationsWrapper.appendChild(dimensionsTag)
+    const dimensionsTitle = document.createElement('h5')
+    dimensionsTitle.innerText = 'Dimensions:'
+    const dimensionsValue = document.createElement('div')
+    dimensionsValue.setAttribute('class', 'offset-left mono')
+    dimensionsValue.innerText = keyCombinationString
+    allSimulationsWrapper.appendChild(dimensionsTitle)
+    allSimulationsWrapper.appendChild(dimensionsValue)
 
-    const scalingFactorTag = document.createElement('div')
-    scalingFactorTag.innerText = 'Scaling Factor: ' + scalingFactor
-    allSimulationsWrapper.appendChild(scalingFactorTag)
+    const scalingFactorTitle = document.createElement('h5')
+    scalingFactorTitle.innerText = 'Scaling factor:'
+    const scalingFactorValue = document.createElement('div')
+    scalingFactorValue.setAttribute('class', 'offset-left has-helper mono')
+    const scalingFactorHelper = document.createElement('div')
+    scalingFactorHelper.setAttribute('class', 'help help-scaling-factor-value')
+    scalingFactorValue.innerText = scalingFactor
+    allSimulationsWrapper.appendChild(scalingFactorTitle)
+    allSimulationsWrapper.appendChild(scalingFactorValue)
+    allSimulationsWrapper.appendChild(scalingFactorHelper)
 
     displayNoiseAverage(allSimulationsWrapper, averageNoisePercentage)
 
+    allSimulationsWrapper.appendChild(document.createElement('br'))
+
     const tableTitle = document.createElement('h5')
-    tableTitle.innerText = '➡ Detail of the data: '
+    tableTitle.innerText = 'Details of the data: '
+    tableTitle.setAttribute('class', 'has-helper')
+    const dataTableHelper = document.createElement('div')
+    dataTableHelper.setAttribute('class', 'help help-data')
     allSimulationsWrapper.appendChild(tableTitle)
+    allSimulationsWrapper.appendChild(dataTableHelper)
 
     // Add current report in the simulation wrapper div
     const tableId = `output-data-table-${simulationId}-${metricName}-${simulationNo}`
-    const div = document.createElement('div')
-    div.setAttribute('id', tableId)
-    simulationWrapperDiv.appendChild(div)
+    const tableWrapperEl = document.createElement('details')
+    tableWrapperEl.setAttribute('id', tableId)
+    tableWrapperEl.setAttribute('class', 'offset-left')
+
+    simulationWrapperDiv.appendChild(tableWrapperEl)
     var table = new TabulatorFull(`#${tableId}`, {
         data: data,
         // Create columns from data field names
         autoColumns: true,
         layout: 'fitColumns',
     })
-
-    simulationWrapperDiv.appendChild(document.createElement('br'))
+    tempSaveTable_advancedMode(
+        table,
+        `${simulationId}-${metricName}-${simulationNo}`
+    )
 
     // Create download button
     const downloadButton = document.createElement('button')
-    downloadButton.innerHTML = '⬇️ Download'
-    downloadButton.setAttribute('class', 'download')
+    downloadButton.innerHTML = '⬇️ Download table (CSV)'
+    downloadButton.setAttribute('class', 'ternary offset-left')
     simulationWrapperDiv.appendChild(downloadButton)
 
-    //Create eventListener for download of csv file
+    // Create eventListener for download of csv file
     downloadButton.addEventListener('click', function () {
         table.download('csv', generateCsvFileName(simulationId, metricName))
     })
@@ -488,6 +598,9 @@ export function displaySimulationResults_advancedMode(
         generateSimulationWrapperElId(simulationId)
     )
     simulationWrapper.scrollIntoView({ block: 'end' })
+
+    // Update tooltips
+    updateTooltips()
 }
 
 export function resetDimensionsDiv() {
@@ -502,7 +615,7 @@ export function getMetricsArrayFromDom() {
         metrics.push({
             id: i,
             maxValue: document.getElementById('metric' + i + '-max').value,
-            minValue: document.getElementById('metric' + i + '-def').value,
+            avgValue: document.getElementById('metric' + i + '-def').value,
             name: document.getElementById('metric' + i + '-name').value,
         })
     }
@@ -532,7 +645,12 @@ export function createSimulationDiv(simulationId, inputParameters) {
     allSimulationsWrapper.appendChild(simulationDiv)
 
     // Display simulation parameters:
-    displayInputParameters(simulationDiv, inputParameters, simulationId)
+    displayInputParameters(
+        simulationDiv,
+        inputParameters,
+        simulationId,
+        MODES.advanced.name
+    )
 
     // TODO BUG BATCHING FREQUENCY NOT DISPLAYED -> Should be done later as part of the field unification (populate options dynamically etc)
     // TODO TWEAK isGranular VS keyStrategy
@@ -584,10 +702,10 @@ export function createCustomMetricsInputs() {
         var maxInputLabel = document.createElement('div')
         maxInputLabel.innerText = 'Maximum value'
 
-        var minInput = document.createElement('input')
-        minInput.setAttribute('id', 'metric' + i + '-def')
-        minInput.setAttribute('type', 'number')
-        minInput.setAttribute(
+        var avgInput = document.createElement('input')
+        avgInput.setAttribute('id', 'metric' + i + '-def')
+        avgInput.setAttribute('type', 'number')
+        avgInput.setAttribute(
             'placeholder',
             'Minimum/default value for the metric'
         )
@@ -598,7 +716,7 @@ export function createCustomMetricsInputs() {
         metricsDiv.appendChild(maxInput)
         metricsDiv.appendChild(maxInputLabel)
         metricsDiv.appendChild(document.createElement('br'))
-        metricsDiv.appendChild(minInput)
+        metricsDiv.appendChild(avgInput)
     }
 }
 
@@ -741,15 +859,15 @@ export function displayMetrics(metrics) {
         metricDiv.appendChild(metricMax)
         metricDiv.appendChild(document.createElement('br'))
 
-        var metricMin = document.createElement('input')
-        metricMin.setAttribute('id', 'metric' + element.id + '-def')
-        metricMin.setAttribute('type', 'number')
-        metricMin.setAttribute('placeholder', 'Minimum value')
-        metricMin.value = element.minValue
-        const metricMinLabel = document.createElement('label')
-        metricMinLabel.innerText = 'Min value:'
-        metricDiv.appendChild(metricMinLabel)
-        metricDiv.appendChild(metricMin)
+        var metricAvg = document.createElement('input')
+        metricAvg.setAttribute('id', 'metric' + element.id + '-def')
+        metricAvg.setAttribute('type', 'number')
+        metricAvg.setAttribute('placeholder', 'Average value')
+        metricAvg.value = element.avgValue
+        const metricAvgLabel = document.createElement('label')
+        metricAvgLabel.innerText = 'Average value:'
+        metricDiv.appendChild(metricAvgLabel)
+        metricDiv.appendChild(metricAvg)
         metricDiv.appendChild(document.createElement('br'))
         metricDiv.appendChild(document.createElement('br'))
     })
@@ -810,11 +928,11 @@ export function addMetric() {
     metricDiv.appendChild(metricMax)
     metricDiv.appendChild(document.createElement('br'))
 
-    var metricMin = document.createElement('input')
-    metricMin.setAttribute('id', 'metric' + metricsNo + '-def')
-    metricMin.setAttribute('type', 'number')
-    metricMin.setAttribute('placeholder', 'Minimum value')
-    metricDiv.appendChild(metricMin)
+    var metricAvg = document.createElement('input')
+    metricAvg.setAttribute('id', 'metric' + metricsNo + '-def')
+    metricAvg.setAttribute('type', 'number')
+    metricAvg.setAttribute('placeholder', 'Average value')
+    metricDiv.appendChild(metricAvg)
 
     metricsMainDiv.appendChild(metricDiv)
 }
@@ -855,7 +973,7 @@ export function displayDimensions(dimensions) {
         dimensionName.value = element.name
 
         const dimensionNameLabel = document.createElement('label')
-        dimensionNameLabel.innerText = 'Name'
+        dimensionNameLabel.innerText = 'Name:'
         dimensionDiv.appendChild(dimensionNameLabel)
 
         dimensionDiv.appendChild(dimensionName)
@@ -869,7 +987,7 @@ export function displayDimensions(dimensions) {
 
         const dimensionSizeLabel = document.createElement('label')
         dimensionSizeLabel.innerText =
-            'Number of possible different values for this dimension'
+            'Number of possible different values for this dimension:'
         dimensionDiv.appendChild(dimensionSizeLabel)
 
         dimensionDiv.appendChild(dimensionSize)
@@ -998,12 +1116,12 @@ function validateMetrics(metrics, errors) {
     metrics.forEach((element) => {
         if (element.maxValue * 1 < 1 || element.maxValue == undefined)
             errors.push(element.name + ' - maximum value must be >= 1')
-        if (element.minValue * 1 < 1 || element.minValue == undefined)
-            errors.push(element.name + ' - minimum value must be >= 1')
-        if (element.minValue * 1 > element.maxValue * 1)
+        if (element.avgValue * 1 < 1 || element.avgValue == undefined)
+            errors.push(element.name + ' - average value must be >= 1')
+        if (element.avgValue * 1 > element.maxValue * 1)
             errors.push(
                 element.name +
-                    ' - maximum value cannot be smaller than minimum value'
+                    ' - maximum value cannot be smaller than average value'
             )
     })
 }

@@ -1,5 +1,4 @@
 import {
-    clearDataDisplay,
     getEpsilonFromDom,
     getFrequencyValue,
     getDailyValue,
@@ -22,29 +21,45 @@ import {
     getKeyCombinationString,
     validateInputsBeforeSimulation,
     resetFormValidation,
+    clearAll,
 } from './dom.js'
-import { generateSimulationId } from './utils.misc'
+import { generateSimulationId, tempSaveTable, downloadAll } from './utils.misc'
 import { CONTRIBUTION_BUDGET } from './consts.js'
+import { MODES } from './config'
 
 import {
     getRandomLaplacianNoise,
-    calculateMaximumCount,
     getScalingFactorForMetric,
     calculateNoisePercentage,
     generateKeyCombinationArray,
     generateAggregatedValue,
+    calculateAverageNoisePercentageRaw,
 } from './utils.noise.js'
 
 // define default metrics
 const defaultMetrics = [
-    { id: 1, name: 'purchaseValue', maxValue: 1000, minValue: 120 },
-    { id: 2, name: 'purchaseCount', maxValue: 1, minValue: 1 },
+    { id: 1, name: 'purchaseValue', maxValue: 1000, avgValue: 120 },
+    { id: 2, name: 'purchaseCount', maxValue: 1, avgValue: 1 },
 ]
+
+let allSimulationDataTables_advancedMode = {}
+
+export function tempSaveTable_advancedMode(table, tableTitle) {
+    allSimulationDataTables_advancedMode = tempSaveTable(
+        table,
+        tableTitle,
+        allSimulationDataTables_advancedMode
+    )
+}
+
+export function downloadAll_advancedMode() {
+    downloadAll(allSimulationDataTables_advancedMode)
+}
 
 // define default dimensions
 const defaultDimensions = [
     { id: '1', size: '3', name: 'geography' },
-    { id: '2', size: '2', name: 'campaignId' },
+    { id: '2', size: '4', name: 'campaignId' },
     { id: '3', size: '2', name: 'productCategory' },
 ]
 
@@ -89,7 +104,7 @@ function simulatePerMetric(
     const keyCombinationString = getKeyCombinationString(keyCombinations.names)
 
     const report = []
-    var averageNoisePercentage = 0
+    var noisePercentageSum = 0
     for (let i = 0; i < keyCombinations.combinations.length; i++) {
         const noise = getRandomLaplacianNoise(contributionBudget, epsilon)
 
@@ -103,7 +118,7 @@ function simulatePerMetric(
             noise,
             randCount * scalingFactor + noise
         )
-        averageNoisePercentage += noisePercentage
+        noisePercentageSum += noisePercentage
 
         report.push({
             key: keyCombinations.combinations[i],
@@ -115,12 +130,12 @@ function simulatePerMetric(
         })
     }
 
-    averageNoisePercentage =
-        averageNoisePercentage / keyCombinations.combinations.length
-
     const simulationReport = {
         data: report,
-        averageNoisePercentage: averageNoisePercentage,
+        averageNoisePercentage: calculateAverageNoisePercentageRaw(
+            noisePercentageSum,
+            keyCombinations.combinations.length
+        ),
     }
 
     displaySimulationResults_advancedMode(
@@ -173,7 +188,6 @@ export function triggerSimulation(
     // Validate inputs are correct
     if (!validateInputsBeforeSimulation(metrics, dimensions, isGranular)) return
 
-    console.log(batchingFrequency)
     // declare array containing possible combinations for keys
     var r = []
     var keyCombList = []
@@ -232,15 +246,15 @@ export function triggerSimulation(
 
 function clearAllAdvancedMode() {
     resetFormValidation()
-    document.getElementById('all-simulations-wrapper-advanced-mode').innerHTML =
-        ''
+    clearAll(MODES.advanced.name)
 }
 
 window.triggerSimulation = triggerSimulation
 window.simulateAndDisplayResultsAdvancedMode =
     simulateAndDisplayResultsAdvancedMode
 
-window.clearDataDisplay = clearDataDisplay
+window.downloadAll_advancedMode = downloadAll_advancedMode
+
 window.addMetric = addMetric
 window.removeMetric = removeMetric
 window.resetMetrics = resetMetrics

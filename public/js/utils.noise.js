@@ -108,16 +108,20 @@ export function generateAggregatedValue(
         metric.avgValue * 1 +
         deterministicValue * 1 * (deterministicValue % 2 == 0 ? 1 : -1)
 
+    var dailyConversionValue = Math.abs(dailyConversionCount * 1 + ((deterministicValue % 2 == 0 ? 1 * deterministicValue : -1 * deterministicValue)))
+
     var calculationValue =
         deterministicNumber > 0 &&
-        (metric.maxValue == metric.avgValue ||
-            metric.maxValue > deterministicNumber)
+            (metric.maxValue == metric.avgValue ||
+                metric.maxValue > deterministicNumber)
             ? deterministicNumber
             : metric.maxValue
 
-    return Math.floor(
+    var res = Math.floor(
         calculationValue * dailyConversionCount * batchingFrequency
     )
+
+    return res
 }
 
 export function generateAggregatedValueTemp(
@@ -133,8 +137,8 @@ export function generateAggregatedValueTemp(
 
     var calculationValue =
         deterministicNumber > 0 &&
-        (metric.maxValue == metric.avgValue ||
-            metric.maxValue > deterministicNumber)
+            (metric.maxValue == metric.avgValue ||
+                metric.maxValue > deterministicNumber)
             ? deterministicNumber
             : metric.maxValue
 

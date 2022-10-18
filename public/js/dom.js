@@ -1151,16 +1151,22 @@ function validateMetrics(metrics, errors) {
         if (element.avgValue * 1 > element.maxValue * 1)
             errors.push(
                 element.name +
-                    ' - maximum value cannot be smaller than average value'
+                ' - maximum value cannot be smaller than average value'
             )
     })
 }
 
 function validateDimensions(dimensions, errors) {
+    var bits = 1
+
     dimensions.forEach((element) => {
         if (element.size * 1 < 1 || element.size == undefined)
             errors.push(element.name + ' - dimension size must be >=1 ')
+        bits = bits * element.size
     })
+
+    if (bits > 128)
+        errors.push('The dimensions sizes you defined would result in a key longer than 128 bits. Please adjust the dimensions sizes so their product is <= 128')
 }
 
 function validateKeyStrategy(errors) {
@@ -1178,8 +1184,8 @@ function validateKeyStrategy(errors) {
         if (noChecked < 2)
             errors.push(
                 'Key structure ' +
-                    i +
-                    ': at least 2 dimensions should be checked for each key structure'
+                i +
+                ': at least 2 dimensions should be checked for each key structure'
             )
     }
 }

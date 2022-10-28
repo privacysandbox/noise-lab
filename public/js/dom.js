@@ -1223,16 +1223,20 @@ function validateBudgetPercentages(metrics, errors) {
 }
 
 function validateDimensions(dimensions, errors) {
-    var bits = 1
+    var totalNumberOfPossibleDistinctValues = 1
 
-    dimensions.forEach((element) => {
-        if (element.size * 1 < 1 || element.size == undefined)
+    dimensions.forEach((dimension) => {
+        // dimension.size is the number of distinct values for that dimension
+        if (dimension.size * 1 < 1 || dimension.size == undefined)
             errors.push(element.name + ' - dimension size must be >=1 ')
-        bits = bits * element.size
+        totalNumberOfPossibleDistinctValues =
+            totalNumberOfPossibleDistinctValues * dimension.size
     })
 
-    if (bits > 128)
-        errors.push('The dimensions sizes you defined would result in a key longer than 128 bits. Please adjust the dimensions sizes so their product is <= 128')
+    if (totalNumberOfPossibleDistinctValues > Math.pow(2, 128))
+        errors.push(
+            'The dimensions sizes you defined would result in a key longer than 128 bits. Please adjust the dimensions sizes so their product is <= 128'
+        )
 }
 
 function validateKeyStrategy(errors) {

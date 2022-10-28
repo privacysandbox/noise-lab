@@ -77,15 +77,15 @@ limitations under the License. -->
                                     oninput="capEpsilon(event, this)"
                                 />
                                 <div class="help" id="help-epsilon"></div>
-                                <div class="input-hint">Min: 0, Max: 64</div>
+                                <div class="input-hint below-input">Min: 0, Max: 64</div>
                             </div>
                         </div>
                         <div>
                             <h3>Your conversion data</h3>
                             <div>
                                 <label for="daily"
-                                    >Average daily attributable conversion count
-                                    PER BUCKET:</label
+                                    >Average daily attributable conversion
+                                    count PER BUCKET:</label
                                 >
                                 <select name="daily" id="daily">
                                     <option value="5">5</option>
@@ -134,17 +134,13 @@ limitations under the License. -->
                                 </select>
                                 <div class="help" id="help-scaling"></div>
                             </div>
-                            <div>
-                                <label>Scaling approach:</label>
-                                <select name="scaling-approach" disabled>
-                                    <option value="equal">
-                                        Equal budget split
-                                    </option>
-                                    <option value="custom">
-                                        Custom budget split
-                                    </option>
-                                </select>
-                                <div class="help" id="help-budget-split"></div>
+                            <div id="budget-split">
+                                <label class="long">Budget split (used for Scaling):</label>
+                                <div class="help" id="help-budget-split-simple-mode"></div>
+                                <div >
+                                    <div class="input-hint">⚠️ The total contribution budget is split across measurement goals following the percentages below, so the sum of all percentages can't exceed 100.</div>
+                                    <div id="budget-split-wrapper-el"><label>Budget % for measurement goal 1:</label><input id="budget-percent-meas-goal-1" type="number" disabled value="50"><label>Budget % for measurement goal 2:</label><input id="budget-percent-meas-goal-2" type="number" disabled value="50"></div>
+                                </div>
                             </div>
                             <div>
                                 <label for="key-strategy">Key strategy:</label>
@@ -153,11 +149,7 @@ limitations under the License. -->
                                     id="key-strategy-select"
                                     disabled
                                 ></select>
-                                <div class="help" id="help-key-strategy"></div>
-                                <div class="input-hint">
-                                    Only Strategy A is available in the simple
-                                    mode. Try Strategy B in the advanced mode.
-                                </div>
+                                <div class="help" id="help-key-strategy-simple-mode"></div>
                                 <!-- Options are populated automatically -->
                             </div>
                         </div>
@@ -186,11 +178,20 @@ limitations under the License. -->
                         🗑 Clear all
                     </button>
                 </div>
+                <div id="empty-state-simple">
+                    <div class="empty-state">
+                        <img src="./assets/test-tube.png" alt="">
+                        <p>
+                            No simulations yet. To generate your first simulation, click the <strong>▶️ SIMULATE</strong> button at the bottom the <strong>Parameters</strong> panel on the left.
+                        </p>
+                    </div>
+                </div>
 
                 <div
                     class="all-simulations-wrapper"
                     id="all-simulations-wrapper-simple-mode"
-                ></div>
+                >
+            </div>
             </main>
         </div>
         <!-- SIMPLE MODE END -->
@@ -220,22 +221,34 @@ limitations under the License. -->
                                     oninput="capEpsilon(event, this)"
                                 />
                                 <div class="help" id="help-epsilon"></div>
-                                <div class="input-hint">Min: 0, Max: 64</div>
+                                <div class="input-hint below-input">Min: 0, Max: 64</div>
                             </div>
                         </div>
                         <div>
                             <h3>Your conversion data</h3>
-                            <label for="daily"
-                                >Average daily attributable conversion count PER
-                                BUCKET:</label
+                            <label for="event-count"
+                                >TOTAL daily attributable conversion
+                                count:</label
                             >
-                            <select name="daily" id="daily">
+                            <select
+                                name="event-count"
+                                id="event-count"
+                                oninput="updateDailyPerBucket()"
+                            >
                                 <option value="5">5</option>
                                 <option value="10">10</option>
-                                <option value="100" selected>100</option>
-                                <option value="1000">1000</option>
+                                <option value="100">100</option>
+                                <option value="1000" selected>1000</option>
                                 <option value="10000">10000</option>
+                                <option value="100000">100000</option>
                             </select>
+                            <div class="help" id="help-daily-total"></div>
+                            <label for="daily"
+                                >Average daily attributable conversion
+                                count PER BUCKET:</label
+                            >
+                            <input name="daily" id="daily" disabled>
+                            </input>
                             <div class="help" id="help-daily"></div>
                         </div>
                         <div id="metrics-params">
@@ -252,7 +265,6 @@ limitations under the License. -->
                                         type="number"
                                         value="2"
                                         id="metrics-number"
-                                        max="64"
                                         min="0"
                                     />
                                     <br />
@@ -277,8 +289,6 @@ limitations under the License. -->
                                         type="number"
                                         id="dimensions-number"
                                         name="dimensions-number"
-                                        max="64"
-                                        min="0"
                                     />
                                     <div id="dimensions-div"></div>
                                     <div id="dimensions-buttons-div"></div>
@@ -308,24 +318,20 @@ limitations under the License. -->
                                 </select>
                                 <div class="help" id="help-scaling"></div>
                             </div>
-                            <div>
-                                <label>Scaling approach:</label>
-                                <select name="scaling-approach" disabled>
-                                    <option value="equal">
-                                        Equal budget split
-                                    </option>
-                                    <option value="custom">
-                                        Custom budget split
-                                    </option>
-                                </select>
-                                <div class="help" id="help-budget-split"></div>
+                            <div id="budget-split">
+                                <label class="long">Budget split (used for Scaling):</label>
+                                <div class="help" id="help-budget-split-advanced-mode"></div>
+                                <div>
+                                    <div class="input-hint">⚠️ The total contribution budget is split across measurement goals following the percentages below, so the sum of all percentages can't exceed 100.</div>
+                                    <div id="budget-split-wrapper-el"></div>
+                                </div>
                             </div>
                             <label for="granularity">Key strategy:</label>
                             <select name="granularity" id="granularity">
                                 <option value="A">A</option>
                                 <option value="B">B</option>
                             </select>
-                            <div class="help" id="help-key-strategy"></div>
+                            <div class="help" id="help-key-strategy-advanced-mode"></div>
                         </div>
                         <div id="granular" hidden>
                             <h4>Key structures</h4>
@@ -380,6 +386,14 @@ limitations under the License. -->
                     >
                         🗑 Clear all
                     </button>
+                </div>
+                <div id="empty-state-advanced">
+                    <div class="empty-state">
+                        <img src="./assets/test-tube.png" alt="">
+                        <p>
+                            No simulations yet. To generate your first simulation, click the <strong>▶️ SIMULATE</strong> button at the bottom the <strong>Parameters</strong> panel on the left.
+                        </p>
+                    </div>
                 </div>
                 <div
                     class="all-simulations-wrapper"

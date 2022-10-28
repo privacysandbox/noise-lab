@@ -36,11 +36,13 @@ body {
     --red: rgb(222, 0, 0);
     --red-light: #ffecef;
     --label-width: 10.2rem;
+    --label-width-long: 14rem;
     --label-padding-right: 0.5rem;
     --font-size-s: 0.8rem;
     --header-height: 4rem;
     --text-color-lighter: rgb(44, 45, 46);
     --text-color-x-lighter: rgb(28, 29, 30);
+    --text-color-x-x-lighter: #696969;
     --main-height: calc(100vh - var(--header-height));
     --margin-helper: 0;
 }
@@ -393,6 +395,16 @@ label {
     display: inline-block;
 }
 
+label.long {
+    width: auto;
+}
+
+#budget-split-wrapper-el {
+    border: solid 1px var(--border-color-dark);
+    margin: 0.2rem 2rem 0.2rem 0rem;
+    padding: 0.4rem;
+}
+
 input,
 select {
     margin: 0.2rem 0;
@@ -424,11 +436,13 @@ select:focus {
 }
 
 .input-hint {
-    margin-left: calc(var(--label-width) + var(--label-padding-right) + 0.2rem);
     font-size: var(--font-size-s);
-    color: dimgrey;
+    color: var(--text-color-x-x-lighter);
 }
 
+.input-hint.below-input {
+    margin-left: calc(var(--label-width) + var(--label-padding-right) + 0.2rem);
+}
 /* HELPER BADGES */
 
 .help {
@@ -504,6 +518,10 @@ hr {
     display: none;
 }
 
+.visible {
+    display: block;
+}
+
 @keyframes appear {
     0% {
         opacity: 0;
@@ -535,4 +553,15 @@ hr {
     z-index: 10000;
     overflow-y: scroll;
     bottom: 1.2rem;
+}
+
+/* EMPTY STATE */
+
+.empty-state {
+    color: var(--text-color-x-x-lighter);
+    margin: 0 auto;
+    text-align: center;
+    padding-top: 6rem;
+    width: 50%;
+    min-width: 30ch;
 }

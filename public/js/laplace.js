@@ -22,6 +22,7 @@ import {
     validateInputsBeforeSimulation,
     resetFormValidation,
     clearAll,
+    getBudgetPercentageForMetricIdFromDom,
 } from './dom.js'
 import { generateSimulationId, tempSaveTable, downloadAll } from './utils.misc'
 import { CONTRIBUTION_BUDGET } from './consts.js'
@@ -98,8 +99,9 @@ function simulatePerMetric(
     dailyCount,
     simulationNo
 ) {
+    const percentage = getBudgetPercentageForMetricIdFromDom(metric.id)
     const scalingFactor = isUseScaling
-        ? getScalingFactorForMetric(metric, metricsNo, contributionBudget)
+        ? getScalingFactorForMetric(metric, percentage, contributionBudget)
         : 1
     const keyCombinationString = getKeyCombinationString(keyCombinations.names)
 
@@ -114,6 +116,7 @@ function simulatePerMetric(
             dailyCount,
             batchingFrequency
         )
+
         const noisePercentage = calculateNoisePercentage(
             noise,
             randCount * scalingFactor + noise

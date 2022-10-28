@@ -21,6 +21,7 @@ import {
     displaySimulationResults_simpleMode,
     getIsUseScalingFromDom,
     clearAll,
+    getBudgetPercentageForMetricIdFromDom,
 } from './dom'
 import {
     getScalingFactorForMetric,
@@ -146,8 +147,9 @@ function simulate(
     const numberOfMetrics = metrics.length
     for (let i = 0; i < numberOfMetrics; i++) {
         const metric = metrics[i]
+        const percentage = getBudgetPercentageForMetricIdFromDom(i + 1)
         const scalingFactorForThisMetric = isUseScaling
-            ? getScalingFactorForMetric(metric, numberOfMetrics, budget)
+            ? getScalingFactorForMetric(metric, percentage, budget)
             : 1
         const dailyReportPreNoise = generateUnnoisyKeyValuePairsReport(
             metric,

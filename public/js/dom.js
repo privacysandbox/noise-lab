@@ -108,15 +108,57 @@ export function clearAll(mode) {
             `all-simulations-wrapper-${mode}-mode`
         ).innerHTML = ''
     }
+    displayEmptyState(mode)
 }
 
 export function initializeDisplayAdvancedMode(metrics, dimensions, budget) {
+    updateDailyPerBucket()
     displayContributionBudget(budget)
     addKeyStrategyListener()
+    addScalingListener()
     displayMetrics(metrics)
+    displayBudgetSplit()
     addMetricsButtons()
     displayDimensions(dimensions)
     addDimensionsButtons()
+}
+
+function displayBudgetSplit() {
+    const budgetSplitWrapperEl = document.getElementById(
+        'budget-split-wrapper-el'
+    )
+    budgetSplitWrapperEl.innerHTML = ''
+    const measurementGoals = getMetricsArrayFromDom()
+    console.log(measurementGoals)
+    const numberOfMeasurementGoals = measurementGoals.length
+    const defaultPercentOfBudgetPerMeasurementGoal = (
+        100 / numberOfMeasurementGoals
+    ).toFixed(0)
+    measurementGoals.forEach((m) => {
+        const { id } = m
+        const label = document.createElement('label')
+        label.innerText = `Budget % for measurement goal ${id}:`
+        const input = document.createElement('input')
+        input.id = `budget-percent-meas-goal-${id}`
+        input.value = defaultPercentOfBudgetPerMeasurementGoal
+        input.setAttribute('type', 'number')
+        budgetSplitWrapperEl.appendChild(label)
+        budgetSplitWrapperEl.appendChild(input)
+    })
+}
+
+
+export function addScalingListener() {
+    const scalingSelector = document.getElementById('scaling')
+    const budgetSplitDiv = document.getElementById('budget-split')
+
+    scalingSelector.addEventListener('change', function () {
+        if (scalingSelector.value == 0) {
+            budgetSplitDiv.style.display = 'none'
+        } else {
+            budgetSplitDiv.style.display = 'block'
+        }
+    })
 }
 
 export function initializeDisplaySimpleMode(
@@ -141,6 +183,7 @@ export function initializeDisplaySimpleMode(
         dimensions,
         false
     )
+    addScalingListener()
 }
 
 export function displayInputParameters(
@@ -256,10 +299,26 @@ export function displayInputParameters(
     })
 }
 
+function displayEmptyState(mode) {
+    const emptyState = document.getElementById(`empty-state-${mode}`)
+    if (emptyState) {
+        emptyState.className = 'visible'
+    }
+}
+
+function hideEmptyState(mode) {
+    const emptyState = document.getElementById(`empty-state-${mode}`)
+    if (emptyState) {
+        emptyState.className = 'hidden'
+    }
+}
+
 export function displaySimulationResults_simpleMode(
     simulation,
     keyCombinationDisplay
 ) {
+    hideEmptyState('simple')
+
     const allSimulationsWrapper = document.getElementById(
         'all-simulations-wrapper-simple-mode'
     )
@@ -390,6 +449,12 @@ function displayNoise(parentDomEl, averageNoisePercentage) {
     displayNoiseAverage(noiseWrapperDiv, averageNoisePercentage)
 }
 
+export function getBudgetPercentageForMetricIdFromDom(metricId) {
+    return Number.parseInt(
+        getElementValueById(`budget-percent-meas-goal-${metricId}`)
+    )
+}
+
 function displayReport(
     parentDomEl,
     report,
@@ -471,6 +536,7 @@ export function displayDimensionInputFields(id) {
     dimensionSize.type = 'number'
     dimensionSize.id = 'dimension' + id + '-size'
     dimensionSize.setAttribute('placeholder', 'Dimension size')
+    dimensionSize.setAttribute('class', 'dimension-size')
 
     const dimensionName = document.createElement('input')
     dimensionName.type = 'text'
@@ -481,6 +547,8 @@ export function displayDimensionInputFields(id) {
     dimensionId.appendChild(document.createElement('br'))
     dimensionId.appendChild(dimensionName)
     dimensionsConfigDiv.appendChild(dimensionId)
+
+    updateDailyPerBucket()
 }
 
 export function getFrequencyValue() {
@@ -531,6 +599,8 @@ export function displaySimulationResults_advancedMode(
     simulationNo,
     metricsNo
 ) {
+    hideEmptyState('advanced')
+
     const allSimulationsWrapper = mainDiv
 
     const { data, averageNoisePercentage } = simulation
@@ -597,9 +667,6 @@ export function displaySimulationResults_advancedMode(
 
     allSimulationsWrapper.appendChild(simulationWrapperDiv)
 
-    const simulationWrapper = document.getElementById(
-        generateSimulationWrapperElId(simulationId)
-    )
     simulationWrapperDiv.scrollIntoView({ block: 'end' })
 
     // Update tooltips
@@ -872,8 +939,9 @@ export function displayMetrics(metrics) {
         metricDiv.appendChild(metricAvgLabel)
         metricDiv.appendChild(metricAvg)
         metricDiv.appendChild(document.createElement('br'))
-        metricDiv.appendChild(document.createElement('br'))
     })
+
+    displayBudgetSplit()
 }
 
 export function addMetricsButtons() {
@@ -901,6 +969,7 @@ export function addMetricsButtons() {
     resetMetricsBtn.innerHTML = 'Reset'
     metricsButtonDiv.appendChild(resetMetricsBtn)
 }
+
 export function addMetric() {
     var metricsNo = document.getElementById('metrics-number').value
     metricsNo = metricsNo * 1 + 1
@@ -914,12 +983,12 @@ export function addMetric() {
     metricsMainDiv.appendChild(metricDiv)
 
     var metricHeader = document.createElement('h4')
-    metricHeader.innerHTML = 'Metric ' + metricsNo
+    metricHeader.innerHTML = 'Measurement goal ' + metricsNo
     metricDiv.appendChild(metricHeader)
 
     var metricName = document.createElement('input')
     metricName.setAttribute('type', 'text')
-    metricName.setAttribute('placeholder', 'Metric name')
+    metricName.setAttribute('placeholder', 'Measurement goal name')
     metricName.setAttribute('id', 'metric' + metricsNo + '-name')
     metricDiv.appendChild(metricName)
     metricDiv.appendChild(document.createElement('br'))
@@ -938,6 +1007,8 @@ export function addMetric() {
     metricDiv.appendChild(metricAvg)
 
     metricsMainDiv.appendChild(metricDiv)
+
+    displayBudgetSplit()
 }
 
 export function removeMetric() {
@@ -947,6 +1018,8 @@ export function removeMetric() {
 
     metricsNo = metricsNo * 1 - 1
     document.getElementById('metrics-number').value = metricsNo
+
+    displayBudgetSplit()
 }
 
 export function displayDimensions(dimensions) {
@@ -981,11 +1054,15 @@ export function displayDimensions(dimensions) {
 
         dimensionDiv.appendChild(dimensionName)
         dimensionDiv.appendChild(document.createElement('br'))
+        dimensionDiv.addEventListener('change', () => {
+            updateDailyPerBucket()
+        })
 
         var dimensionSize = document.createElement('input')
         dimensionSize.setAttribute('id', 'dimension' + element.id + '-size')
         dimensionSize.setAttribute('type', 'number')
         dimensionSize.setAttribute('placeholder', 'Dimension size')
+        dimensionSize.setAttribute('class', 'dimension-size')
         dimensionSize.value = element.size
 
         const dimensionSizeLabel = document.createElement('label')
@@ -997,6 +1074,8 @@ export function displayDimensions(dimensions) {
         dimensionDiv.appendChild(document.createElement('br'))
 
         dimensionsMainDiv.appendChild(dimensionDiv)
+
+        updateDailyPerBucket()
     })
 }
 
@@ -1057,6 +1136,8 @@ export function addDimension() {
     dimensionDiv.appendChild(document.createElement('br'))
 
     dimensionsMainDiv.appendChild(dimensionDiv)
+
+    updateDailyPerBucket()
 }
 
 export function removeDimension() {
@@ -1066,6 +1147,8 @@ export function removeDimension() {
 
     dimensionsNo = dimensionsNo * 1 - 1
     document.getElementById('dimensions-number').value = dimensionsNo
+
+    updateDailyPerBucket()
 }
 
 export function getKeyCombinationString(names) {
@@ -1082,6 +1165,22 @@ export function capEpsilon(event, inputEl) {
     }
 }
 
+export function getNumberOfBuckets() {
+    const allDimensionSizes = document.querySelectorAll('.dimension-size')
+    let nbOfBuckets = 1
+    allDimensionSizes.forEach((dimSize) => {
+        nbOfBuckets = nbOfBuckets * dimSize.value
+    })
+    return nbOfBuckets
+}
+
+export function updateDailyPerBucket() {
+    const dailyTotal = document.getElementById('event-count').value
+    const nbOfBuckets = getNumberOfBuckets()
+    const d = document.getElementById('daily')
+    d.value = Math.floor(dailyTotal / nbOfBuckets)
+}
+
 export function resetFormValidation() {
     const formValidationWrapperEl = getFormValidationElFromDom()
     formValidationWrapperEl.innerText = ''
@@ -1096,6 +1195,7 @@ export function validateInputsBeforeSimulation(
     keyCombinationNumber
 ) {
     var errors = []
+    validateBudgetPercentages(metrics, errors)
     validateMetrics(metrics, errors)
     validateDimensions(dimensions, errors)
     if (!isGranular) validateKeyStrategy(errors)
@@ -1124,16 +1224,37 @@ function validateMetrics(metrics, errors) {
         if (element.avgValue * 1 > element.maxValue * 1)
             errors.push(
                 element.name +
-                    ' - maximum value cannot be smaller than average value'
+                ' - maximum value cannot be smaller than average value'
             )
     })
 }
 
+function validateBudgetPercentages(metrics, errors) {
+    const sumOfAllPercentages = metrics.reduce((sum, metric) => {
+        return sum + getBudgetPercentageForMetricIdFromDom(metric.id)
+    }, 0)
+    if (sumOfAllPercentages > 100) {
+        errors.push('The sum of all budget split percentages exceeds 100')
+    }
+}
+
 function validateDimensions(dimensions, errors) {
-    dimensions.forEach((element) => {
-        if (element.size * 1 < 1 || element.size == undefined)
-            errors.push(element.name + ' - dimension size must be >=1 ')
+
+    console.log(dimensions)
+    var totalNumberOfPossibleDistinctValues = 1
+
+    dimensions.forEach((dimension) => {
+        // dimension.size is the number of distinct values for that dimension
+        if (dimension.size * 1 < 1 || dimension.size == undefined || dimension.size == '')
+            errors.push(dimension.name + ' - dimension size must be >=1 ')
+        totalNumberOfPossibleDistinctValues =
+            totalNumberOfPossibleDistinctValues * dimension.size
     })
+
+    if (totalNumberOfPossibleDistinctValues > Math.pow(2, 128))
+        errors.push(
+            'The dimensions sizes you defined would result in a key longer than 128 bits. Please adjust the dimensions sizes so their product is <= 128'
+        )
 }
 
 function validateKeyStrategy(errors) {
@@ -1151,13 +1272,18 @@ function validateKeyStrategy(errors) {
         if (noChecked < 2)
             errors.push(
                 'Key structure ' +
-                    i +
-                    ': at least 2 dimensions should be checked for each key structure'
+                i +
+                ': at least 2 dimensions should be checked for each key structure'
             )
     }
+}
+
+export function getScalingApproachFromDom() {
+    return document.getElementById('scaling-approach').value
 }
 
 window.createCustomMetricsInputs = createCustomMetricsInputs
 window.generateCustomMetrics = generateCustomMetrics
 window.generateKeyStructures = generateKeyStructures
 window.capEpsilon = capEpsilon
+window.updateDailyPerBucket = updateDailyPerBucket

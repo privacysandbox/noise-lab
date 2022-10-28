@@ -57,6 +57,11 @@ tippy('#help-scaling', {
     ...defaultOptions,
 })
 
+tippy('#help-daily-total', {
+    content: `Average daily count of attributable conversions over all buckets (keys).`,
+    ...defaultOptions,
+})
+
 tippy('#help-daily', {
     content: `Average daily count of <em>attributable</em> conversions for one bucket (key) <em>with all
     dimensions combined</em>. 
@@ -65,7 +70,7 @@ tippy('#help-daily', {
     <li><em>with all
     dimensions combined</em>: For a set of dimensions <em>Campaign Id</em> x <em>Geography</em> x <em>Product category</em>, the average daily conversion count is the average daily conversion count for a given <em>Campaign Id</em> AND <em>Geography</em> AND <em>Product category</em>. This is a naive approach. Check out the advanced mode for more elaborate approaches. </li>
     </ul>
-    <strong>This impacts signal-to-noise ratios in the final summary reports.</strong><br/> ${learnMoreHtml} <br/> Tip: Try and experiment with different conversion counts based on different campaign variables: campaign budget, user reach, ad efficiencies, etc. For example, all else being equal, what happens when your advertiser's budget is $10K vs. $100K? $10K will have less attributed conversions than $100K. Maybe the signal-to-noise ratio will be too high at $10K, but acceptable at $100K.`,
+    <strong>This impacts signal-to-noise ratios in the final summary reports.</strong><br/> ${learnMoreHtml} <br/><br/> Tip: Try and experiment with different conversion counts based on different campaign variables: campaign budget, user reach, ad efficiencies, etc. For example, all else being equal, what happens when your advertiser's budget is $10K vs. $100K? $10K will have less attributed conversions than $100K. Maybe the signal-to-noise ratio will be too high at $10K, but acceptable at $100K.`,
     ...defaultOptions,
 })
 
@@ -74,20 +79,29 @@ tippy('#help-batching-frequency', {
     ...defaultOptions,
 })
 
-tippy('#help-key-strategy', {
-    content: `<strong>A = one granular key structure. B = several coarse key structures.</strong><br />In Strategy A, you have "one deep tree": each summary value in summary reports is associated to all of the dimensions you're tracking. You can then roll up these values yourself as needed, after aggregation. In Strategy B, you have "several shallow threes": the summary values in summary reports map to one of several sets of dimensions. <br/><strong>Your key strategy impacts signal-to-noise ratios in the final summary reports.</strong><br/>${learnMoreHtml}<br/><br/>
-    Example:<br/>
-    Let's consider this set of dimensions: <em>Measurement goal type</em> x <em>Campaign ID</em> x <em>Geo ID</em> x <em>Product category</em>
-    <ul>
-    <li>
-    In Strategy A, you use one granular key structure, that includes all your dimensions: <em>Measurement goal type</em> x <em>Campaign ID</em> x <em>Geo ID</em> x <em>Product category</em>. All your keys use this structure. 
-    </li>
-    <li>
-    In Strategy B, you use two coarse key structures, each including a subset of your dimensions. For example:
-    Key structure I: <em>Measurement goal type</em> x <em>Geo ID</em> x <em>Product category</em>.
-    Key structure II: <em>Measurement goal type</em> x <em>Campaign ID</em> x <em>Geo ID</em>.
-    </li>
-    </ul>`,
+const keyStrategyHelperHTML = `<strong>A = one granular key structure. B = several coarse key structures.</strong><br />In Strategy A, you have "one deep tree": each summary value in summary reports is associated to all of the dimensions you're tracking. You can then roll up these values yourself as needed, after aggregation. In Strategy B, you have "several shallow threes": the summary values in summary reports map to one of several sets of dimensions. <br/><strong>Your key strategy impacts signal-to-noise ratios in the final summary reports.</strong><br/>${learnMoreHtml}<br/><br/>
+Example:<br/>
+Let's consider this set of dimensions: <em>Measurement goal type</em> x <em>Campaign ID</em> x <em>Geo ID</em> x <em>Product category</em>
+<ul>
+<li>
+In Strategy A, you use one granular key structure, that includes all your dimensions: <em>Measurement goal type</em> x <em>Campaign ID</em> x <em>Geo ID</em> x <em>Product category</em>. All your keys use this structure. 
+</li>
+<li>
+In Strategy B, you use two coarse key structures, each including a subset of your dimensions. For example:
+Key structure I: <em>Measurement goal type</em> x <em>Geo ID</em> x <em>Product category</em>.
+Key structure II: <em>Measurement goal type</em> x <em>Campaign ID</em> x <em>Geo ID</em>.
+</li>
+</ul>`
+
+const advancedModeOnly = `This option is only available in the <strong>Advanced mode</strong>.<br/><br/>`
+
+tippy('#help-key-strategy-simple-mode', {
+    content: `${advancedModeOnly}${keyStrategyHelperHTML}`,
+    ...defaultOptions,
+})
+
+tippy('#help-key-strategy-advanced-mode', {
+    content: keyStrategyHelperHTML,
     ...defaultOptions,
 })
 
@@ -105,8 +119,15 @@ tippy('#help-key-strategy-number', {
     ...defaultOptions,
 })
 
-tippy('#help-budget-split', {
-    content: `[Not implemented yet, coming in the future]<br/><br/>When scaling, adtechs can decide to split their contribution budget in various ways. This control helps you configure this. You can split the budget equally across measurement goals⏤this is the more basic approach, and the default Noise Lab uses⏤, or to split it inequally⏤this is more elaborate and leads to higher signal-to-noise ratios.`,
+const budgetHelperHTML = `When scaling, adtechs can decide to split their contribution budget in various ways. You can split the budget equally across measurement goals⏤this is the more basic approach, and the default Noise Lab uses⏤, or to split it inequally by assigning more budget to a measurement goal⏤this leads to <strong>higher signal-to-noise ratios</strong>.`
+
+tippy('#help-budget-split-simple-mode', {
+    content: `${advancedModeOnly}${budgetHelperHTML}`,
+    ...defaultOptions,
+})
+
+tippy('#help-budget-split-advanced-mode', {
+    content: budgetHelperHTML,
     ...defaultOptions,
 })
 

@@ -108,6 +108,7 @@ export function clearAll(mode) {
             `all-simulations-wrapper-${mode}-mode`
         ).innerHTML = ''
     }
+    displayEmptyState(mode)
 }
 
 export function initializeDisplayAdvancedMode(metrics, dimensions, budget) {
@@ -115,9 +116,34 @@ export function initializeDisplayAdvancedMode(metrics, dimensions, budget) {
     displayContributionBudget(budget)
     addKeyStrategyListener()
     displayMetrics(metrics)
+    displayBudgetSplit()
     addMetricsButtons()
     displayDimensions(dimensions)
     addDimensionsButtons()
+}
+
+function displayBudgetSplit() {
+    const budgetSplitWrapperEl = document.getElementById(
+        'budget-split-wrapper-el'
+    )
+    budgetSplitWrapperEl.innerHTML = ''
+    const measurementGoals = getMetricsArrayFromDom()
+    console.log(measurementGoals)
+    const numberOfMeasurementGoals = measurementGoals.length
+    const defaultPercentOfBudgetPerMeasurementGoal = (
+        100 / numberOfMeasurementGoals
+    ).toFixed(0)
+    measurementGoals.forEach((m) => {
+        const { id } = m
+        const label = document.createElement('label')
+        label.innerText = `Budget % for measurement goal ${id}:`
+        const input = document.createElement('input')
+        input.id = `budget-percent-meas-goal-${id}`
+        input.value = defaultPercentOfBudgetPerMeasurementGoal
+        input.setAttribute('type', 'number')
+        budgetSplitWrapperEl.appendChild(label)
+        budgetSplitWrapperEl.appendChild(input)
+    })
 }
 
 export function initializeDisplaySimpleMode(
@@ -257,10 +283,26 @@ export function displayInputParameters(
     })
 }
 
+function displayEmptyState(mode) {
+    const emptyState = document.getElementById(`empty-state-${mode}`)
+    if (emptyState) {
+        emptyState.className = 'visible'
+    }
+}
+
+function hideEmptyState(mode) {
+    const emptyState = document.getElementById(`empty-state-${mode}`)
+    if (emptyState) {
+        emptyState.className = 'hidden'
+    }
+}
+
 export function displaySimulationResults_simpleMode(
     simulation,
     keyCombinationDisplay
 ) {
+    hideEmptyState('simple')
+
     const allSimulationsWrapper = document.getElementById(
         'all-simulations-wrapper-simple-mode'
     )
@@ -389,6 +431,12 @@ function displayNoise(parentDomEl, averageNoisePercentage) {
     noiseWrapperDiv.setAttribute('class', 'noise-wrapper')
     parentDomEl.appendChild(noiseWrapperDiv)
     displayNoiseAverage(noiseWrapperDiv, averageNoisePercentage)
+}
+
+export function getBudgetPercentageForMetricIdFromDom(metricId) {
+    return Number.parseInt(
+        getElementValueById(`budget-percent-meas-goal-${metricId}`)
+    )
 }
 
 function displayReport(
@@ -535,6 +583,8 @@ export function displaySimulationResults_advancedMode(
     simulationNo,
     metricsNo
 ) {
+    hideEmptyState('advanced')
+
     const allSimulationsWrapper = mainDiv
 
     const { data, averageNoisePercentage } = simulation
@@ -873,8 +923,9 @@ export function displayMetrics(metrics) {
         metricDiv.appendChild(metricAvgLabel)
         metricDiv.appendChild(metricAvg)
         metricDiv.appendChild(document.createElement('br'))
-        metricDiv.appendChild(document.createElement('br'))
     })
+
+    displayBudgetSplit()
 }
 
 export function addMetricsButtons() {
@@ -902,6 +953,7 @@ export function addMetricsButtons() {
     resetMetricsBtn.innerHTML = 'Reset'
     metricsButtonDiv.appendChild(resetMetricsBtn)
 }
+
 export function addMetric() {
     var metricsNo = document.getElementById('metrics-number').value
     metricsNo = metricsNo * 1 + 1
@@ -915,12 +967,12 @@ export function addMetric() {
     metricsMainDiv.appendChild(metricDiv)
 
     var metricHeader = document.createElement('h4')
-    metricHeader.innerHTML = 'Metric ' + metricsNo
+    metricHeader.innerHTML = 'Measurement goal ' + metricsNo
     metricDiv.appendChild(metricHeader)
 
     var metricName = document.createElement('input')
     metricName.setAttribute('type', 'text')
-    metricName.setAttribute('placeholder', 'Metric name')
+    metricName.setAttribute('placeholder', 'Measurement goal name')
     metricName.setAttribute('id', 'metric' + metricsNo + '-name')
     metricDiv.appendChild(metricName)
     metricDiv.appendChild(document.createElement('br'))
@@ -939,6 +991,8 @@ export function addMetric() {
     metricDiv.appendChild(metricAvg)
 
     metricsMainDiv.appendChild(metricDiv)
+
+    displayBudgetSplit()
 }
 
 export function removeMetric() {
@@ -948,6 +1002,8 @@ export function removeMetric() {
 
     metricsNo = metricsNo * 1 - 1
     document.getElementById('metrics-number').value = metricsNo
+
+    displayBudgetSplit()
 }
 
 export function displayDimensions(dimensions) {
@@ -1123,6 +1179,7 @@ export function validateInputsBeforeSimulation(
     keyCombinationNumber
 ) {
     var errors = []
+    validateBudgetPercentages(metrics, errors)
     validateMetrics(metrics, errors)
     validateDimensions(dimensions, errors)
     if (!isGranular) validateKeyStrategy(errors)
@@ -1151,9 +1208,18 @@ function validateMetrics(metrics, errors) {
         if (element.avgValue * 1 > element.maxValue * 1)
             errors.push(
                 element.name +
-                ' - maximum value cannot be smaller than average value'
+                    ' - maximum value cannot be smaller than average value'
             )
     })
+}
+
+function validateBudgetPercentages(metrics, errors) {
+    const sumOfAllPercentages = metrics.reduce((sum, metric) => {
+        return sum + getBudgetPercentageForMetricIdFromDom(metric.id)
+    }, 0)
+    if (sumOfAllPercentages > 100) {
+        errors.push('The sum of all budget split percentages exceeds 100')
+    }
 }
 
 function validateDimensions(dimensions, errors) {
@@ -1184,10 +1250,14 @@ function validateKeyStrategy(errors) {
         if (noChecked < 2)
             errors.push(
                 'Key structure ' +
-                i +
-                ': at least 2 dimensions should be checked for each key structure'
+                    i +
+                    ': at least 2 dimensions should be checked for each key structure'
             )
     }
+}
+
+export function getScalingApproachFromDom() {
+    return document.getElementById('scaling-approach').value
 }
 
 window.createCustomMetricsInputs = createCustomMetricsInputs

@@ -16,16 +16,12 @@ import laplace from '@stdlib/random-base-laplace'
 
 export function getScalingFactorForMetric(
     metric,
-    totalNumberOfMetrics,
+    percentage,
     contributionBudget
 ) {
-    const budgetPerMetric = Math.floor(
-        contributionBudget / totalNumberOfMetrics
-    )
-    const scalingFactorForThisMetric = Math.floor(
-        budgetPerMetric / metric.maxValue
-    )
-    return scalingFactorForThisMetric
+    const budgetForThisMetric = contributionBudget * (percentage / 100)
+    const scalingFactorForThisMetric = budgetForThisMetric / metric.maxValue
+    return scalingFactorForThisMetric.toFixed(1)
 }
 
 export function getRandomLaplacianNoise(budget, epsilon) {
@@ -108,12 +104,17 @@ export function generateAggregatedValue(
         metric.avgValue * 1 +
         deterministicValue * 1 * (deterministicValue % 2 == 0 ? 1 : -1)
 
-    var dailyConversionValue = Math.abs(dailyConversionCount * 1 + ((deterministicValue % 2 == 0 ? 1 * deterministicValue : -1 * deterministicValue)))
+    var dailyConversionValue = Math.abs(
+        dailyConversionCount * 1 +
+            (deterministicValue % 2 == 0
+                ? 1 * deterministicValue
+                : -1 * deterministicValue)
+    )
 
     var calculationValue =
         deterministicNumber > 0 &&
-            (metric.maxValue == metric.avgValue ||
-                metric.maxValue > deterministicNumber)
+        (metric.maxValue == metric.avgValue ||
+            metric.maxValue > deterministicNumber)
             ? deterministicNumber
             : metric.maxValue
 
@@ -137,8 +138,8 @@ export function generateAggregatedValueTemp(
 
     var calculationValue =
         deterministicNumber > 0 &&
-            (metric.maxValue == metric.avgValue ||
-                metric.maxValue > deterministicNumber)
+        (metric.maxValue == metric.avgValue ||
+            metric.maxValue > deterministicNumber)
             ? deterministicNumber
             : metric.maxValue
 

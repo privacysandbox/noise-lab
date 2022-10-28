@@ -115,6 +115,7 @@ export function initializeDisplayAdvancedMode(metrics, dimensions, budget) {
     updateDailyPerBucket()
     displayContributionBudget(budget)
     addKeyStrategyListener()
+    addScalingListener()
     displayMetrics(metrics)
     displayBudgetSplit()
     addMetricsButtons()
@@ -146,6 +147,20 @@ function displayBudgetSplit() {
     })
 }
 
+
+export function addScalingListener() {
+    const scalingSelector = document.getElementById('scaling')
+    const budgetSplitDiv = document.getElementById('budget-split')
+
+    scalingSelector.addEventListener('change', function () {
+        if (scalingSelector.value == 0) {
+            budgetSplitDiv.style.display = 'none'
+        } else {
+            budgetSplitDiv.style.display = 'block'
+        }
+    })
+}
+
 export function initializeDisplaySimpleMode(
     keyStrategies, // as array
     batchingFrequencies, // as array
@@ -168,6 +183,7 @@ export function initializeDisplaySimpleMode(
         dimensions,
         false
     )
+    addScalingListener()
 }
 
 export function displayInputParameters(

@@ -1224,7 +1224,7 @@ function validateMetrics(metrics, errors) {
         if (element.avgValue * 1 > element.maxValue * 1)
             errors.push(
                 element.name +
-                    ' - maximum value cannot be smaller than average value'
+                ' - maximum value cannot be smaller than average value'
             )
     })
 }
@@ -1239,12 +1239,14 @@ function validateBudgetPercentages(metrics, errors) {
 }
 
 function validateDimensions(dimensions, errors) {
+
+    console.log(dimensions)
     var totalNumberOfPossibleDistinctValues = 1
 
     dimensions.forEach((dimension) => {
         // dimension.size is the number of distinct values for that dimension
-        if (dimension.size * 1 < 1 || dimension.size == undefined)
-            errors.push(element.name + ' - dimension size must be >=1 ')
+        if (dimension.size * 1 < 1 || dimension.size == undefined || dimension.size == '')
+            errors.push(dimension.name + ' - dimension size must be >=1 ')
         totalNumberOfPossibleDistinctValues =
             totalNumberOfPossibleDistinctValues * dimension.size
     })
@@ -1270,8 +1272,8 @@ function validateKeyStrategy(errors) {
         if (noChecked < 2)
             errors.push(
                 'Key structure ' +
-                    i +
-                    ': at least 2 dimensions should be checked for each key structure'
+                i +
+                ': at least 2 dimensions should be checked for each key structure'
             )
     }
 }

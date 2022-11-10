@@ -4,14 +4,18 @@ Noise Lab is a tool to onboard and experiment with summary reports and noise in 
 
 ## Live deployed version
 
-LINK TBD
+https://noise-lab.uc.r.appspot.com/
 
 ## How to use
 
-Refer to the instructions in the web app.
+Refer to the instructions in Noise Lab directly.
+
+## How to give feedcack
+
+Refer to the instructions in Noise Lab directly.
 
 ## How to run locally
 
 ```bash
-npx parcel src/index.html
+npx parcel public/index.html
 ```

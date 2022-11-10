@@ -177,6 +177,7 @@ tippy('#feedback', {
         To give public feedback on another aspect of the API (use cases...):
         <a
         target="_blank"
+        noreferrer noopeneer
         href="https://github.com/WICG/attribution-reporting-api/issues/"
     >
         Create a new issue here
@@ -186,12 +187,11 @@ tippy('#feedback', {
 })
 
 tippy('#about-info', {
-    content:
-        '<strong>Noise Lab is experimental!</strong> Expect quirks. Your feedback is needed and welcome.<br/><br/>Simulations are not saved in your browser, not persisted to a database, and not exposed to any site other than this one. You can download them.<br/><br/>Noise Lab code is open source: Link to open-source repository coming soon.',
+    content: `<strong>Noise Lab is experimental!</strong> Expect quirks. Your feedback is needed and welcome. <br/><br/><strong>Download your simulations. </strong> Noise Lab simulations are not saved (neither in your browser nor in a a database).<br/><br/><strong>Noise Lab is open source. </strong><a target="_blank" noreferrer noopeneer href="https://github.com/privacysandbox/noise-lab/">Open source GitHub repository</a>`,
     ...bottomOptions,
 })
 
 tippy('#user-guide', {
-    content: 'User guide coming soon.',
+    content: `<a target="_blank" noreferrer noopeneer href="https://developer.chrome.com/docs/privacy-sandbox/summary-reports/design-decisions/">Noise Lab user guide</a>`,
     ...bottomOptions,
 })

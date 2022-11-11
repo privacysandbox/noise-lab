@@ -8,14 +8,22 @@ https://noise-lab.uc.r.appspot.com/
 
 ## How to use
 
-Refer to the instructions in Noise Lab directly.
+Directly refer to the instructions in Noise Lab.
 
 ## How to give feedcack
 
-Refer to the instructions in Noise Lab directly.
+Directly refer to the instructions in Noise Lab.
 
 ## How to run locally
 
 ```bash
 npx parcel public/index.html
 ```
+
+## Contribute
+
+See [Contributing](https://github.com/privacysandbox/noise-lab/blob/main/docs/contributing.md).
+
+## Code of conduct
+
+See [Code of conduct](https://github.com/privacysandbox/noise-lab/blob/main/docs/code-of-conduct.md).

@@ -22,7 +22,7 @@ import {
 import { MODES } from './config'
 import { tempSaveTable_simpleMode } from './simple-mode'
 import { tempSaveTable_advancedMode } from './laplace'
-import { updateTooltips } from './tooltips'
+import { updateTooltips, updateOutlierNote } from './tooltips'
 
 export function displayContributionBudget(budget) {
     document.getElementById('contribution-budget').innerText = budget
@@ -925,6 +925,12 @@ export function displayMetrics(metrics) {
         metricMax.value = element.maxValue
         const metricMaxLabel = document.createElement('label')
         metricMaxLabel.innerText = 'Max value:'
+
+        const outlierNote = document.createElement('div')
+        outlierNote.setAttribute('class', 'help')
+        outlierNote.setAttribute('id', 'help-outlier-management')
+        metricMaxLabel.appendChild(outlierNote)
+
         metricDiv.appendChild(metricMaxLabel)
         metricDiv.appendChild(metricMax)
         metricDiv.appendChild(document.createElement('br'))
@@ -941,6 +947,7 @@ export function displayMetrics(metrics) {
         metricDiv.appendChild(document.createElement('br'))
     })
 
+    updateOutlierNote()
     displayBudgetSplit()
 }
 
@@ -997,8 +1004,16 @@ export function addMetric() {
     metricMax.setAttribute('id', 'metric' + metricsNo + '-max')
     metricMax.setAttribute('type', 'number')
     metricMax.setAttribute('placeholder', 'Maximum value')
+    const outlierNote = document.createElement('div')
+    outlierNote.setAttribute('class', 'help')
+    outlierNote.setAttribute('id', 'help-outlier-management')
+ 
     metricDiv.appendChild(metricMax)
+    metricDiv.appendChild(outlierNote)
+
     metricDiv.appendChild(document.createElement('br'))
+
+    
 
     var metricAvg = document.createElement('input')
     metricAvg.setAttribute('id', 'metric' + metricsNo + '-def')
@@ -1007,7 +1022,7 @@ export function addMetric() {
     metricDiv.appendChild(metricAvg)
 
     metricsMainDiv.appendChild(metricDiv)
-
+    updateOutlierNote()
     displayBudgetSplit()
 }
 

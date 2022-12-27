@@ -22,7 +22,9 @@ import {
     validateInputsBeforeSimulation,
     resetFormValidation,
     clearAll,
-    getBudgetPercentageForMetricIdFromDom,
+    getBudgetValueForMetricIdFromDom,
+    displayBudgetSplit,
+    getIsPercentageBudgetSplitFromDom,
 } from './dom.js'
 import { generateSimulationId, tempSaveTable, downloadAll } from './utils.misc'
 import { CONTRIBUTION_BUDGET } from './consts.js'
@@ -99,9 +101,10 @@ function simulatePerMetric(
     dailyCount,
     simulationNo
 ) {
-    const percentage = getBudgetPercentageForMetricIdFromDom(metric.id)
+    const value = getBudgetValueForMetricIdFromDom(metric.id)
+    const isPercentage = getIsPercentageBudgetSplitFromDom()
     const scalingFactor = isUseScaling
-        ? getScalingFactorForMetric(metric, percentage, contributionBudget)
+        ? getScalingFactorForMetric(metric, value, isPercentage, contributionBudget)
         : 1
     const keyCombinationString = getKeyCombinationString(keyCombinations.names)
 
@@ -170,6 +173,10 @@ export function simulateAndDisplayResultsAdvancedMode() {
 
 export function resetMetrics() {
     displayMetrics(defaultMetrics)
+}
+
+export function resetBudgetSplit() {
+    displayBudgetSplit()
 }
 
 export function resetDimensions() {
@@ -268,3 +275,4 @@ window.resetDimensions = resetDimensions
 window.clearAllAdvancedMode = clearAllAdvancedMode
 window.initializeDisplayAdvancedModeWithParams =
     initializeDisplayAdvancedModeWithParams
+window.resetBudgetSplit = resetBudgetSplit

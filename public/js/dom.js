@@ -61,10 +61,20 @@ export function getEpsilonFromDom() {
     return document.getElementById('eps').value
 }
 
+export function getIsPercentageBudgetSplitFromDom() {
+    return document.getElementById('percentage').checked
+}
 function getFormValidationElFromDom() {
     return document.getElementById('form-validation-wrapper')
 }
 
+function getContributionBudgetFromDom() {
+    return document.getElementById('contribution-budget').innerHTML
+}
+
+function getBudgetSplitOptionFromDom() {
+    return document.querySelector('input[name="budget-split-option"]:checked').value
+}
 export function displayTabularData(
     parentDomEl,
     tabularData,
@@ -123,24 +133,29 @@ export function initializeDisplayAdvancedMode(metrics, dimensions, budget) {
     addDimensionsButtons()
 }
 
-function displayBudgetSplit() {
+export function displayBudgetSplit() {
     const budgetSplitWrapperEl = document.getElementById(
         'budget-split-wrapper-el'
     )
     budgetSplitWrapperEl.innerHTML = ''
     const measurementGoals = getMetricsArrayFromDom()
+    const contributionBudget = getContributionBudgetFromDom()
     console.log(measurementGoals)
     const numberOfMeasurementGoals = measurementGoals.length
-    const defaultPercentOfBudgetPerMeasurementGoal = (
-        100 / numberOfMeasurementGoals
-    ).toFixed(0)
+    const budgetSplitOption = getBudgetSplitOptionFromDom()
+
+    const defaultValueOfBudgetPerMeasurementGoal =
+        (budgetSplitOption == 'percentage' ?
+            (100 / numberOfMeasurementGoals).toFixed(0) :
+            (contributionBudget / numberOfMeasurementGoals).toFixed(0) )
+    
     measurementGoals.forEach((m) => {
         const { id } = m
         const label = document.createElement('label')
-        label.innerText = `Budget % for measurement goal ${id}:`
+        label.innerText = `Budget `+budgetSplitOption+` for measurement goal ${id}:`
         const input = document.createElement('input')
         input.id = `budget-percent-meas-goal-${id}`
-        input.value = defaultPercentOfBudgetPerMeasurementGoal
+        input.value = defaultValueOfBudgetPerMeasurementGoal
         input.setAttribute('type', 'number')
         budgetSplitWrapperEl.appendChild(label)
         budgetSplitWrapperEl.appendChild(input)
@@ -449,7 +464,8 @@ function displayNoise(parentDomEl, averageNoisePercentage) {
     displayNoiseAverage(noiseWrapperDiv, averageNoisePercentage)
 }
 
-export function getBudgetPercentageForMetricIdFromDom(metricId) {
+export function getBudgetValueForMetricIdFromDom(metricId) {
+
     return Number.parseInt(
         getElementValueById(`budget-percent-meas-goal-${metricId}`)
     )
@@ -1007,13 +1023,13 @@ export function addMetric() {
     const outlierNote = document.createElement('div')
     outlierNote.setAttribute('class', 'help')
     outlierNote.setAttribute('id', 'help-outlier-management')
- 
+
     metricDiv.appendChild(metricMax)
     metricDiv.appendChild(outlierNote)
 
     metricDiv.appendChild(document.createElement('br'))
 
-    
+
 
     var metricAvg = document.createElement('input')
     metricAvg.setAttribute('id', 'metric' + metricsNo + '-def')
@@ -1214,6 +1230,7 @@ export function validateInputsBeforeSimulation(
     validateMetrics(metrics, errors)
     validateDimensions(dimensions, errors)
     if (!isGranular) validateKeyStrategy(errors)
+    validateConversionsPerBucket(errors)
 
     const formValidationWrapperEl = getFormValidationElFromDom()
 
@@ -1246,11 +1263,17 @@ function validateMetrics(metrics, errors) {
 
 function validateBudgetPercentages(metrics, errors) {
     const sumOfAllPercentages = metrics.reduce((sum, metric) => {
-        return sum + getBudgetPercentageForMetricIdFromDom(metric.id)
+        return sum + getBudgetValueForMetricIdFromDom(metric.id)
     }, 0)
-    if (sumOfAllPercentages > 100) {
+
+    if (getIsPercentageBudgetSplitFromDom() && sumOfAllPercentages > 100) {
         errors.push('The sum of all budget split percentages exceeds 100')
     }
+    
+    if( !getIsPercentageBudgetSplitFromDom() && sumOfAllPercentages > getContributionBudgetFromDom() ){
+        errors.push('The sum of all budget split values exceeds the total contribution budget '+getContributionBudgetFromDom())
+    }
+
 }
 
 function validateDimensions(dimensions, errors) {
@@ -1290,6 +1313,16 @@ function validateKeyStrategy(errors) {
                 i +
                 ': at least 2 dimensions should be checked for each key structure'
             )
+    }
+}
+
+function validateConversionsPerBucket(errors) {
+    var convPerBucket = getDailyConversionCountFromDom()
+
+    if (convPerBucket < 1) {
+        errors.push(
+            'The daily conversion count is too low. Please increase it so there is at least 1 conversion per bucket'
+        )
     }
 }
 

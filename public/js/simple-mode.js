@@ -186,21 +186,40 @@ function generateUnnoisyKeyValuePairsReport(
         dimensions.map((dim) => dim.numberOfDistinctValues)
     )
 
+    // TODO fix - right now we're using j to add a deterministic variation to the numbers, so that they remain the same across simulations. It does the job but is clunky.
+
+    console.log("frequency: " + batchingFrequency)
+    console.log("daily: " + dailyConversionCount)
+    console.log("scaling factor: " + scalingFactorForThisMetric)
+
+
     const report = []
     keyCombinations.forEach((k, idx) => {
+
+
+        var deterministicValue = (metric.defaultValuePerConversion + idx * (idx % 2 == 0 ? 1 : -1))
+
+
+        console.log("summaryValue" + idx + ": " + deterministicValue)
+        console.log("default " + idx + ": " + metric.defaultValuePerConversion)
+
+        var finalValue = (deterministicValue >= 0 ? deterministicValue : metric.defaultValuePerConversion) *
+            scalingFactorForThisMetric *
+            dailyConversionCount *
+            batchingFrequency
+
         report.push({
+
             // TODO, though the exact key doesn't really matter
             key: k,
-            aggregatedValue:
-                // TODO fix - right now we're using j to add a deterministic variation to the numbers, so that they remain the same across simulations. It does the job but is clunky.
-                (metric.defaultValuePerConversion + idx) *
-                scalingFactorForThisMetric *
-                dailyConversionCount *
-                batchingFrequency,
+            aggregatedValue: Math.ceil(finalValue),
+
         })
     })
     return report
+
 }
+
 
 function generateNoisyReportFromUnnoisyKeyValuePairsReport(
     unnoisyKeyValuePairReport,

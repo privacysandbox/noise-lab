@@ -14,7 +14,13 @@ Directly refer to the instructions in Noise Lab.
 
 Directly refer to the instructions in Noise Lab.
 
-## How to run locally
+## Set up
+
+```bash
+npm install
+```
+
+## Run locally
 
 ```bash
 npx parcel public/index.html

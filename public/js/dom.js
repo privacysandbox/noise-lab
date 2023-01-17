@@ -1023,13 +1023,10 @@ export function addMetric() {
     const outlierNote = document.createElement('div')
     outlierNote.setAttribute('class', 'help')
     outlierNote.setAttribute('id', 'help-outlier-management')
-
     metricDiv.appendChild(metricMax)
     metricDiv.appendChild(outlierNote)
 
     metricDiv.appendChild(document.createElement('br'))
-
-
 
     var metricAvg = document.createElement('input')
     metricAvg.setAttribute('id', 'metric' + metricsNo + '-def')

@@ -207,7 +207,7 @@ function generateNoisyReportFromUnnoisyKeyValuePairsReport(
     budget,
     epsilon
 ) {
-    return unnoisyKeyValuePairReport.map((entry) => {
+    const noisyReport = unnoisyKeyValuePairReport.map((entry) => {
         const { key, aggregatedValue } = entry
         const noise = getRandomLaplacianNoise(budget, epsilon)
         const aggregatedValuePostNoise = entry.aggregatedValue + noise
@@ -222,6 +222,21 @@ function generateNoisyReportFromUnnoisyKeyValuePairsReport(
             ),
         }
     })
+    const allSummaryValuesPreNoise = Object.values(noisyReport).map(
+        (v) => v.summaryValuePreNoise
+    )
+    const allSummaryValuesPostNoise = Object.values(noisyReport).map(
+        (v) => v.summaryValuePostNoise
+    )
+
+    noise_ratio_function_js = pyscript.runtime.globals.get('noise_ratio')
+    const ratio = noise_ratio_function_js(
+        allSummaryValuesPostNoise,
+        allSummaryValuesPreNoise
+    )
+    console.log('RATIO CALCULATED WITH PYTHON', ratio)
+
+    return noisyReport
 }
 
 function clearAllSimpleMode() {

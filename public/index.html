@@ -24,6 +24,8 @@ limitations under the License. -->
         <script type="module" src="js/tooltips.js" defer></script>
         <link rel="stylesheet" href="./style.css" />
         <link href="./third_party/tabulator.min.css" rel="stylesheet" />
+        <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+        <script defer src="https://pyscript.net/latest/pyscript.js"></script>
         <link
             rel="icon"
             href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧪</text></svg>"
@@ -34,6 +36,49 @@ limitations under the License. -->
         ></script>
     </head>
     <body>
+    <py-script>
+        print('Hello World, from python!')
+    </py-script>
+    <py-config>
+      packages = ["matplotlib", "pandas", "numpy"]
+    </py-config>
+
+   <py-script>
+    import numpy as np
+
+    def noise_ratio(noisy_data: [float],
+                noiseless_data: [float]) -> float:
+        if len(noisy_data) != len(noiseless_data):
+            raise ValueError('Noisy and noiseless data length did not match. ')
+
+        if not isinstance(noisy_data, np.ndarray) or not isinstance(
+            noisy_data, np.ndarray):
+            noisy_data = np.array(noisy_data.to_py())
+            noiseless_data = np.array(noiseless_data.to_py())
+
+        errors = noisy_data - noiseless_data
+        error_ratios = abs(errors)/noiseless_data
+        avg_error_ratios = np.average(error_ratios)
+        return avg_error_ratios
+
+    def add_arrays_python(arr_1, arr_2):
+        arr_1b = np.asarray(arr_1.to_py())
+        arr_2b = np.asarray(arr_2.to_py())
+        # result = np.add(arr_1b,arr_2b)
+        result = arr_1b + arr_2b + arr_2b
+        return result
+
+    def add_arrays_python_2(arr_1, arr_2):
+        arr_1b = np.array(arr_1.to_py())
+        arr_2b = np.array(arr_2.to_py())
+        # result = np.add(arr_1b,arr_2b)
+        result = arr_1b + arr_2b + arr_2b
+        return result
+
+    print(add_arrays_python([1], [88]))
+
+    </py-script>
+
         <div id="menu">
             <div class="flex">
                 <div class="app-name">

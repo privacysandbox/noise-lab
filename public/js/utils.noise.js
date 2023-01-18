@@ -33,25 +33,6 @@ export function getRandomLaplacianNoise(budget, epsilon) {
 }
 
 export function calculateNoisePercentage(noise, noisyAggregatedValue) {
-    // add_arrays_js_1 = pyscript.runtime.globals.get('add_arrays_python')
-    // const x = add_arrays_js_1(
-    //     new Float32Array([8.1, 3.6]),
-    //     new Float32Array([1.8, 2.2])
-    // )
-
-    // add_arrays_js_2 = pyscript.runtime.globals.get('add_arrays_python_2')
-    // const x2 = add_arrays_js_2([8, 3], [1, 2])
-    // console.log(x2.toJs())
-
-    // ratio_js = pyscript.runtime.globals.get('noise_ratio')
-    // const x3 = ratio_js([8, 3], [1, 2])
-    // console.log('ratio_js', x3)
-
-    // js_noise_ratio = pyscript.runtime.globals.get('noise_ratio') //grab python's 'noise_ratio' function
-    // console.log(js_noise_ratio)
-    // const rat = js_noise_ratio([1], [2])
-    // console.log(rat)
-
     return Number.parseFloat(
         (Math.abs(noise / noisyAggregatedValue) * 100).toFixed(3)
     )

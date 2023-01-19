@@ -12,11 +12,11 @@ https://noise-lab.uc.r.appspot.com/
 
 ## How to use
 
-Directly refer to the instructions in Noise Lab.
+Refer to the instructions in Noise Lab.
 
-## How to give feedcack
+## How to give feedback
 
-Directly refer to the instructions in Noise Lab.
+Refer to the instructions in Noise Lab.
 
 ## Set up
 

@@ -200,6 +200,5 @@ export function updateOutlierNote() {
     tippy('#help-outlier-management', {
         content: `'Max value' will be used for calculating the scaling factor. If this maximum value includes outliers, you may want to consider setting up a different key structure as explained in this section of the user guide - <a href="https://developer.chrome.com/docs/privacy-sandbox/summary-reports/design-decisions/#outlier-management-advanced">Advanced outlier management</a>, or by removing outliers, when figuring out the maximum value, if they account for a small percentage of all the values.`,
         ...defaultOptions,
-    
     })
 }

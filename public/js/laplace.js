@@ -104,7 +104,12 @@ function simulatePerMetric(
     const value = getBudgetValueForMetricIdFromDom(metric.id)
     const isPercentage = getIsPercentageBudgetSplitFromDom()
     const scalingFactor = isUseScaling
-        ? getScalingFactorForMetric(metric, value, isPercentage, contributionBudget)
+        ? getScalingFactorForMetric(
+              metric,
+              value,
+              isPercentage,
+              contributionBudget
+          )
         : 1
     const keyCombinationString = getKeyCombinationString(keyCombinations.names)
 
@@ -184,7 +189,7 @@ export function resetDimensions() {
 }
 
 // generate dataset
-export function triggerSimulation(
+function triggerSimulation(
     metrics,
     dimensions,
     dimensionNames,
@@ -260,10 +265,8 @@ function clearAllAdvancedMode() {
     clearAll(MODES.advanced.name)
 }
 
-window.triggerSimulation = triggerSimulation
 window.simulateAndDisplayResultsAdvancedMode =
     simulateAndDisplayResultsAdvancedMode
-
 window.downloadAll_advancedMode = downloadAll_advancedMode
 
 window.addMetric = addMetric
@@ -273,6 +276,4 @@ window.addDimension = addDimension
 window.removeDimension = removeDimension
 window.resetDimensions = resetDimensions
 window.clearAllAdvancedMode = clearAllAdvancedMode
-window.initializeDisplayAdvancedModeWithParams =
-    initializeDisplayAdvancedModeWithParams
 window.resetBudgetSplit = resetBudgetSplit

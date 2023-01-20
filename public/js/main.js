@@ -13,6 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import { generateConfirmMessage } from './utils.misc'
+import { initializeDisplaySimpleModeWithParams } from './simple-mode'
+import { initializeDisplayAdvancedModeWithParams } from './laplace'
 import { APP_VERSION, MODES, modeSearchQueryParams } from './config'
 
 // Generate navigation menu automatically based on the available modes

@@ -26,8 +26,10 @@ npm install
 
 ## Run locally
 
+Use node LTS (`nvm use --lts`, which may require `nvm install --lts`)
+
 ```bash
-npx parcel public/index.html
+npx parcel@latest public/index.html
 ```
 
 ## Contribute

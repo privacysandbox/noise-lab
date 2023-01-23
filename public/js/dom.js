@@ -1297,6 +1297,9 @@ export function getScalingApproachFromDom() {
     return document.getElementById('scaling-approach').value
 }
 
+export function getZeroConversionsPercentageFromDom() {
+    return document.getElementById("zero-pct").value
+}
 window.createCustomMetricsInputs = createCustomMetricsInputs
 window.generateCustomMetrics = generateCustomMetrics
 window.generateKeyStructures = generateKeyStructures

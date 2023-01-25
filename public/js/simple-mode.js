@@ -175,6 +175,7 @@ function simulate(
             averageNoisePercentage:
                 calculateAverageNoisePercentage(dailyReportWithNoise),
             data: dailyReportWithNoise,
+            rsmpe: dailyReportWithNoise.rsmpe,
             scalingFactor: scalingFactorForThisMetric,
         })
     }
@@ -253,10 +254,12 @@ function generateNoisyReportFromUnnoisyKeyValuePairsReport(
     rmspe_t_function_js = pyscript.runtime.globals.get('rmspe_t')
     const rmspe_t_result = rmspe_t_function_js(
         allSummaryValuesPostNoise,
-        allSummaryValuesPreNoise
-    )
-    console.log('RSMPT CALCULATED WITH PYTHON', rmspe_t_result.toJs())
+        allSummaryValuesPreNoise,
+        5
+    ).toJs()
+    const rsmpe_5 = rmspe_t_result.get(5)[0]
 
+    noisyReport.rsmpe = rsmpe_5
     return noisyReport
 }
 

@@ -401,7 +401,7 @@ function getNoiseBadgeType(noiseValue) {
     }
 }
 
-function displayNoiseAverage(parentDomEl, averageNoisePercentage) {
+function displayNoiseAverageLegacy(parentDomEl, averageNoisePercentage) {
     // Display average noise
     const labelEl = document.createElement('h5')
     const valueEl = document.createElement('div')
@@ -423,6 +423,17 @@ function displayNoiseAverage(parentDomEl, averageNoisePercentage) {
     parentDomEl.appendChild(valueEl)
     parentDomEl.appendChild(exactValueEl)
     parentDomEl.appendChild(noiseRatioHelper)
+}
+
+function displayNoiseRsmpe(parentDomEl, rsmpe) {
+    // Display average noise
+    const labelEl = document.createElement('h5')
+    const valueEl = document.createElement('div')
+    labelEl.innerText = 'Rsmpe (t=5): '
+    valueEl.innerText = rsmpe
+
+    parentDomEl.appendChild(labelEl)
+    parentDomEl.appendChild(valueEl)
 }
 
 function displayDataDetailsTitle(parentDomEl) {
@@ -458,11 +469,11 @@ function displayScalingFactor(parentDomEl, scalingFactor) {
     parentDomEl.appendChild(scalingFactorHelper)
 }
 
-function displayNoise(parentDomEl, averageNoisePercentage) {
+function displayNoiseLegacy(parentDomEl, averageNoisePercentage) {
     const noiseWrapperDiv = document.createElement('div')
     noiseWrapperDiv.setAttribute('class', 'noise-wrapper')
     parentDomEl.appendChild(noiseWrapperDiv)
-    displayNoiseAverage(noiseWrapperDiv, averageNoisePercentage)
+    displayNoiseAverageLegacy(noiseWrapperDiv, averageNoisePercentage)
 }
 
 export function getBudgetValueForMetricIdFromDom(metricId) {
@@ -477,14 +488,15 @@ function displayReport(
     simulationId,
     keyCombinationDisplay
 ) {
-    const { averageNoisePercentage, data, title, scalingFactor } = report
+    const { averageNoisePercentage, data, title, scalingFactor, rsmpe } = report
 
     // Display report table title
     const titleDiv = document.createElement('h4')
     titleDiv.innerText = 'Measurement goal: ' + title
     parentDomEl.appendChild(titleDiv)
     // Display noise
-    displayNoise(parentDomEl, averageNoisePercentage)
+    displayNoiseLegacy(parentDomEl, averageNoisePercentage)
+    displayNoiseRsmpe(parentDomEl, rsmpe)
     // Display details section title
     displayDataDetailsTitle(parentDomEl)
     parentDomEl.appendChild(document.createElement('br'))

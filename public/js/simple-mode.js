@@ -74,7 +74,7 @@ const metrics = [
     { name: 'purchaseCount', defaultValuePerConversion: 1, maxValue: 1 },
 ]
 
-function initializeDisplaySimpleModeWithParams() {
+export function initializeDisplaySimpleModeWithParams() {
     initializeDisplaySimpleMode(
         Object.values(keyStrategies),
         Object.values(batchingFrequencies),
@@ -150,7 +150,12 @@ function simulate(
         const isPercentage = true
         const percentage = getBudgetValueForMetricIdFromDom(i + 1)
         const scalingFactorForThisMetric = isUseScaling
-            ? getScalingFactorForMetric(metric, percentage, isPercentage, budget)
+            ? getScalingFactorForMetric(
+                  metric,
+                  percentage,
+                  isPercentage,
+                  budget
+              )
             : 1
         const dailyReportPreNoise = generateUnnoisyKeyValuePairsReport(
             metric,
@@ -240,9 +245,5 @@ function clearAllSimpleMode() {
 }
 
 window.downloadAll_simpleMode = downloadAll_simpleMode
-
 window.simulateAndDisplayResultsSimpleMode = simulateAndDisplayResultsSimpleMode
-
 window.clearAllSimpleMode = clearAllSimpleMode
-window.initializeDisplaySimpleModeWithParams =
-    initializeDisplaySimpleModeWithParams

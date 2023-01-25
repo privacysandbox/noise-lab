@@ -196,27 +196,25 @@ function generateUnnoisyKeyValuePairsReport(
 
     const report = []
     keyCombinations.forEach((k, idx) => {
+        var deterministicValue =
+            metric.defaultValuePerConversion + idx * (idx % 2 == 0 ? 1 : -1)
 
-
-        var deterministicValue = (metric.defaultValuePerConversion + idx * (idx % 2 == 0 ? 1 : -1))
-
-        var finalValue = (deterministicValue >= 0 ? deterministicValue : metric.defaultValuePerConversion) *
+        var finalValue =
+            (deterministicValue >= 0
+                ? deterministicValue
+                : metric.defaultValuePerConversion) *
             scalingFactorForThisMetric *
             dailyConversionCount *
             batchingFrequency
 
         report.push({
-
             // TODO, though the exact key doesn't really matter
             key: k,
             aggregatedValue: Math.ceil(finalValue),
-
         })
     })
     return report
-
 }
-
 
 function generateNoisyReportFromUnnoisyKeyValuePairsReport(
     unnoisyKeyValuePairReport,
@@ -250,7 +248,14 @@ function generateNoisyReportFromUnnoisyKeyValuePairsReport(
         allSummaryValuesPostNoise,
         allSummaryValuesPreNoise
     )
-    console.log('RATIO CALCULATED WITH PYTHON', ratio)
+    console.log('LEGACY RATIO CALCULATED WITH PYTHON', ratio)
+
+    rmspe_t_function_js = pyscript.runtime.globals.get('rmspe_t')
+    const rmspe_t_result = rmspe_t_function_js(
+        allSummaryValuesPostNoise,
+        allSummaryValuesPreNoise
+    )
+    console.log('RSMPT CALCULATED WITH PYTHON', rmspe_t_result.toJs())
 
     return noisyReport
 }

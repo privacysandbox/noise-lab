@@ -21,7 +21,7 @@ import {
     displaySimulationResults_simpleMode,
     getIsUseScalingFromDom,
     clearAll,
-    getBudgetPercentageForMetricIdFromDom,
+    getBudgetValueForMetricIdFromDom,
 } from './dom'
 import {
     getScalingFactorForMetric,
@@ -74,7 +74,7 @@ const metrics = [
     { name: 'purchaseCount', defaultValuePerConversion: 1, maxValue: 1 },
 ]
 
-function initializeDisplaySimpleModeWithParams() {
+export function initializeDisplaySimpleModeWithParams() {
     initializeDisplaySimpleMode(
         Object.values(keyStrategies),
         Object.values(batchingFrequencies),
@@ -147,9 +147,15 @@ function simulate(
     const numberOfMetrics = metrics.length
     for (let i = 0; i < numberOfMetrics; i++) {
         const metric = metrics[i]
-        const percentage = getBudgetPercentageForMetricIdFromDom(i + 1)
+        const isPercentage = true
+        const percentage = getBudgetValueForMetricIdFromDom(i + 1)
         const scalingFactorForThisMetric = isUseScaling
-            ? getScalingFactorForMetric(metric, percentage, budget)
+            ? getScalingFactorForMetric(
+                  metric,
+                  percentage,
+                  isPercentage,
+                  budget
+              )
             : 1
         const dailyReportPreNoise = generateUnnoisyKeyValuePairsReport(
             metric,
@@ -186,21 +192,31 @@ function generateUnnoisyKeyValuePairsReport(
         dimensions.map((dim) => dim.numberOfDistinctValues)
     )
 
+    // TODO fix - right now we're using j to add a deterministic variation to the numbers, so that they remain the same across simulations. It does the job but is clunky.
+
     const report = []
     keyCombinations.forEach((k, idx) => {
+
+
+        var deterministicValue = (metric.defaultValuePerConversion + idx * (idx % 2 == 0 ? 1 : -1))
+
+        var finalValue = (deterministicValue >= 0 ? deterministicValue : metric.defaultValuePerConversion) *
+            scalingFactorForThisMetric *
+            dailyConversionCount *
+            batchingFrequency
+
         report.push({
+
             // TODO, though the exact key doesn't really matter
             key: k,
-            aggregatedValue:
-                // TODO fix - right now we're using j to add a deterministic variation to the numbers, so that they remain the same across simulations. It does the job but is clunky.
-                (metric.defaultValuePerConversion + idx) *
-                scalingFactorForThisMetric *
-                dailyConversionCount *
-                batchingFrequency,
+            aggregatedValue: Math.ceil(finalValue),
+
         })
     })
     return report
+
 }
+
 
 function generateNoisyReportFromUnnoisyKeyValuePairsReport(
     unnoisyKeyValuePairReport,
@@ -244,9 +260,5 @@ function clearAllSimpleMode() {
 }
 
 window.downloadAll_simpleMode = downloadAll_simpleMode
-
 window.simulateAndDisplayResultsSimpleMode = simulateAndDisplayResultsSimpleMode
-
 window.clearAllSimpleMode = clearAllSimpleMode
-window.initializeDisplaySimpleModeWithParams =
-    initializeDisplaySimpleModeWithParams

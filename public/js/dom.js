@@ -61,10 +61,21 @@ export function getEpsilonFromDom() {
     return document.getElementById('eps').value
 }
 
+export function getIsPercentageBudgetSplitFromDom() {
+    return document.getElementById('percentage').checked
+}
 function getFormValidationElFromDom() {
     return document.getElementById('form-validation-wrapper')
 }
 
+function getContributionBudgetFromDom() {
+    return document.getElementById('contribution-budget').innerHTML
+}
+
+function getBudgetSplitOptionFromDom() {
+    return document.querySelector('input[name="budget-split-option"]:checked')
+        .value
+}
 export function displayTabularData(
     parentDomEl,
     tabularData,
@@ -123,30 +134,35 @@ export function initializeDisplayAdvancedMode(metrics, dimensions, budget) {
     addDimensionsButtons()
 }
 
-function displayBudgetSplit() {
+export function displayBudgetSplit() {
     const budgetSplitWrapperEl = document.getElementById(
         'budget-split-wrapper-el'
     )
     budgetSplitWrapperEl.innerHTML = ''
     const measurementGoals = getMetricsArrayFromDom()
+    const contributionBudget = getContributionBudgetFromDom()
     console.log(measurementGoals)
     const numberOfMeasurementGoals = measurementGoals.length
-    const defaultPercentOfBudgetPerMeasurementGoal = (
-        100 / numberOfMeasurementGoals
-    ).toFixed(0)
+    const budgetSplitOption = getBudgetSplitOptionFromDom()
+
+    const defaultValueOfBudgetPerMeasurementGoal =
+        budgetSplitOption == 'percentage'
+            ? (100 / numberOfMeasurementGoals).toFixed(0)
+            : (contributionBudget / numberOfMeasurementGoals).toFixed(0)
+
     measurementGoals.forEach((m) => {
         const { id } = m
         const label = document.createElement('label')
-        label.innerText = `Budget % for measurement goal ${id}:`
+        label.innerText =
+            `Budget ` + budgetSplitOption + ` for measurement goal ${id}:`
         const input = document.createElement('input')
         input.id = `budget-percent-meas-goal-${id}`
-        input.value = defaultPercentOfBudgetPerMeasurementGoal
+        input.value = defaultValueOfBudgetPerMeasurementGoal
         input.setAttribute('type', 'number')
         budgetSplitWrapperEl.appendChild(label)
         budgetSplitWrapperEl.appendChild(input)
     })
 }
-
 
 export function addScalingListener() {
     const scalingSelector = document.getElementById('scaling')
@@ -449,7 +465,7 @@ function displayNoise(parentDomEl, averageNoisePercentage) {
     displayNoiseAverage(noiseWrapperDiv, averageNoisePercentage)
 }
 
-export function getBudgetPercentageForMetricIdFromDom(metricId) {
+export function getBudgetValueForMetricIdFromDom(metricId) {
     return Number.parseInt(
         getElementValueById(`budget-percent-meas-goal-${metricId}`)
     )
@@ -732,64 +748,6 @@ export function createSimulationDiv(simulationId, inputParameters) {
     return simulationDiv
 }
 
-export function generateCustomMetrics() {
-    const metricsDiv = document.getElementById('metrics')
-    metricsDiv.innerHTML = ''
-
-    const metricsNoInputLabel = document.createElement('label')
-    metricsNoInputLabel.innerHTML = 'Number of metrics you want to track: '
-    const metricsNoInput = document.createElement('input')
-    metricsNoInput.setAttribute('id', 'metrics-number')
-    metricsNoInput.setAttribute('type', 'number')
-    metricsNoInput.setAttribute('max', '10')
-    metricsNoInput.setAttribute('min', '1')
-
-    const metricsNoSubmit = document.createElement('button')
-    metricsNoSubmit.innerHTML = 'Submit'
-    metricsNoSubmit.setAttribute('onClick', 'createCustomMetricsInputs()')
-
-    metricsDiv.appendChild(metricsNoInputLabel)
-    metricsDiv.appendChild(metricsNoInput)
-    metricsDiv.appendChild(metricsNoSubmit)
-}
-
-export function createCustomMetricsInputs() {
-    var noMetrics = document.getElementById('metrics-number').value
-    var metricsDiv = document.getElementById('metrics-params')
-
-    for (let i = 1; i <= noMetrics; i++) {
-        var element = document.createElement('input')
-        var label = document.createElement('label')
-        label.innerHTML = '<h4>Metric ' + i + ':</h4>'
-        var nameInput = document.createElement('input')
-        nameInput.setAttribute('type', 'text')
-        nameInput.setAttribute('id', 'metric' + i + '-name')
-        nameInput.setAttribute('placeholder', 'Name of the metric')
-        var maxInput = document.createElement('input')
-        maxInput.setAttribute('type', 'number')
-        maxInput.setAttribute('id', 'metric' + i + '-max')
-        maxInput.setAttribute('placeholder', 'Maximum value for the metric')
-        var maxInputLabel = document.createElement('div')
-        maxInputLabel.innerText = 'Maximum value'
-
-        var avgInput = document.createElement('input')
-        avgInput.setAttribute('id', 'metric' + i + '-def')
-        avgInput.setAttribute('type', 'number')
-        avgInput.setAttribute(
-            'placeholder',
-            'Minimum/default value for the metric'
-        )
-
-        metricsDiv.appendChild(label)
-        metricsDiv.appendChild(nameInput)
-        metricsDiv.appendChild(document.createElement('br'))
-        metricsDiv.appendChild(maxInput)
-        metricsDiv.appendChild(maxInputLabel)
-        metricsDiv.appendChild(document.createElement('br'))
-        metricsDiv.appendChild(avgInput)
-    }
-}
-
 export function getDimensionsArrayFromDom() {
     var len = document.getElementById('dimensions-number').value
     var dimensions = []
@@ -1007,13 +965,10 @@ export function addMetric() {
     const outlierNote = document.createElement('div')
     outlierNote.setAttribute('class', 'help')
     outlierNote.setAttribute('id', 'help-outlier-management')
- 
     metricDiv.appendChild(metricMax)
     metricDiv.appendChild(outlierNote)
 
     metricDiv.appendChild(document.createElement('br'))
-
-    
 
     var metricAvg = document.createElement('input')
     metricAvg.setAttribute('id', 'metric' + metricsNo + '-def')
@@ -1214,6 +1169,7 @@ export function validateInputsBeforeSimulation(
     validateMetrics(metrics, errors)
     validateDimensions(dimensions, errors)
     if (!isGranular) validateKeyStrategy(errors)
+    validateConversionsPerBucket(errors)
 
     const formValidationWrapperEl = getFormValidationElFromDom()
 
@@ -1239,28 +1195,42 @@ function validateMetrics(metrics, errors) {
         if (element.avgValue * 1 > element.maxValue * 1)
             errors.push(
                 element.name +
-                ' - maximum value cannot be smaller than average value'
+                    ' - maximum value cannot be smaller than average value'
             )
     })
 }
 
 function validateBudgetPercentages(metrics, errors) {
     const sumOfAllPercentages = metrics.reduce((sum, metric) => {
-        return sum + getBudgetPercentageForMetricIdFromDom(metric.id)
+        return sum + getBudgetValueForMetricIdFromDom(metric.id)
     }, 0)
-    if (sumOfAllPercentages > 100) {
+
+    if (getIsPercentageBudgetSplitFromDom() && sumOfAllPercentages > 100) {
         errors.push('The sum of all budget split percentages exceeds 100')
+    }
+
+    if (
+        !getIsPercentageBudgetSplitFromDom() &&
+        sumOfAllPercentages > getContributionBudgetFromDom()
+    ) {
+        errors.push(
+            'The sum of all budget split values exceeds the total contribution budget ' +
+                getContributionBudgetFromDom()
+        )
     }
 }
 
 function validateDimensions(dimensions, errors) {
-
     console.log(dimensions)
     var totalNumberOfPossibleDistinctValues = 1
 
     dimensions.forEach((dimension) => {
         // dimension.size is the number of distinct values for that dimension
-        if (dimension.size * 1 < 1 || dimension.size == undefined || dimension.size == '')
+        if (
+            dimension.size * 1 < 1 ||
+            dimension.size == undefined ||
+            dimension.size == ''
+        )
             errors.push(dimension.name + ' - dimension size must be >=1 ')
         totalNumberOfPossibleDistinctValues =
             totalNumberOfPossibleDistinctValues * dimension.size
@@ -1287,9 +1257,19 @@ function validateKeyStrategy(errors) {
         if (noChecked < 2)
             errors.push(
                 'Key structure ' +
-                i +
-                ': at least 2 dimensions should be checked for each key structure'
+                    i +
+                    ': at least 2 dimensions should be checked for each key structure'
             )
+    }
+}
+
+function validateConversionsPerBucket(errors) {
+    var convPerBucket = getDailyConversionCountFromDom()
+
+    if (convPerBucket < 1) {
+        errors.push(
+            'The daily conversion count is too low. Please increase it so there is at least 1 conversion per bucket'
+        )
     }
 }
 
@@ -1297,8 +1277,6 @@ export function getScalingApproachFromDom() {
     return document.getElementById('scaling-approach').value
 }
 
-window.createCustomMetricsInputs = createCustomMetricsInputs
-window.generateCustomMetrics = generateCustomMetrics
 window.generateKeyStructures = generateKeyStructures
 window.capEpsilon = capEpsilon
 window.updateDailyPerBucket = updateDailyPerBucket

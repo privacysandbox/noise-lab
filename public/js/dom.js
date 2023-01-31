@@ -648,7 +648,8 @@ export function displaySimulationResults_advancedMode(
     allSimulationsWrapper.appendChild(metricTag)
 
     // Display noise
-    displayNoise(allSimulationsWrapper, averageNoisePercentage)
+    displayNoiseLegacy(allSimulationsWrapper, averageNoisePercentage)
+    displayNoiseRsmpe(allSimulationsWrapper, data.rsmpe)
     // Display details section title
     displayDataDetailsTitle(allSimulationsWrapper)
     allSimulationsWrapper.appendChild(document.createElement('br'))

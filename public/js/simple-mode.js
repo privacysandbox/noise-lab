@@ -209,13 +209,16 @@ function generateUnnoisyKeyValuePairsReport(
             batchingFrequency
 
         report.push({
+
             // TODO, though the exact key doesn't really matter
             key: k,
             aggregatedValue: Math.ceil(finalValue),
         })
     })
     return report
+
 }
+
 
 function generateNoisyReportFromUnnoisyKeyValuePairsReport(
     unnoisyKeyValuePairReport,

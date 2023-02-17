@@ -1290,6 +1290,10 @@ export function getScalingApproachFromDom() {
     return document.getElementById('scaling-approach').value
 }
 
+export function getZeroConversionsPercentageFromDom() {
+    return document.getElementById("zero-pct").value
+}
+
 window.generateKeyStructures = generateKeyStructures
 window.capEpsilon = capEpsilon
 window.updateDailyPerBucket = updateDailyPerBucket

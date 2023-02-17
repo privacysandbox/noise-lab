@@ -141,6 +141,31 @@ function simulatePerMetric(
         })
     }
 
+    const allSummaryValuesPreNoise = Object.values(report).map(
+        (v) => v.scaledSummaryValue
+    )
+    const allSummaryValuesPostNoise = Object.values(report).map(
+        (v) => v.noisyScaledSummaryValue
+    )
+
+    noise_ratio_function_js = pyscript.runtime.globals.get('noise_ratio')
+    const ratio = noise_ratio_function_js(
+        allSummaryValuesPostNoise,
+        allSummaryValuesPreNoise
+    )
+    console.log('LEGACY RATIO CALCULATED WITH PYTHON', ratio)
+
+    rmspe_t_function_js = pyscript.runtime.globals.get('rmspe_t')
+    const rmspe_t_result = rmspe_t_function_js(
+        allSummaryValuesPostNoise,
+        allSummaryValuesPreNoise,
+        5
+    ).toJs()
+    const rsmpe_5 = rmspe_t_result.get(5)[0]
+
+    report.rsmpe = rsmpe_5
+
+
     const simulationReport = {
         data: report,
         averageNoisePercentage: calculateAverageNoisePercentageRaw(

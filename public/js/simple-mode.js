@@ -201,7 +201,7 @@ function generateUnnoisyKeyValuePairsReport(
             metric.defaultValuePerConversion + idx * (idx % 2 == 0 ? 1 : -1)
 
         var finalValue =
-            (deterministicValue >= 0
+            (deterministicValue > 0
                 ? deterministicValue
                 : metric.defaultValuePerConversion) *
             scalingFactorForThisMetric *

@@ -16,10 +16,12 @@ import laplace from '@stdlib/random-base-laplace'
 
 export function getScalingFactorForMetric(
     metric,
-    percentage,
+    value,
+    isPercentage,
     contributionBudget
 ) {
-    const budgetForThisMetric = contributionBudget * (percentage / 100)
+    
+    const budgetForThisMetric = (isPercentage ? contributionBudget * (value / 100) : value)
     const scalingFactorForThisMetric = budgetForThisMetric / metric.maxValue
     return scalingFactorForThisMetric.toFixed(1)
 }

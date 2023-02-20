@@ -29,6 +29,7 @@ import {
     calculateNoisePercentage,
     calculateAverageNoisePercentage,
     generateKeyCombinationArray,
+    getNoise_Rmspe,
 } from './utils.noise'
 import {
     generateSimulationId,
@@ -171,10 +172,9 @@ function simulate(
             )
         simulation.reports.push({
             title: metric.name,
-            averageNoisePercentage:
-                calculateAverageNoisePercentage(dailyReportWithNoise),
+            noise_naive: calculateAverageNoisePercentage(dailyReportWithNoise),
             data: dailyReportWithNoise,
-            rsmpe: dailyReportWithNoise.rsmpe,
+            noise_rmspe: dailyReportWithNoise.noise_rmspe,
             scalingFactor: scalingFactorForThisMetric,
         })
     }
@@ -208,16 +208,13 @@ function generateUnnoisyKeyValuePairsReport(
             batchingFrequency
 
         report.push({
-
             // TODO, though the exact key doesn't really matter
             key: k,
             aggregatedValue: Math.ceil(finalValue),
         })
     })
     return report
-
 }
-
 
 function generateNoisyReportFromUnnoisyKeyValuePairsReport(
     unnoisyKeyValuePairReport,
@@ -246,22 +243,11 @@ function generateNoisyReportFromUnnoisyKeyValuePairsReport(
         (v) => v.summaryValuePostNoise
     )
 
-    noise_ratio_function_js = pyscript.runtime.globals.get('noise_ratio')
-    const ratio = noise_ratio_function_js(
+    noisyReport.noise_rmspe = getNoise_Rmspe(
         allSummaryValuesPostNoise,
         allSummaryValuesPreNoise
     )
-    console.log('LEGACY RATIO CALCULATED WITH PYTHON', ratio)
 
-    rmspe_t_function_js = pyscript.runtime.globals.get('rmspe_t')
-    const rmspe_t_result = rmspe_t_function_js(
-        allSummaryValuesPostNoise,
-        allSummaryValuesPreNoise,
-        5
-    ).toJs()
-    const rsmpe_5 = rmspe_t_result.get(5)[0]
-
-    noisyReport.rsmpe = rsmpe_5
     return noisyReport
 }
 

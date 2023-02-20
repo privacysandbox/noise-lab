@@ -36,8 +36,7 @@ import {
     downloadAll,
     tempSaveTable,
 } from './utils.misc'
-import { MODES } from './config'
-import { CONTRIBUTION_BUDGET } from './consts.js'
+import { CONTRIBUTION_BUDGET, MODES } from './config'
 
 const keyStrategies = {
     A: { value: 'A', name: 'A' },

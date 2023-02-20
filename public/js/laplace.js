@@ -28,7 +28,7 @@ import {
 } from './dom.js'
 import { generateSimulationId, tempSaveTable, downloadAll } from './utils.misc'
 import { CONTRIBUTION_BUDGET } from './consts.js'
-import { MODES } from './config'
+import { CONTRIBUTION_BUDGET, MODES } from './config'
 
 import {
     getRandomLaplacianNoise,

@@ -35,12 +35,13 @@ const bottomOptions = {
     placement: 'bottom',
 }
 
-const quickGuideUrl = ''
+const quickGuideUrl =
+    'https://developer.chrome.com/docs/privacy-sandbox/summary-reports/design-decisions/'
 
 const detailedGuideUrl =
     'https://docs.google.com/document/d/1bU0a_njpDcRd9vDR0AJjwJjrf3Or8vAzyfuK8JZDEfo/view'
 
-const learnMoreHtml = `<br/>Learn more:<br/>Quick guide (coming soon) · <a href='${detailedGuideUrl}'>Detailed guide</a>`
+const learnMoreHtml = `<br/>Learn more:<br/><a href='${quickGuideUrl}'>Detailed guide</a> · <a href='${detailedGuideUrl}'>Detailed guide</a>`
 
 tippy('#help-epsilon', {
     content: `A higher epsilon leads to lower noise. Its maximum value for the aggregation service is 64. Epsilon can be altered by adtechs during the origin trial to evaluate various utility/privacy adjustments.<strong><br/>This impacts signal-to-noise ratios in the final summary reports.</strong><br/>${learnMoreHtml}`,
@@ -192,13 +193,13 @@ tippy('#about-info', {
 })
 
 tippy('#user-guide', {
-    content: `<a target="_blank" noreferrer noopeneer href="https://developer.chrome.com/docs/privacy-sandbox/summary-reports/design-decisions/">Noise Lab user guide</a>`,
+    content: `<a target="_blank" noreferrer noopeneer href='${quickGuideUrl}'>Noise Lab user guide</a>`,
     ...bottomOptions,
 })
 
 export function updateOutlierNote() {
     tippy('#help-outlier-management', {
-        content: `'Max value' will be used for calculating the scaling factor. If this maximum value includes outliers, you may want to consider setting up a different key structure as explained in this section of the user guide - <a href="https://developer.chrome.com/docs/privacy-sandbox/summary-reports/design-decisions/#outlier-management-advanced">Advanced outlier management</a>, or by removing outliers, when figuring out the maximum value, if they account for a small percentage of all the values.`,
+        content: `'Max value' will be used for calculating the scaling factor. If this maximum value includes outliers, you may want to consider setting up a different key structure as explained in this section of the user guide - <a href="${quickGuideUrl}/#outlier-management-advanced">Advanced outlier management</a>, or by removing outliers, when figuring out the maximum value, if they account for a small percentage of all the values.`,
         ...defaultOptions,
     })
 }

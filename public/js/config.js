@@ -27,6 +27,10 @@ export const MODES = {
     },
 }
 
+export const RMSPE_THRESHOLD = 5
+
+export const CONTRIBUTION_BUDGET = 65536
+
 export const modeSearchQueryParams = Object.values(MODES).map(
     (mode) => mode.searchQueryParam
 )

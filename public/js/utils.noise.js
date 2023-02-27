@@ -13,6 +13,10 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import laplace from '@stdlib/random-base-laplace'
+import { getZeroConversionsPercentageFromDom } from './dom.js'
+import { RMSPE_THRESHOLD } from './config'
+
+// SHARED UTILS
 
 export function getScalingFactorForMetric(
     metric,
@@ -20,8 +24,9 @@ export function getScalingFactorForMetric(
     isPercentage,
     contributionBudget
 ) {
-    
-    const budgetForThisMetric = (isPercentage ? contributionBudget * (value / 100) : value)
+    const budgetForThisMetric = isPercentage
+        ? contributionBudget * (value / 100)
+        : value
     const scalingFactorForThisMetric = budgetForThisMetric / metric.maxValue
     return scalingFactorForThisMetric.toFixed(1)
 }
@@ -51,6 +56,20 @@ export function calculateAverageNoisePercentageRaw(sum, count) {
     const averageNoisePercentage = sum / count
     // Only display 3 decimal digits
     return Number.parseFloat(averageNoisePercentage).toFixed(3)
+}
+
+export function getNoise_Rmspe(
+    allSummaryValuesPostNoise,
+    allSummaryValuesPreNoise
+) {
+    rmspe_t_function_js = pyscript.runtime.globals.get('rmspe_t')
+    const rmspe_t_result = rmspe_t_function_js(
+        allSummaryValuesPostNoise,
+        allSummaryValuesPreNoise,
+        RMSPE_THRESHOLD
+    ).toJs()
+    const rmspe_t = rmspe_t_result.get(RMSPE_THRESHOLD)[0]
+    return rmspe_t
 }
 
 // ADVANCED MODE UTILS
@@ -101,17 +120,31 @@ export function generateAggregatedValue(
     dailyConversionCount,
     batchingFrequency
 ) {
+    // every 20th bucket gets 0 conversions -> ~5%
+    var zeroPct = getZeroConversionsPercentageFromDom()
+
+    if (
+        zeroPct > 0 &&
+        deterministicValue != 0 &&
+        deterministicValue % Math.abs(100 / zeroPct) == 0
+    )
+        return 0
+
     // Calculate deterministic Number
     var deterministicNumber =
         metric.avgValue * 1 +
         deterministicValue * 1 * (deterministicValue % 2 == 0 ? 1 : -1)
 
+    // calculate variation for conversions/bucket
     var dailyConversionValue = Math.abs(
-        dailyConversionCount * 1 +
-            (deterministicValue % 2 == 0
-                ? 1 * deterministicValue
-                : -1 * deterministicValue)
+        deterministicValue % 2 == 0 && deterministicValue > 0
+            ? Math.abs(dailyConversionCount / deterministicValue) +
+                  1 * deterministicValue
+            : dailyConversionCount * deterministicValue - 1 * deterministicValue
     )
+
+    dailyConversionValue =
+        dailyConversionValue > 0 ? dailyConversionValue : dailyConversionCount
 
     var calculationValue =
         deterministicNumber > 0 &&
@@ -121,7 +154,7 @@ export function generateAggregatedValue(
             : metric.maxValue
 
     var res = Math.floor(
-        calculationValue * dailyConversionCount * batchingFrequency
+        calculationValue * dailyConversionValue * batchingFrequency
     )
 
     return res

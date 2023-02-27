@@ -28,10 +28,6 @@ export function displayContributionBudget(budget) {
     document.getElementById('contribution-budget').innerText = budget
 }
 
-export function displayNoise(l) {
-    document.getElementById('laplace').innerText += ' ' + l
-}
-
 export function displayEpsilon(epsilon) {
     document.getElementById('eps').value = epsilon
 }
@@ -401,28 +397,42 @@ function getNoiseBadgeType(noiseValue) {
     }
 }
 
-function displayNoiseAverage(parentDomEl, averageNoisePercentage) {
-    // Display average noise
+function displayNoiseNaive(parentDomEl, noise_naive) {
     const labelEl = document.createElement('h5')
     const valueEl = document.createElement('div')
     labelEl.innerText = 'Average noise ratio: '
     // Set a class to display noise in color
     valueEl.setAttribute(
         'class',
-        `average-noise ${getNoiseBadgeType(averageNoisePercentage)} has-helper`
+        `average-noise ${getNoiseBadgeType(noise_naive)} has-helper`
     )
 
     const exactValueEl = document.createElement('div')
     exactValueEl.setAttribute('class', 'has-helper mono')
-    exactValueEl.innerText = `(Exact value = ${averageNoisePercentage}%)`
+    exactValueEl.innerText = `(Exact value = ${noise_naive}%)`
 
-    const noiseRatioHelper = document.createElement('div')
-    noiseRatioHelper.setAttribute('class', 'help help-noise-value')
+    const helper = document.createElement('div')
+    helper.setAttribute('class', 'help help-noise-naive')
 
     parentDomEl.appendChild(labelEl)
     parentDomEl.appendChild(valueEl)
     parentDomEl.appendChild(exactValueEl)
-    parentDomEl.appendChild(noiseRatioHelper)
+    parentDomEl.appendChild(helper)
+}
+
+function displayNoiseRmspe(parentDomEl, noise_rmspe) {
+    const labelEl = document.createElement('h5')
+    const valueEl = document.createElement('div')
+    labelEl.innerText = 'RMSPE (t=5): '
+    valueEl.innerText = noise_rmspe
+    valueEl.setAttribute('class', 'has-helper mono')
+
+    const helper = document.createElement('div')
+    helper.setAttribute('class', 'help help-noise-rmspe')
+
+    parentDomEl.appendChild(labelEl)
+    parentDomEl.appendChild(valueEl)
+    parentDomEl.appendChild(helper)
 }
 
 function displayDataDetailsTitle(parentDomEl) {
@@ -458,11 +468,12 @@ function displayScalingFactor(parentDomEl, scalingFactor) {
     parentDomEl.appendChild(scalingFactorHelper)
 }
 
-function displayNoise(parentDomEl, averageNoisePercentage) {
+function displayNoise(parentDomEl, noise_naive, noise_rmspe) {
     const noiseWrapperDiv = document.createElement('div')
     noiseWrapperDiv.setAttribute('class', 'noise-wrapper')
     parentDomEl.appendChild(noiseWrapperDiv)
-    displayNoiseAverage(noiseWrapperDiv, averageNoisePercentage)
+    displayNoiseNaive(noiseWrapperDiv, noise_naive)
+    displayNoiseRmspe(noiseWrapperDiv, noise_rmspe)
 }
 
 export function getBudgetValueForMetricIdFromDom(metricId) {
@@ -477,14 +488,14 @@ function displayReport(
     simulationId,
     keyCombinationDisplay
 ) {
-    const { averageNoisePercentage, data, title, scalingFactor } = report
+    const { noise_naive, data, title, scalingFactor, noise_rmspe } = report
 
     // Display report table title
     const titleDiv = document.createElement('h4')
     titleDiv.innerText = 'Measurement goal: ' + title
     parentDomEl.appendChild(titleDiv)
     // Display noise
-    displayNoise(parentDomEl, averageNoisePercentage)
+    displayNoise(parentDomEl, noise_naive, noise_rmspe)
     // Display details section title
     displayDataDetailsTitle(parentDomEl)
     parentDomEl.appendChild(document.createElement('br'))
@@ -619,9 +630,9 @@ export function displaySimulationResults_advancedMode(
 
     const allSimulationsWrapper = mainDiv
 
-    const { data, averageNoisePercentage } = simulation
+    const { data, noise_naive } = simulation
     // TODO make simulationID part of the sim object
-    // const { data, averageNoisePercentage, simulationId } = simulation
+    // const { data, noise_naive, simulationId } = simulation
 
     // Prepare wrapper div that will contain the simulation
     const simulationWrapperDiv = document.createElement('div')
@@ -636,7 +647,7 @@ export function displaySimulationResults_advancedMode(
     allSimulationsWrapper.appendChild(metricTag)
 
     // Display noise
-    displayNoise(allSimulationsWrapper, averageNoisePercentage)
+    displayNoise(allSimulationsWrapper, noise_naive, data.noise_rmspe)
     // Display details section title
     displayDataDetailsTitle(allSimulationsWrapper)
     allSimulationsWrapper.appendChild(document.createElement('br'))
@@ -1275,6 +1286,10 @@ function validateConversionsPerBucket(errors) {
 
 export function getScalingApproachFromDom() {
     return document.getElementById('scaling-approach').value
+}
+
+export function getZeroConversionsPercentageFromDom() {
+    return document.getElementById('zero-pct').value
 }
 
 window.generateKeyStructures = generateKeyStructures

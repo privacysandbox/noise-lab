@@ -25,10 +25,10 @@ import {
     getBudgetValueForMetricIdFromDom,
     displayBudgetSplit,
     getIsPercentageBudgetSplitFromDom,
-} from './dom.js'
+} from './dom'
 import { generateSimulationId, tempSaveTable, downloadAll } from './utils.misc'
-import { CONTRIBUTION_BUDGET } from './consts.js'
-import { MODES } from './config'
+import { getNoise_Rmspe } from './utils.noise'
+import { CONTRIBUTION_BUDGET, MODES } from './config'
 
 import {
     getRandomLaplacianNoise,
@@ -37,7 +37,7 @@ import {
     generateKeyCombinationArray,
     generateAggregatedValue,
     calculateAverageNoisePercentageRaw,
-} from './utils.noise.js'
+} from './utils.noise'
 
 // define default metrics
 const defaultMetrics = [
@@ -141,9 +141,22 @@ function simulatePerMetric(
         })
     }
 
+    const allSummaryValuesPreNoise = Object.values(report).map(
+        (v) => v.scaledSummaryValue
+    )
+    const allSummaryValuesPostNoise = Object.values(report).map(
+        (v) => v.noisyScaledSummaryValue
+    )
+
+    getNoise_Rmspe(allSummaryValuesPostNoise, allSummaryValuesPreNoise)
+    report.noise_rmspe = getNoise_Rmspe(
+        allSummaryValuesPostNoise,
+        allSummaryValuesPreNoise
+    )
+
     const simulationReport = {
         data: report,
-        averageNoisePercentage: calculateAverageNoisePercentageRaw(
+        noise_naive: calculateAverageNoisePercentageRaw(
             noisePercentageSum,
             keyCombinations.combinations.length
         ),

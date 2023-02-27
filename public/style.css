@@ -470,6 +470,8 @@ select:focus {
 
 .help::after {
     content: '?';
+    position: relative;
+    top: -2px;
 }
 
 .has-helper {

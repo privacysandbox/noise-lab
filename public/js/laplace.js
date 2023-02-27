@@ -25,10 +25,10 @@ import {
     getBudgetValueForMetricIdFromDom,
     displayBudgetSplit,
     getIsPercentageBudgetSplitFromDom,
-} from './dom.js'
+} from './dom'
 import { generateSimulationId, tempSaveTable, downloadAll } from './utils.misc'
-import { CONTRIBUTION_BUDGET } from './consts.js'
-import { MODES } from './config'
+import { getNoise_Rmspe } from './utils.noise'
+import { CONTRIBUTION_BUDGET, MODES } from './config'
 
 import {
     getRandomLaplacianNoise,
@@ -37,7 +37,7 @@ import {
     generateKeyCombinationArray,
     generateAggregatedValue,
     calculateAverageNoisePercentageRaw,
-} from './utils.noise.js'
+} from './utils.noise'
 
 // define default metrics
 const defaultMetrics = [
@@ -148,27 +148,15 @@ function simulatePerMetric(
         (v) => v.noisyScaledSummaryValue
     )
 
-    noise_ratio_function_js = pyscript.runtime.globals.get('noise_ratio')
-    const ratio = noise_ratio_function_js(
+    getNoise_Rmspe(allSummaryValuesPostNoise, allSummaryValuesPreNoise)
+    report.noise_rmspe = getNoise_Rmspe(
         allSummaryValuesPostNoise,
         allSummaryValuesPreNoise
     )
-    console.log('LEGACY RATIO CALCULATED WITH PYTHON', ratio)
-
-    rmspe_t_function_js = pyscript.runtime.globals.get('rmspe_t')
-    const rmspe_t_result = rmspe_t_function_js(
-        allSummaryValuesPostNoise,
-        allSummaryValuesPreNoise,
-        5
-    ).toJs()
-    const rsmpe_5 = rmspe_t_result.get(5)[0]
-
-    report.rsmpe = rsmpe_5
-
 
     const simulationReport = {
         data: report,
-        averageNoisePercentage: calculateAverageNoisePercentageRaw(
+        noise_naive: calculateAverageNoisePercentageRaw(
             noisePercentageSum,
             keyCombinations.combinations.length
         ),

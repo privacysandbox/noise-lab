@@ -137,8 +137,13 @@ export function updateTooltips() {
         ...defaultOptions,
     })
 
-    tippy('.help-noise-value', {
-        content: `This represents the average signal-to-noise ratio for this summary report. This is the average noise of all entries in this report, i.e. of all summary values (each associated with an aggregation key), i.e. of all values in the last column of the data table below.<br/><br/>For an individual summary value⏤that is for an individual row in the table⏤the noise ratio is calculated as follows:<br/>absolute(noise / noisy summary value) * 100, where absolute is required because the noise can be negative.`,
+    tippy('.help-noise-naive', {
+        content: `The lower, the better. This represents the average signal-to-noise ratio for this summary report. This is the average noise of all entries in this report, i.e. of all summary values (each associated with an aggregation key), i.e. of all values in the last column of the data table below.<br/><br/>For an individual summary value⏤that is for an individual row in the table⏤the noise ratio is calculated as follows:<br/>absolute(noise / noisy summary value) * 100, where absolute is required because the noise can be negative.`,
+        ...defaultOptions,
+    })
+
+    tippy('.help-noise-rmspe', {
+        content: `The lower, the better. RMSPE (root-mean-square percentage error) is another measure for noise. "t" is a threshold: buckets with less than t conversions are not evaluated. This means that small buckets are effectively ignored for RMSPE calculation, making that calculation more reliable and stable metric than a basic noise ratio average.`,
         ...defaultOptions,
     })
 

@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-export const APP_VERSION = 'v2.2.1'
+export const APP_VERSION = 'v2.3.2'
 
 export const MODES = {
     simple: {

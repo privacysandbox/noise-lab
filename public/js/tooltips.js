@@ -41,7 +41,7 @@ const quickGuideUrl =
 const detailedGuideUrl =
     'https://docs.google.com/document/d/1bU0a_njpDcRd9vDR0AJjwJjrf3Or8vAzyfuK8JZDEfo/view'
 
-const learnMoreHtml = `<br/>Learn more:<br/><a href='${quickGuideUrl}'>Detailed guide</a> · <a href='${detailedGuideUrl}'>Detailed guide</a>`
+const learnMoreHtml = `<br/>Learn more:<br/><a href='${quickGuideUrl}'>Quick guide</a> · <a href='${detailedGuideUrl}'>Detailed guide</a>`
 
 tippy('#help-epsilon', {
     content: `A higher epsilon leads to lower noise. Its maximum value for the aggregation service is 64. Epsilon can be altered by adtechs during the origin trial to evaluate various utility/privacy adjustments.<strong><br/>This impacts signal-to-noise ratios in the final summary reports.</strong><br/>${learnMoreHtml}`,

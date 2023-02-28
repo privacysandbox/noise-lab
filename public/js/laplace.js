@@ -27,7 +27,6 @@ import {
     getIsPercentageBudgetSplitFromDom,
 } from './dom'
 import { generateSimulationId, tempSaveTable, downloadAll } from './utils.misc'
-import { getNoise_Rmspe } from './utils.noise'
 import { CONTRIBUTION_BUDGET, MODES } from './config'
 
 import {
@@ -37,6 +36,7 @@ import {
     generateKeyCombinationArray,
     generateAggregatedValue,
     calculateAverageNoisePercentageRaw,
+    getNoise_Rmspe,
 } from './utils.noise'
 
 // define default metrics
@@ -148,10 +148,10 @@ function simulatePerMetric(
         (v) => v.noisyScaledSummaryValue
     )
 
-    getNoise_Rmspe(allSummaryValuesPostNoise, allSummaryValuesPreNoise)
     report.noise_rmspe = getNoise_Rmspe(
         allSummaryValuesPostNoise,
-        allSummaryValuesPreNoise
+        allSummaryValuesPreNoise,
+        scalingFactor
     )
 
     const simulationReport = {

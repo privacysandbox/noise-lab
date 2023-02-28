@@ -67,6 +67,7 @@ export function getNoise_Rmspe(
     const rmspe_t_result = rmspe_t_function_js(
         allSummaryValuesPostNoise,
         allSummaryValuesPreNoise,
+        // python code needs an integer as scaling factor
         Math.floor(scalingFactor),
         RMSPE_THRESHOLD
     ).toJs()

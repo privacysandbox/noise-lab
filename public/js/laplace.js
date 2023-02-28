@@ -148,10 +148,10 @@ function simulatePerMetric(
         (v) => v.noisyScaledSummaryValue
     )
 
-    getNoise_Rmspe(allSummaryValuesPostNoise, allSummaryValuesPreNoise)
     report.noise_rmspe = getNoise_Rmspe(
         allSummaryValuesPostNoise,
-        allSummaryValuesPreNoise
+        allSummaryValuesPreNoise,
+        scalingFactor
     )
 
     const simulationReport = {

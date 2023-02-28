@@ -60,12 +60,14 @@ export function calculateAverageNoisePercentageRaw(sum, count) {
 
 export function getNoise_Rmspe(
     allSummaryValuesPostNoise,
-    allSummaryValuesPreNoise
+    allSummaryValuesPreNoise,
+    scalingFactor
 ) {
     rmspe_t_function_js = pyscript.runtime.globals.get('rmspe_t')
     const rmspe_t_result = rmspe_t_function_js(
         allSummaryValuesPostNoise,
         allSummaryValuesPreNoise,
+        Math.floor(scalingFactor),
         RMSPE_THRESHOLD
     ).toJs()
     const rmspe_t = rmspe_t_result.get(RMSPE_THRESHOLD)[0]

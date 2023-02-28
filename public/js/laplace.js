@@ -27,7 +27,6 @@ import {
     getIsPercentageBudgetSplitFromDom,
 } from './dom'
 import { generateSimulationId, tempSaveTable, downloadAll } from './utils.misc'
-import { getNoise_Rmspe } from './utils.noise'
 import { CONTRIBUTION_BUDGET, MODES } from './config'
 
 import {
@@ -37,6 +36,7 @@ import {
     generateKeyCombinationArray,
     generateAggregatedValue,
     calculateAverageNoisePercentageRaw,
+    getNoise_Rmspe,
 } from './utils.noise'
 
 // define default metrics

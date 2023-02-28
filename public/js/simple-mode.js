@@ -168,7 +168,8 @@ function simulate(
             generateNoisyReportFromUnnoisyKeyValuePairsReport(
                 dailyReportPreNoise,
                 budget,
-                epsilon
+                epsilon,
+                scalingFactorForThisMetric
             )
         simulation.reports.push({
             title: metric.name,
@@ -219,7 +220,8 @@ function generateUnnoisyKeyValuePairsReport(
 function generateNoisyReportFromUnnoisyKeyValuePairsReport(
     unnoisyKeyValuePairReport,
     budget,
-    epsilon
+    epsilon,
+    scalingFactor
 ) {
     const noisyReport = unnoisyKeyValuePairReport.map((entry) => {
         const { key, aggregatedValue } = entry
@@ -245,7 +247,8 @@ function generateNoisyReportFromUnnoisyKeyValuePairsReport(
 
     noisyReport.noise_rmspe = getNoise_Rmspe(
         allSummaryValuesPostNoise,
-        allSummaryValuesPreNoise
+        allSummaryValuesPreNoise,
+        scalingFactor,        
     )
 
     return noisyReport

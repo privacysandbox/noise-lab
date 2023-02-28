@@ -64,9 +64,11 @@ limitations under the License. -->
         return avg_error_ratios
 
     def rmspe_t(
-    noisy_data: Sequence[float],
-    noiseless_data: Sequence[float],
-    maximum_threshold: int = 10) -> dict[int, tuple[float, Sequence[float]]]:
+        noisy_data: Sequence[float],
+        noiseless_data: Sequence[float],
+        l1_scale: int,
+        maximum_threshold: int = 10,
+    ) -> dict[int, tuple[float, Sequence[float]]]:
 
         if len(noisy_data) != len(noiseless_data):
             raise ValueError('Noisy and noiseless data length did not match.')
@@ -85,7 +87,7 @@ limitations under the License. -->
         result = dict()
         # TODO(aksu): verify if [1,10] range is sufficient.
         for t in range(1, maximum_threshold + 1):
-            percentage_errors = errors / np.maximum(noiseless_data, t)
+            percentage_errors = errors / np.maximum(noiseless_data, l1_scale * t)
             squared_percentage_errors = percentage_errors**2
             mean_squared_percentage_error = np.average(squared_percentage_errors)
             root_mean_squared_percentage_error: float = np.sqrt(
@@ -96,8 +98,8 @@ limitations under the License. -->
         return result
 
     # also works in native python
-    print(noise_ratio([1, 2], [88, 10]))
-    print(rmspe_t([1, 2], [88, 10]))
+    # print(noise_ratio([1, 2], [88, 10]))
+    # print(rmspe_t([1, 2], [88, 10]))
 
     </py-script>
     <div id="menu">

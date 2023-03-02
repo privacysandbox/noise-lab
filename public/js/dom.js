@@ -19,7 +19,8 @@ import {
     generateSimulationWrapperElId,
     generateConfirmMessage,
 } from './utils.misc'
-import { MODES } from './config'
+import { MODES, RMSPE_THRESHOLD } from './config'
+
 import { tempSaveTable_simpleMode } from './simple-mode'
 import { tempSaveTable_advancedMode } from './laplace'
 import { updateTooltips, updateOutlierNote } from './tooltips'
@@ -374,7 +375,7 @@ export function displaySimulationResults_simpleMode(
     simulationOutputWrapperDiv.appendChild(reportsTitleDiv)
 
     reports.forEach((report) => {
-        displayReport(
+        displayReportSimpleMode(
             simulationOutputWrapperDiv,
             report,
             simulationId,
@@ -397,41 +398,32 @@ function getNoiseBadgeType(noiseValue) {
     }
 }
 
-function displayNoiseNaive(parentDomEl, noise_naive) {
+function displayNoiseAsPercentageWithBadge(
+    parentDomEl,
+    noise_value_percent,
+    noiseMetricDisplayName,
+    noiseMetricId
+) {
+    // noiseMetricName = Average percentage error (APE)
     const labelEl = document.createElement('h5')
     const valueEl = document.createElement('div')
-    labelEl.innerText = 'Average noise ratio: '
+    labelEl.innerText = `${noiseMetricDisplayName}: `
     // Set a class to display noise in color
     valueEl.setAttribute(
         'class',
-        `average-noise ${getNoiseBadgeType(noise_naive)} has-helper`
+        `noise ${getNoiseBadgeType(noise_value_percent)} has-helper`
     )
 
     const exactValueEl = document.createElement('div')
     exactValueEl.setAttribute('class', 'has-helper mono')
-    exactValueEl.innerText = `(Exact value = ${noise_naive}%)`
+    exactValueEl.innerText = `Exact value = ${noise_value_percent} %`
 
     const helper = document.createElement('div')
-    helper.setAttribute('class', 'help help-noise-naive')
+    helper.setAttribute('class', `help help-noise-${noiseMetricId}`)
 
     parentDomEl.appendChild(labelEl)
     parentDomEl.appendChild(valueEl)
     parentDomEl.appendChild(exactValueEl)
-    parentDomEl.appendChild(helper)
-}
-
-function displayNoiseRmspe(parentDomEl, noise_rmspe) {
-    const labelEl = document.createElement('h5')
-    const valueEl = document.createElement('div')
-    labelEl.innerText = 'RMSPE (t=5): '
-    valueEl.innerText = noise_rmspe
-    valueEl.setAttribute('class', 'has-helper mono')
-
-    const helper = document.createElement('div')
-    helper.setAttribute('class', 'help help-noise-rmspe')
-
-    parentDomEl.appendChild(labelEl)
-    parentDomEl.appendChild(valueEl)
     parentDomEl.appendChild(helper)
 }
 
@@ -468,12 +460,27 @@ function displayScalingFactor(parentDomEl, scalingFactor) {
     parentDomEl.appendChild(scalingFactorHelper)
 }
 
-function displayNoise(parentDomEl, noise_naive, noise_rmspe) {
+function displayNoiseAsPercentage(
+    parentDomEl,
+    noise_ape_percent,
+    noise_rmspe_percent
+) {
     const noiseWrapperDiv = document.createElement('div')
     noiseWrapperDiv.setAttribute('class', 'noise-wrapper')
     parentDomEl.appendChild(noiseWrapperDiv)
-    displayNoiseNaive(noiseWrapperDiv, noise_naive)
-    displayNoiseRmspe(noiseWrapperDiv, noise_rmspe)
+
+    displayNoiseAsPercentageWithBadge(
+        noiseWrapperDiv,
+        noise_ape_percent,
+        'Average percentage error (APE)',
+        'ape'
+    )
+    displayNoiseAsPercentageWithBadge(
+        noiseWrapperDiv,
+        noise_rmspe_percent,
+        `RMSPE with t=${RMSPE_THRESHOLD}`,
+        'rmspe'
+    )
 }
 
 export function getBudgetValueForMetricIdFromDom(metricId) {
@@ -482,20 +489,30 @@ export function getBudgetValueForMetricIdFromDom(metricId) {
     )
 }
 
-function displayReport(
+function displayReportSimpleMode(
     parentDomEl,
     report,
     simulationId,
     keyCombinationDisplay
 ) {
-    const { noise_naive, data, title, scalingFactor, noise_rmspe } = report
+    const {
+        noise_ape_percent,
+        noise_rmspe_percent,
+        data,
+        title,
+        scalingFactor,
+    } = report
 
     // Display report table title
     const titleDiv = document.createElement('h4')
     titleDiv.innerText = 'Measurement goal: ' + title
     parentDomEl.appendChild(titleDiv)
     // Display noise
-    displayNoise(parentDomEl, noise_naive, noise_rmspe)
+    displayNoiseAsPercentage(
+        parentDomEl,
+        noise_ape_percent,
+        noise_rmspe_percent
+    )
     // Display details section title
     displayDataDetailsTitle(parentDomEl)
     parentDomEl.appendChild(document.createElement('br'))
@@ -630,9 +647,9 @@ export function displaySimulationResults_advancedMode(
 
     const allSimulationsWrapper = mainDiv
 
-    const { data, noise_naive } = simulation
+    const { data, noise_ape_percent, noise_rmspe_percent } = simulation
     // TODO make simulationID part of the sim object
-    // const { data, noise_naive, simulationId } = simulation
+    // const { data, noise_ape_percent, noise_rmspe_percent, simulationId } = simulation
 
     // Prepare wrapper div that will contain the simulation
     const simulationWrapperDiv = document.createElement('div')
@@ -647,7 +664,11 @@ export function displaySimulationResults_advancedMode(
     allSimulationsWrapper.appendChild(metricTag)
 
     // Display noise
-    displayNoise(allSimulationsWrapper, noise_naive, data.noise_rmspe)
+    displayNoiseAsPercentage(
+        allSimulationsWrapper,
+        noise_ape_percent,
+        noise_rmspe_percent
+    )
     // Display details section title
     displayDataDetailsTitle(allSimulationsWrapper)
     allSimulationsWrapper.appendChild(document.createElement('br'))

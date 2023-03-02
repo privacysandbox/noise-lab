@@ -1133,13 +1133,13 @@ export function addDimension() {
     var dimensionSize = document.createElement('input')
     dimensionSize.setAttribute('id', 'dimension' + dimensionsNo + '-size')
     dimensionSize.setAttribute('type', 'number')
+    dimensionSize.setAttribute('class', 'dimension-size')
     dimensionSize.setAttribute('placeholder', 'Dimension size')
+    dimensionSize.addEventListener('input', () => updateDailyPerBucket())
     dimensionDiv.appendChild(dimensionSize)
     dimensionDiv.appendChild(document.createElement('br'))
 
     dimensionsMainDiv.appendChild(dimensionDiv)
-
-    updateDailyPerBucket()
 }
 
 export function removeDimension() {

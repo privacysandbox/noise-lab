@@ -127,15 +127,18 @@ function simulatePerMetric(
 
         const noisePercentage = calculateNoisePercentage(
             noise,
-            randCount * scalingFactor + noise
+            // unnoisy aggregated value for APE
+            randCount * scalingFactor
         )
         noisePercentageSum += noisePercentage
+
+        const noisyScaledSummaryValue = randCount * scalingFactor + noise
 
         report.push({
             key: keyCombinations.combinations[i],
             summaryValue: randCount,
             scaledSummaryValue: randCount * scalingFactor,
-            noisyScaledSummaryValue: randCount * scalingFactor + noise,
+            noisyScaledSummaryValue: noisyScaledSummaryValue,
             noise: noise,
             noisePercentage: noisePercentage,
         })

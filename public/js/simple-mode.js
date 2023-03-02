@@ -232,9 +232,9 @@ function generateNoisyReportFromUnnoisyKeyValuePairsReport(
             summaryValuePreNoise: aggregatedValue,
             summaryValuePostNoise: aggregatedValuePostNoise,
             noise,
-            noisePercentage: calculateNoisePercentage(
+            noise_ape_individual: calculateNoisePercentage(
                 noise,
-                aggregatedValuePostNoise
+                aggregatedValue
             ),
         }
     })

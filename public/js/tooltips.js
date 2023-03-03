@@ -80,6 +80,11 @@ tippy('#help-batching-frequency', {
     ...defaultOptions,
 })
 
+tippy('#help-zero-pct', {
+    content: `<em> Final text TBC</em> <br> The percentage of buckets with zero conversions expected. Expected values between 0-10.  <br> NOTE: <em>In real world we can expect up to 99% of the buckets to have <1 conversions. However, this parameter only allows up to 10% just to give you a better understanding of how this can affect the noise overall</em>`,
+    ...defaultOptions,
+})
+
 const keyStrategyHelperHTML = `<strong>A = one granular key structure. B = several coarse key structures.</strong><br />In Strategy A, you have "one deep tree": each summary value in summary reports is associated to all of the dimensions you're tracking. You can then roll up these values yourself as needed, after aggregation. In Strategy B, you have "several shallow threes": the summary values in summary reports map to one of several sets of dimensions. <br/><strong>Your key strategy impacts signal-to-noise ratios in the final summary reports.</strong><br/>${learnMoreHtml}<br/><br/>
 Example:<br/>
 Let's consider this set of dimensions: <em>Measurement goal type</em> x <em>Campaign ID</em> x <em>Geo ID</em> x <em>Product category</em>

@@ -41,6 +41,9 @@ const quickGuideUrl =
 const detailedGuideUrl =
     'https://docs.google.com/document/d/1bU0a_njpDcRd9vDR0AJjwJjrf3Or8vAzyfuK8JZDEfo/view'
 
+const apeDescriptionUrl = `${quickGuideUrl}#ape`
+const rmspe_tDescriptionUrl = `${quickGuideUrl}#rmspe_t`
+
 const learnMoreHtml = `<br/>Learn more:<br/><a href='${quickGuideUrl}'>Quick guide</a> · <a href='${detailedGuideUrl}'>Detailed guide</a>`
 
 tippy('#help-epsilon', {
@@ -69,7 +72,7 @@ tippy('#help-daily', {
     <ul>
     <li><em>attributable</em>: Attributable conversions are conversions that can be attributed to a given impression or click with the Attribution Reporting API. As of today, only <strong>single-touch, same-device conversions</strong> can be attributed with the API.</li>
     <li><em>with all
-    dimensions combined</em>: For a set of dimensions <em>Campaign Id</em> x <em>Geography</em> x <em>Product category</em>, the average daily conversion count is the average daily conversion count for a given <em>Campaign Id</em> AND <em>Geography</em> AND <em>Product category</em>. This is a ape approach. Check out the advanced mode for more elaborate approaches. </li>
+    dimensions combined</em>: For a set of dimensions <em>Campaign Id</em> x <em>Geography</em> x <em>Product category</em>, the average daily conversion count is the average daily conversion count for a given <em>Campaign Id</em> AND <em>Geography</em> AND <em>Product category</em>. This is a simple approach. Check out the advanced mode for more elaborate approaches. </li>
     </ul>
     <strong>This impacts signal-to-noise ratios in the final summary reports.</strong><br/> ${learnMoreHtml} <br/><br/> Tip: Try and experiment with different conversion counts based on different campaign variables: campaign budget, user reach, ad efficiencies, etc. For example, all else being equal, what happens when your advertiser's budget is $10K vs. $100K? $10K will have less attributed conversions than $100K. Maybe the signal-to-noise ratio will be too high at $10K, but acceptable at $100K.`,
     ...defaultOptions,
@@ -139,12 +142,12 @@ export function updateTooltips() {
     })
 
     tippy('.help-noise-ape', {
-        content: `TBD`,
+        content: `<a href='${apeDescriptionUrl}'>APE explanation</a>`,
         ...defaultOptions,
     })
 
     tippy('.help-noise-rmspe', {
-        content: `TBD`,
+        content: `<a href='${rmspe_tDescriptionUrl}'>RMSPE_T explanation</a>`,
         ...defaultOptions,
     })
 

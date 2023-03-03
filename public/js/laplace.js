@@ -127,15 +127,18 @@ function simulatePerMetric(
 
         const noisePercentage = calculateNoisePercentage(
             noise,
-            randCount * scalingFactor + noise
+            // unnoisy aggregated value for APE
+            randCount * scalingFactor
         )
         noisePercentageSum += noisePercentage
+
+        const noisyScaledSummaryValue = randCount * scalingFactor + noise
 
         report.push({
             key: keyCombinations.combinations[i],
             summaryValue: randCount,
             scaledSummaryValue: randCount * scalingFactor,
-            noisyScaledSummaryValue: randCount * scalingFactor + noise,
+            noisyScaledSummaryValue: noisyScaledSummaryValue,
             noise: noise,
             noisePercentage: noisePercentage,
         })
@@ -148,7 +151,12 @@ function simulatePerMetric(
         (v) => v.noisyScaledSummaryValue
     )
 
-    report.noise_rmspe = getNoise_Rmspe(
+    const noise_ape = calculateAverageNoisePercentageRaw(
+        noisePercentageSum,
+        keyCombinations.combinations.length
+    )
+
+    const noise_rmspe = getNoise_Rmspe(
         allSummaryValuesPostNoise,
         allSummaryValuesPreNoise,
         scalingFactor
@@ -156,10 +164,10 @@ function simulatePerMetric(
 
     const simulationReport = {
         data: report,
-        noise_naive: calculateAverageNoisePercentageRaw(
-            noisePercentageSum,
-            keyCombinations.combinations.length
-        ),
+        noise_ape: noise_ape,
+        noise_ape_percent: Number.parseFloat((noise_ape * 100).toFixed(3)),
+        noise_rmspe: noise_rmspe,
+        noise_rmspe_percent: Number.parseFloat((noise_rmspe * 100).toFixed(3)),
     }
 
     displaySimulationResults_advancedMode(

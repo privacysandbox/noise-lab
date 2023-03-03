@@ -171,12 +171,20 @@ function simulate(
                 epsilon,
                 scalingFactorForThisMetric
             )
+
+        const noise_ape = calculateAverageNoisePercentage(dailyReportWithNoise)
+        const noise_rmspe = dailyReportWithNoise.noise_rmspe
+
         simulation.reports.push({
-            title: metric.name,
-            noise_naive: calculateAverageNoisePercentage(dailyReportWithNoise),
             data: dailyReportWithNoise,
-            noise_rmspe: dailyReportWithNoise.noise_rmspe,
+            noise_ape: noise_ape,
+            noise_ape_percent: Number.parseFloat((noise_ape * 100).toFixed(3)),
+            noise_rmspe: noise_rmspe,
+            noise_rmspe_percent: Number.parseFloat(
+                (noise_rmspe * 100).toFixed(3)
+            ),
             scalingFactor: scalingFactorForThisMetric,
+            title: metric.name,
         })
     }
     return simulation
@@ -232,9 +240,9 @@ function generateNoisyReportFromUnnoisyKeyValuePairsReport(
             summaryValuePreNoise: aggregatedValue,
             summaryValuePostNoise: aggregatedValuePostNoise,
             noise,
-            noisePercentage: calculateNoisePercentage(
+            noise_ape_individual: calculateNoisePercentage(
                 noise,
-                aggregatedValuePostNoise
+                aggregatedValue
             ),
         }
     })
@@ -248,7 +256,7 @@ function generateNoisyReportFromUnnoisyKeyValuePairsReport(
     noisyReport.noise_rmspe = getNoise_Rmspe(
         allSummaryValuesPostNoise,
         allSummaryValuesPreNoise,
-        scalingFactor,  
+        scalingFactor
     )
 
     return noisyReport

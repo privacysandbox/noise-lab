@@ -39,15 +39,13 @@ export function getRandomLaplacianNoise(budget, epsilon) {
     return randomLaplacianNoise
 }
 
-export function calculateNoisePercentage(noise, noisyAggregatedValue) {
-    return Number.parseFloat(
-        (Math.abs(noise / noisyAggregatedValue) * 100).toFixed(3)
-    )
+export function calculateNoisePercentage(noise, noiselessAggregatedValue) {
+    return Math.abs(noise / noiselessAggregatedValue)
 }
 
 export function calculateAverageNoisePercentage(report) {
     const sum = report
-        .map((entry) => entry.noisePercentage)
+        .map((entry) => entry.noise_ape_individual)
         .reduce((prev, curr) => prev + curr, 0)
     return calculateAverageNoisePercentageRaw(sum, report.length)
 }
@@ -55,7 +53,7 @@ export function calculateAverageNoisePercentage(report) {
 export function calculateAverageNoisePercentageRaw(sum, count) {
     const averageNoisePercentage = sum / count
     // Only display 3 decimal digits
-    return Number.parseFloat(averageNoisePercentage).toFixed(3)
+    return Number.parseFloat(averageNoisePercentage.toFixed(5))
 }
 
 export function getNoise_Rmspe(
@@ -72,7 +70,7 @@ export function getNoise_Rmspe(
         RMSPE_THRESHOLD
     ).toJs()
     const rmspe_t = rmspe_t_result.get(RMSPE_THRESHOLD)[0]
-    return rmspe_t
+    return Number.parseFloat(rmspe_t.toFixed(5))
 }
 
 // ADVANCED MODE UTILS

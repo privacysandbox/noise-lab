@@ -131,31 +131,35 @@ export function generateAggregatedValue(
     )
         return 0
 
-    // Calculate deterministic Number
-    var deterministicNumber =
-        metric.avgValue * 1 +
-        deterministicValue * 1 * (deterministicValue % 2 == 0 ? 1 : -1)
+    // Calculate deterministic Number - variation between 0 and metric max
+    // If the avg and max are equal, all buckets will be calculated with this value, no variation added 
+    if (metric.avgValue == metric.maxValue)
+        var deterministicNumber = metric.avgValue
+    else {
+        var deterministicNumber =
+            Math.abs(metric.avgValue * 1 +
+                deterministicValue * 1 * (deterministicValue % 2 == 0 ? 1 : -1))
+        if (deterministicNumber == 0) 
+            deterministicNumber = metric.avgValue
+        deterministicNumber = Math.min(deterministicNumber, metric.maxValue)
+    }
+
 
     // calculate variation for conversions/bucket
-    var dailyConversionValue = Math.abs(
-        deterministicValue % 2 == 0 && deterministicValue > 0
-            ? Math.abs(dailyConversionCount / deterministicValue) +
-                  1 * deterministicValue
-            : dailyConversionCount * deterministicValue - 1 * deterministicValue
-    )
+    // we are adding/deducting the deterministic value
+    var dailyConversionValue = (deterministicValue % 2 == 0 && deterministicValue > 0)
+        ? Number(dailyConversionCount) + Number(deterministicValue)
+        : Number(dailyConversionCount) - Number(deterministicValue)
 
+
+
+    // Limit the number of conversaion per current bucket to double the avg
     dailyConversionValue =
-        dailyConversionValue > 0 ? dailyConversionValue : dailyConversionCount
+        (dailyConversionValue > 0 && dailyConversionValue < 2 * Number(dailyConversionCount)) ? dailyConversionValue : dailyConversionCount
 
-    var calculationValue =
-        deterministicNumber > 0 &&
-        (metric.maxValue == metric.avgValue ||
-            metric.maxValue > deterministicNumber)
-            ? deterministicNumber
-            : metric.maxValue
-
+    // result is the product between variated metric value, variated conversion count per current bucket and frequency
     var res = Math.floor(
-        calculationValue * dailyConversionValue * batchingFrequency
+        deterministicNumber * dailyConversionValue * batchingFrequency
     )
 
     return res
@@ -174,8 +178,8 @@ export function generateAggregatedValueTemp(
 
     var calculationValue =
         deterministicNumber > 0 &&
-        (metric.maxValue == metric.avgValue ||
-            metric.maxValue > deterministicNumber)
+            (metric.maxValue == metric.avgValue ||
+                metric.maxValue > deterministicNumber)
             ? deterministicNumber
             : metric.maxValue
 

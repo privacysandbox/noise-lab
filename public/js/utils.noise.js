@@ -133,14 +133,17 @@ export function generateAggregatedValue(
 
     // Calculate deterministic Number - variation between 0 and metric max
     // If the avg and max are equal, all buckets will be calculated with this value, no variation added 
-    if (metric.avg == metric.maxValue)
+    if (metric.avgValue == metric.maxValue)
         var deterministicNumber = metric.avgValue
     else {
         var deterministicNumber =
             Math.abs(metric.avgValue * 1 +
                 deterministicValue * 1 * (deterministicValue % 2 == 0 ? 1 : -1))
+        if (deterministicNumber == 0) 
+            deterministicNumber = metric.avgValue
         deterministicNumber = Math.min(deterministicNumber, metric.maxValue)
     }
+
 
     // calculate variation for conversions/bucket
     // we are adding/deducting the deterministic value

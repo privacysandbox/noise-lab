@@ -41,8 +41,12 @@ const quickGuideUrl =
 const detailedGuideUrl =
     'https://docs.google.com/document/d/1bU0a_njpDcRd9vDR0AJjwJjrf3Or8vAzyfuK8JZDEfo/view'
 
-const apeDescriptionUrl = `${quickGuideUrl}#ape`
-const rmspe_tDescriptionUrl = `${quickGuideUrl}#rmspe_t`
+// const apeDescriptionUrl = `${quickGuideUrl}#ape`
+// const rmspe_tDescriptionUrl = `${quickGuideUrl}#rmspe_t`
+
+const apeDescriptionUrl =
+    'https://docs.google.com/document/d/e/2PACX-1vQ8_dMtgNZGpH3BPv9N-N_dpDLjg_DDjeIna2aKnnviBOkPSPk1q0KDA3O1FAWlimvO0EapeCHgIwBG/pub'
+const rmspe_tDescriptionUrl = apeDescriptionUrl
 
 const learnMoreHtml = `<br/>Learn more:<br/><a href='${quickGuideUrl}'>Quick guide</a> · <a href='${detailedGuideUrl}'>Detailed guide</a>`
 

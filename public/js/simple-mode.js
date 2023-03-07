@@ -29,6 +29,7 @@ import {
     calculateNoisePercentage,
     calculateAverageNoisePercentage,
     generateKeyCombinationArray,
+    getNoise_Rmspe,
 } from './utils.noise'
 import {
     generateSimulationId,
@@ -36,8 +37,7 @@ import {
     downloadAll,
     tempSaveTable,
 } from './utils.misc'
-import { MODES } from './config'
-import { CONTRIBUTION_BUDGET } from './consts.js'
+import { CONTRIBUTION_BUDGET, MODES } from './config'
 
 const keyStrategies = {
     A: { value: 'A', name: 'A' },
@@ -168,14 +168,23 @@ function simulate(
             generateNoisyReportFromUnnoisyKeyValuePairsReport(
                 dailyReportPreNoise,
                 budget,
-                epsilon
+                epsilon,
+                scalingFactorForThisMetric
             )
+
+        const noise_ape = calculateAverageNoisePercentage(dailyReportWithNoise)
+        const noise_rmspe = dailyReportWithNoise.noise_rmspe
+
         simulation.reports.push({
-            title: metric.name,
-            averageNoisePercentage:
-                calculateAverageNoisePercentage(dailyReportWithNoise),
             data: dailyReportWithNoise,
+            noise_ape: noise_ape,
+            noise_ape_percent: Number.parseFloat((noise_ape * 100).toFixed(3)),
+            noise_rmspe: noise_rmspe,
+            noise_rmspe_percent: Number.parseFloat(
+                (noise_rmspe * 100).toFixed(3)
+            ),
             scalingFactor: scalingFactorForThisMetric,
+            title: metric.name,
         })
     }
     return simulation
@@ -196,34 +205,33 @@ function generateUnnoisyKeyValuePairsReport(
 
     const report = []
     keyCombinations.forEach((k, idx) => {
+        var deterministicValue =
+            metric.defaultValuePerConversion + idx * (idx % 2 == 0 ? 1 : -1)
 
-
-        var deterministicValue = (metric.defaultValuePerConversion + idx * (idx % 2 == 0 ? 1 : -1))
-
-        var finalValue = (deterministicValue >= 0 ? deterministicValue : metric.defaultValuePerConversion) *
+        var finalValue =
+            (deterministicValue > 0
+                ? deterministicValue
+                : metric.defaultValuePerConversion) *
             scalingFactorForThisMetric *
             dailyConversionCount *
             batchingFrequency
 
         report.push({
-
             // TODO, though the exact key doesn't really matter
             key: k,
             aggregatedValue: Math.ceil(finalValue),
-
         })
     })
     return report
-
 }
-
 
 function generateNoisyReportFromUnnoisyKeyValuePairsReport(
     unnoisyKeyValuePairReport,
     budget,
-    epsilon
+    epsilon,
+    scalingFactor
 ) {
-    return unnoisyKeyValuePairReport.map((entry) => {
+    const noisyReport = unnoisyKeyValuePairReport.map((entry) => {
         const { key, aggregatedValue } = entry
         const noise = getRandomLaplacianNoise(budget, epsilon)
         const aggregatedValuePostNoise = entry.aggregatedValue + noise
@@ -232,12 +240,26 @@ function generateNoisyReportFromUnnoisyKeyValuePairsReport(
             summaryValuePreNoise: aggregatedValue,
             summaryValuePostNoise: aggregatedValuePostNoise,
             noise,
-            noisePercentage: calculateNoisePercentage(
+            noise_ape_individual: calculateNoisePercentage(
                 noise,
-                aggregatedValuePostNoise
+                aggregatedValue
             ),
         }
     })
+    const allSummaryValuesPreNoise = Object.values(noisyReport).map(
+        (v) => v.summaryValuePreNoise
+    )
+    const allSummaryValuesPostNoise = Object.values(noisyReport).map(
+        (v) => v.summaryValuePostNoise
+    )
+
+    noisyReport.noise_rmspe = getNoise_Rmspe(
+        allSummaryValuesPostNoise,
+        allSummaryValuesPreNoise,
+        scalingFactor
+    )
+
+    return noisyReport
 }
 
 function clearAllSimpleMode() {

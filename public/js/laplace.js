@@ -25,10 +25,9 @@ import {
     getBudgetValueForMetricIdFromDom,
     displayBudgetSplit,
     getIsPercentageBudgetSplitFromDom,
-} from './dom.js'
+} from './dom'
 import { generateSimulationId, tempSaveTable, downloadAll } from './utils.misc'
-import { CONTRIBUTION_BUDGET } from './consts.js'
-import { MODES } from './config'
+import { CONTRIBUTION_BUDGET, MODES } from './config'
 
 import {
     getRandomLaplacianNoise,
@@ -37,7 +36,8 @@ import {
     generateKeyCombinationArray,
     generateAggregatedValue,
     calculateAverageNoisePercentageRaw,
-} from './utils.noise.js'
+    getNoise_Rmspe,
+} from './utils.noise'
 
 // define default metrics
 const defaultMetrics = [
@@ -127,26 +127,47 @@ function simulatePerMetric(
 
         const noisePercentage = calculateNoisePercentage(
             noise,
-            randCount * scalingFactor + noise
+            // unnoisy aggregated value for APE
+            randCount * scalingFactor
         )
         noisePercentageSum += noisePercentage
+
+        const noisyScaledSummaryValue = randCount * scalingFactor + noise
 
         report.push({
             key: keyCombinations.combinations[i],
             summaryValue: randCount,
             scaledSummaryValue: randCount * scalingFactor,
-            noisyScaledSummaryValue: randCount * scalingFactor + noise,
+            noisyScaledSummaryValue: noisyScaledSummaryValue,
             noise: noise,
             noisePercentage: noisePercentage,
         })
     }
 
+    const allSummaryValuesPreNoise = Object.values(report).map(
+        (v) => v.scaledSummaryValue
+    )
+    const allSummaryValuesPostNoise = Object.values(report).map(
+        (v) => v.noisyScaledSummaryValue
+    )
+
+    const noise_ape = calculateAverageNoisePercentageRaw(
+        noisePercentageSum,
+        keyCombinations.combinations.length
+    )
+
+    const noise_rmspe = getNoise_Rmspe(
+        allSummaryValuesPostNoise,
+        allSummaryValuesPreNoise,
+        scalingFactor
+    )
+
     const simulationReport = {
         data: report,
-        averageNoisePercentage: calculateAverageNoisePercentageRaw(
-            noisePercentageSum,
-            keyCombinations.combinations.length
-        ),
+        noise_ape: noise_ape,
+        noise_ape_percent: Number.parseFloat((noise_ape * 100).toFixed(3)),
+        noise_rmspe: noise_rmspe,
+        noise_rmspe_percent: Number.parseFloat((noise_rmspe * 100).toFixed(3)),
     }
 
     displaySimulationResults_advancedMode(

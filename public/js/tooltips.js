@@ -35,12 +35,20 @@ const bottomOptions = {
     placement: 'bottom',
 }
 
-const quickGuideUrl = ''
+const quickGuideUrl =
+    'https://developer.chrome.com/docs/privacy-sandbox/summary-reports/design-decisions/'
 
 const detailedGuideUrl =
     'https://docs.google.com/document/d/1bU0a_njpDcRd9vDR0AJjwJjrf3Or8vAzyfuK8JZDEfo/view'
 
-const learnMoreHtml = `<br/>Learn more:<br/>Quick guide (coming soon) · <a href='${detailedGuideUrl}'>Detailed guide</a>`
+// const apeDescriptionUrl = `${quickGuideUrl}#ape`
+// const rmspe_tDescriptionUrl = `${quickGuideUrl}#rmspe_t`
+
+const apeDescriptionUrl =
+    'https://docs.google.com/document/d/e/2PACX-1vQ8_dMtgNZGpH3BPv9N-N_dpDLjg_DDjeIna2aKnnviBOkPSPk1q0KDA3O1FAWlimvO0EapeCHgIwBG/pub'
+const rmspe_tDescriptionUrl = apeDescriptionUrl
+
+const learnMoreHtml = `<br/>Learn more:<br/><a href='${quickGuideUrl}'>Quick guide</a> · <a href='${detailedGuideUrl}'>Detailed guide</a>`
 
 tippy('#help-epsilon', {
     content: `A higher epsilon leads to lower noise. Its maximum value for the aggregation service is 64. Epsilon can be altered by adtechs during the origin trial to evaluate various utility/privacy adjustments.<strong><br/>This impacts signal-to-noise ratios in the final summary reports.</strong><br/>${learnMoreHtml}`,
@@ -68,7 +76,7 @@ tippy('#help-daily', {
     <ul>
     <li><em>attributable</em>: Attributable conversions are conversions that can be attributed to a given impression or click with the Attribution Reporting API. As of today, only <strong>single-touch, same-device conversions</strong> can be attributed with the API.</li>
     <li><em>with all
-    dimensions combined</em>: For a set of dimensions <em>Campaign Id</em> x <em>Geography</em> x <em>Product category</em>, the average daily conversion count is the average daily conversion count for a given <em>Campaign Id</em> AND <em>Geography</em> AND <em>Product category</em>. This is a naive approach. Check out the advanced mode for more elaborate approaches. </li>
+    dimensions combined</em>: For a set of dimensions <em>Campaign Id</em> x <em>Geography</em> x <em>Product category</em>, the average daily conversion count is the average daily conversion count for a given <em>Campaign Id</em> AND <em>Geography</em> AND <em>Product category</em>. This is a simple approach. Check out the advanced mode for more elaborate approaches. </li>
     </ul>
     <strong>This impacts signal-to-noise ratios in the final summary reports.</strong><br/> ${learnMoreHtml} <br/><br/> Tip: Try and experiment with different conversion counts based on different campaign variables: campaign budget, user reach, ad efficiencies, etc. For example, all else being equal, what happens when your advertiser's budget is $10K vs. $100K? $10K will have less attributed conversions than $100K. Maybe the signal-to-noise ratio will be too high at $10K, but acceptable at $100K.`,
     ...defaultOptions,
@@ -76,6 +84,11 @@ tippy('#help-daily', {
 
 tippy('#help-batching-frequency', {
     content: `Frequency at which the adtech decides to batch the aggregatable reports, for aggregation by the aggregation service. <br/><strong>This impacts signal-to-noise ratios in the final summary reports.</strong> Batching less frequently leads to a higher value per bucket (key), leading to typically higher signal-to-noise ratios.<br/>${learnMoreHtml}`,
+    ...defaultOptions,
+})
+
+tippy('#help-zero-pct', {
+    content: `<em> Final text TBC</em> <br> The percentage of buckets with zero conversions expected. Expected values between 0-10.  <br> NOTE: <em>In real world we can expect up to 99% of the buckets to have <1 conversions. However, this parameter only allows up to 10% just to give you a better understanding of how this can affect the noise overall</em>`,
     ...defaultOptions,
 })
 
@@ -137,8 +150,13 @@ export function updateTooltips() {
         ...defaultOptions,
     })
 
-    tippy('.help-noise-value', {
-        content: `This represents the average signal-to-noise ratio for this summary report. This is the average noise of all entries in this report, i.e. of all summary values (each associated with an aggregation key), i.e. of all values in the last column of the data table below.<br/><br/>For an individual summary value⏤that is for an individual row in the table⏤the noise ratio is calculated as follows:<br/>absolute(noise / noisy summary value) * 100, where absolute is required because the noise can be negative.`,
+    tippy('.help-noise-ape', {
+        content: `<a href='${apeDescriptionUrl}'>APE explanation</a>`,
+        ...defaultOptions,
+    })
+
+    tippy('.help-noise-rmspe', {
+        content: `<a href='${rmspe_tDescriptionUrl}'>RMSPE_T explanation</a>`,
         ...defaultOptions,
     })
 
@@ -192,13 +210,13 @@ tippy('#about-info', {
 })
 
 tippy('#user-guide', {
-    content: `<a target="_blank" noreferrer noopeneer href="https://developer.chrome.com/docs/privacy-sandbox/summary-reports/design-decisions/">Noise Lab user guide</a>`,
+    content: `<a target="_blank" noreferrer noopeneer href='${quickGuideUrl}'>Noise Lab user guide</a>`,
     ...bottomOptions,
 })
 
 export function updateOutlierNote() {
     tippy('#help-outlier-management', {
-        content: `'Max value' will be used for calculating the scaling factor. If this maximum value includes outliers, you may want to consider setting up a different key structure as explained in this section of the user guide - <a href="https://developer.chrome.com/docs/privacy-sandbox/summary-reports/design-decisions/#outlier-management-advanced">Advanced outlier management</a>, or by removing outliers, when figuring out the maximum value, if they account for a small percentage of all the values.`,
+        content: `'Max value' will be used for calculating the scaling factor. If this maximum value includes outliers, you may want to consider setting up a different key structure as explained in this section of the user guide - <a href="${quickGuideUrl}/#outlier-management-advanced">Advanced outlier management</a>, or by removing outliers, when figuring out the maximum value, if they account for a small percentage of all the values.`,
         ...defaultOptions,
     })
 }

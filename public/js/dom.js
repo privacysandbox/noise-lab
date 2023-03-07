@@ -19,17 +19,14 @@ import {
     generateSimulationWrapperElId,
     generateConfirmMessage,
 } from './utils.misc'
-import { MODES } from './config'
+import { MODES, RMSPE_THRESHOLD } from './config'
+
 import { tempSaveTable_simpleMode } from './simple-mode'
 import { tempSaveTable_advancedMode } from './laplace'
 import { updateTooltips, updateOutlierNote } from './tooltips'
 
 export function displayContributionBudget(budget) {
     document.getElementById('contribution-budget').innerText = budget
-}
-
-export function displayNoise(l) {
-    document.getElementById('laplace').innerText += ' ' + l
 }
 
 export function displayEpsilon(epsilon) {
@@ -378,7 +375,7 @@ export function displaySimulationResults_simpleMode(
     simulationOutputWrapperDiv.appendChild(reportsTitleDiv)
 
     reports.forEach((report) => {
-        displayReport(
+        displayReportSimpleMode(
             simulationOutputWrapperDiv,
             report,
             simulationId,
@@ -401,28 +398,33 @@ function getNoiseBadgeType(noiseValue) {
     }
 }
 
-function displayNoiseAverage(parentDomEl, averageNoisePercentage) {
-    // Display average noise
+function displayNoiseAsPercentageWithBadge(
+    parentDomEl,
+    noise_value_percent,
+    noiseMetricDisplayName,
+    noiseMetricId
+) {
+    // noiseMetricName = Average percentage error (APE)
     const labelEl = document.createElement('h5')
     const valueEl = document.createElement('div')
-    labelEl.innerText = 'Average noise ratio: '
+    labelEl.innerText = `${noiseMetricDisplayName}: `
     // Set a class to display noise in color
     valueEl.setAttribute(
         'class',
-        `average-noise ${getNoiseBadgeType(averageNoisePercentage)} has-helper`
+        `noise ${getNoiseBadgeType(noise_value_percent)} has-helper`
     )
 
     const exactValueEl = document.createElement('div')
     exactValueEl.setAttribute('class', 'has-helper mono')
-    exactValueEl.innerText = `(Exact value = ${averageNoisePercentage}%)`
+    exactValueEl.innerText = `Exact value = ${noise_value_percent} %`
 
-    const noiseRatioHelper = document.createElement('div')
-    noiseRatioHelper.setAttribute('class', 'help help-noise-value')
+    const helper = document.createElement('div')
+    helper.setAttribute('class', `help help-noise-${noiseMetricId}`)
 
     parentDomEl.appendChild(labelEl)
     parentDomEl.appendChild(valueEl)
     parentDomEl.appendChild(exactValueEl)
-    parentDomEl.appendChild(noiseRatioHelper)
+    parentDomEl.appendChild(helper)
 }
 
 function displayDataDetailsTitle(parentDomEl) {
@@ -458,11 +460,27 @@ function displayScalingFactor(parentDomEl, scalingFactor) {
     parentDomEl.appendChild(scalingFactorHelper)
 }
 
-function displayNoise(parentDomEl, averageNoisePercentage) {
+function displayNoiseAsPercentage(
+    parentDomEl,
+    noise_ape_percent,
+    noise_rmspe_percent
+) {
     const noiseWrapperDiv = document.createElement('div')
     noiseWrapperDiv.setAttribute('class', 'noise-wrapper')
     parentDomEl.appendChild(noiseWrapperDiv)
-    displayNoiseAverage(noiseWrapperDiv, averageNoisePercentage)
+
+    displayNoiseAsPercentageWithBadge(
+        noiseWrapperDiv,
+        noise_ape_percent,
+        'Average percentage error (APE)',
+        'ape'
+    )
+    displayNoiseAsPercentageWithBadge(
+        noiseWrapperDiv,
+        noise_rmspe_percent,
+        `RMSPE with t=${RMSPE_THRESHOLD}`,
+        'rmspe'
+    )
 }
 
 export function getBudgetValueForMetricIdFromDom(metricId) {
@@ -471,20 +489,30 @@ export function getBudgetValueForMetricIdFromDom(metricId) {
     )
 }
 
-function displayReport(
+function displayReportSimpleMode(
     parentDomEl,
     report,
     simulationId,
     keyCombinationDisplay
 ) {
-    const { averageNoisePercentage, data, title, scalingFactor } = report
+    const {
+        noise_ape_percent,
+        noise_rmspe_percent,
+        data,
+        title,
+        scalingFactor,
+    } = report
 
     // Display report table title
     const titleDiv = document.createElement('h4')
     titleDiv.innerText = 'Measurement goal: ' + title
     parentDomEl.appendChild(titleDiv)
     // Display noise
-    displayNoise(parentDomEl, averageNoisePercentage)
+    displayNoiseAsPercentage(
+        parentDomEl,
+        noise_ape_percent,
+        noise_rmspe_percent
+    )
     // Display details section title
     displayDataDetailsTitle(parentDomEl)
     parentDomEl.appendChild(document.createElement('br'))
@@ -619,9 +647,9 @@ export function displaySimulationResults_advancedMode(
 
     const allSimulationsWrapper = mainDiv
 
-    const { data, averageNoisePercentage } = simulation
+    const { data, noise_ape_percent, noise_rmspe_percent } = simulation
     // TODO make simulationID part of the sim object
-    // const { data, averageNoisePercentage, simulationId } = simulation
+    // const { data, noise_ape_percent, noise_rmspe_percent, simulationId } = simulation
 
     // Prepare wrapper div that will contain the simulation
     const simulationWrapperDiv = document.createElement('div')
@@ -636,7 +664,11 @@ export function displaySimulationResults_advancedMode(
     allSimulationsWrapper.appendChild(metricTag)
 
     // Display noise
-    displayNoise(allSimulationsWrapper, averageNoisePercentage)
+    displayNoiseAsPercentage(
+        allSimulationsWrapper,
+        noise_ape_percent,
+        noise_rmspe_percent
+    )
     // Display details section title
     displayDataDetailsTitle(allSimulationsWrapper)
     allSimulationsWrapper.appendChild(document.createElement('br'))
@@ -1101,13 +1133,13 @@ export function addDimension() {
     var dimensionSize = document.createElement('input')
     dimensionSize.setAttribute('id', 'dimension' + dimensionsNo + '-size')
     dimensionSize.setAttribute('type', 'number')
+    dimensionSize.setAttribute('class', 'dimension-size')
     dimensionSize.setAttribute('placeholder', 'Dimension size')
+    dimensionSize.addEventListener('input', () => updateDailyPerBucket())
     dimensionDiv.appendChild(dimensionSize)
     dimensionDiv.appendChild(document.createElement('br'))
 
     dimensionsMainDiv.appendChild(dimensionDiv)
-
-    updateDailyPerBucket()
 }
 
 export function removeDimension() {
@@ -1275,6 +1307,10 @@ function validateConversionsPerBucket(errors) {
 
 export function getScalingApproachFromDom() {
     return document.getElementById('scaling-approach').value
+}
+
+export function getZeroConversionsPercentageFromDom() {
+    return document.getElementById('zero-pct').value
 }
 
 window.generateKeyStructures = generateKeyStructures

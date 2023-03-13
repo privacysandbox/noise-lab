@@ -387,12 +387,18 @@ export function displaySimulationResults_simpleMode(
 }
 
 function getNoiseBadgeType(noiseValue) {
-    if (noiseValue >= 20) {
+    if (noiseValue >= 100) {
+        return 'over-100'
+    } else if (noiseValue >= 20) {
         return 'over-20'
+    } else if (noiseValue >= 15) {
+        return 'over-15'
+    } else if (noiseValue >= 10) {
+        return 'over-10'
     } else if (noiseValue >= 5) {
-        return 'between-5-20'
+        return 'over-5'
     } else if (noiseValue >= 1) {
-        return 'under-5'
+        return 'over-1'
     } else {
         return 'under-1'
     }

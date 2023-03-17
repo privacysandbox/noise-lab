@@ -22,6 +22,7 @@ import {
     getIsUseScalingFromDom,
     clearAll,
     getBudgetValueForMetricIdFromDom,
+    loadPython,
 } from './dom'
 import {
     getScalingFactorForMetric,
@@ -75,6 +76,7 @@ const metrics = [
 ]
 
 export function initializeDisplaySimpleModeWithParams() {
+    loadPython()
     initializeDisplaySimpleMode(
         Object.values(keyStrategies),
         Object.values(batchingFrequencies),

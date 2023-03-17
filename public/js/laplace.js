@@ -25,6 +25,7 @@ import {
     getBudgetValueForMetricIdFromDom,
     displayBudgetSplit,
     getIsPercentageBudgetSplitFromDom,
+    loadPython,
 } from './dom'
 import { generateSimulationId, tempSaveTable, downloadAll } from './utils.misc'
 import { CONTRIBUTION_BUDGET, MODES } from './config'
@@ -67,6 +68,7 @@ const defaultDimensions = [
 ]
 
 export function initializeDisplayAdvancedModeWithParams() {
+    loadPython()
     initializeDisplayAdvancedMode(
         defaultMetrics,
         defaultDimensions,

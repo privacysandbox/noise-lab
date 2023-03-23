@@ -63,7 +63,7 @@ export function getNoise_Rmspe(
 ) {
     rmspe_t_function_js = pyscript.runtime.globals.get('rmspe_t')
     // rmspe_t_result is a JS Map.
-    // Each key is a RMSPE_T value (so we could also in theory get RMSPE_T for t=4 if we chanegd it).
+    // Each key is a RMSPE_T value (so we could in theory get RMSPE_T for e.g. t=4, t=1 etc. if we decided to change the value of t or to parametrize it in the frontend for users to change).
     // For each key, its corresponding value is an array:
     // Index 0: rmspe_t averaged over all entries i.e. all buckets
     // Index 1: array of individual rmspe_t value for each entry i.e. each bucket

@@ -13,7 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import laplace from '@stdlib/random-base-laplace'
-import { getZeroConversionsPercentageFromDom } from './dom.js'
 import { RMSPE_THRESHOLD } from './config'
 
 // SHARED UTILS
@@ -39,8 +38,8 @@ export function getRandomLaplacianNoise(budget, epsilon) {
     return randomLaplacianNoise
 }
 
-export function calculateNoisePercentage(noise, noiselessAggregatedValue) {
-    return Math.abs(noise / noiselessAggregatedValue)
+export function calculateNoisePercentage(noise, summaryValue_unnoisy) {
+    return Math.abs(noise / summaryValue_unnoisy)
 }
 
 export function calculateAverageNoisePercentage(report) {
@@ -121,14 +120,14 @@ function cartesian(...args) {
     return r
 }
 
-export function generateAggregatedValue(
+export function generateSummaryValue(
     metric,
     deterministicValue,
     dailyConversionCount,
-    batchingFrequency
+    batchingFrequency,
+    zeroPct
 ) {
     // every 20th bucket gets 0 conversions -> ~5%
-    var zeroPct = getZeroConversionsPercentageFromDom()
 
     if (
         zeroPct > 0 &&
@@ -170,29 +169,4 @@ export function generateAggregatedValue(
     )
 
     return res
-}
-
-export function generateAggregatedValueTemp(
-    metric,
-    deterministicValue,
-    dailyConversionCount,
-    batchingFrequency
-) {
-    // Calculate deterministic Number
-    var deterministicNumber =
-        metric.avgValue * 1 +
-        deterministicValue * 1 * (deterministicValue % 2 == 0 ? 1 : -1)
-
-    var calculationValue =
-        deterministicNumber > 0 &&
-        (metric.maxValue == metric.avgValue ||
-            metric.maxValue > deterministicNumber)
-            ? deterministicNumber
-            : metric.maxValue
-
-    console.log('deter', deterministicNumber)
-    console.log('calcVal', calculationValue)
-    return Math.floor(
-        calculationValue * dailyConversionCount * batchingFrequency
-    )
 }

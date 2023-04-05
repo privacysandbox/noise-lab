@@ -22,6 +22,7 @@ import {
     getIsUseScalingFromDom,
     clearAll,
     getBudgetValueForMetricIdFromDom,
+    loadPython,
 } from './dom'
 import {
     getScalingFactorForMetric,
@@ -30,6 +31,7 @@ import {
     calculateAverageNoisePercentage,
     generateKeyCombinationArray,
     getNoise_Rmspe,
+    generateSummaryValue,
 } from './utils.noise'
 import {
     generateSimulationId,
@@ -70,11 +72,12 @@ const dimensions = [
 ]
 
 const metrics = [
-    { name: 'purchaseValue', defaultValuePerConversion: 120, maxValue: 1000 },
-    { name: 'purchaseCount', defaultValuePerConversion: 1, maxValue: 1 },
+    { name: 'purchaseValue', avgValue: 120, maxValue: 1000 },
+    { name: 'purchaseCount', avgValue: 1, maxValue: 1 },
 ]
 
 export function initializeDisplaySimpleModeWithParams() {
+    loadPython()
     initializeDisplaySimpleMode(
         Object.values(keyStrategies),
         Object.values(batchingFrequencies),
@@ -205,21 +208,22 @@ function generateUnnoisyKeyValuePairsReport(
 
     const report = []
     keyCombinations.forEach((k, idx) => {
-        var deterministicValue =
-            metric.defaultValuePerConversion + idx * (idx % 2 == 0 ? 1 : -1)
+        var summaryValue = generateSummaryValue(
+            metric,
+            idx,
+            dailyConversionCount,
+            batchingFrequency,
+            0
+        )
 
-        var finalValue =
-            (deterministicValue > 0
-                ? deterministicValue
-                : metric.defaultValuePerConversion) *
-            scalingFactorForThisMetric *
-            dailyConversionCount *
-            batchingFrequency
+        const summaryValue_scaled_unnoisy =
+            summaryValue * scalingFactorForThisMetric
 
         report.push({
             // TODO, though the exact key doesn't really matter
             key: k,
-            aggregatedValue: Math.ceil(finalValue),
+            summaryValue,
+            summaryValue_scaled_unnoisy,
         })
     })
     return report
@@ -232,25 +236,25 @@ function generateNoisyReportFromUnnoisyKeyValuePairsReport(
     scalingFactor
 ) {
     const noisyReport = unnoisyKeyValuePairReport.map((entry) => {
-        const { key, aggregatedValue } = entry
+        const { key, summaryValue, summaryValue_scaled_unnoisy } = entry
         const noise = getRandomLaplacianNoise(budget, epsilon)
-        const aggregatedValuePostNoise = entry.aggregatedValue + noise
         return {
             key,
-            summaryValuePreNoise: aggregatedValue,
-            summaryValuePostNoise: aggregatedValuePostNoise,
-            noise,
+            summaryValue,
+            summaryValue_scaled_unnoisy,
+            summaryValue_scaled_noisy: summaryValue_scaled_unnoisy + noise,
             noise_ape_individual: calculateNoisePercentage(
                 noise,
-                aggregatedValue
+                summaryValue_scaled_unnoisy
             ),
         }
     })
+
     const allSummaryValuesPreNoise = Object.values(noisyReport).map(
-        (v) => v.summaryValuePreNoise
+        (v) => v.summaryValue_scaled_unnoisy
     )
     const allSummaryValuesPostNoise = Object.values(noisyReport).map(
-        (v) => v.summaryValuePostNoise
+        (v) => v.summaryValue_scaled_noisy
     )
 
     noisyReport.noise_rmspe = getNoise_Rmspe(

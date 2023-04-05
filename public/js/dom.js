@@ -1319,6 +1319,17 @@ export function getZeroConversionsPercentageFromDom() {
     return document.getElementById('zero-pct').value
 }
 
+export function loadPython(){
+
+    // pyCode is the var declared in python-file.js and containing the full python code
+    var pyCodeText = document.createTextNode(pyCode)
+
+    var pyScriptSection = document.getElementById('py-script')
+    pyScriptSection.appendChild(pyCodeText)
+
+}
+
+
 window.generateKeyStructures = generateKeyStructures
 window.capEpsilon = capEpsilon
 window.updateDailyPerBucket = updateDailyPerBucket

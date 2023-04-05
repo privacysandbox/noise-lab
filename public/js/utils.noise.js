@@ -13,7 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import laplace from '@stdlib/random-base-laplace'
-import { getZeroConversionsPercentageFromDom } from './dom.js'
 import { RMSPE_THRESHOLD } from './config'
 
 // SHARED UTILS
@@ -39,8 +38,8 @@ export function getRandomLaplacianNoise(budget, epsilon) {
     return randomLaplacianNoise
 }
 
-export function calculateNoisePercentage(noise, noiselessAggregatedValue) {
-    return Math.abs(noise / noiselessAggregatedValue)
+export function calculateNoisePercentage(noise, summaryValue_unnoisy) {
+    return Math.abs(noise / summaryValue_unnoisy)
 }
 
 export function calculateAverageNoisePercentage(report) {
@@ -62,6 +61,11 @@ export function getNoise_Rmspe(
     scalingFactor
 ) {
     rmspe_t_function_js = pyscript.runtime.globals.get('rmspe_t')
+    // rmspe_t_result is a JS Map.
+    // Each key is a RMSPE_T value (so we could in theory get RMSPE_T for e.g. t=4, t=1 etc. if we decided to change the value of t or to parametrize it in the frontend for users to change).
+    // Each key's corresponding value is an array:
+    // Index 0: rmspe_t averaged over all entries i.e. all buckets
+    // Index 1: array of individual rmspe_t value for each entry i.e. each bucket
     const rmspe_t_result = rmspe_t_function_js(
         allSummaryValuesPostNoise,
         allSummaryValuesPreNoise,
@@ -69,6 +73,7 @@ export function getNoise_Rmspe(
         Math.floor(scalingFactor),
         RMSPE_THRESHOLD
     ).toJs()
+    // Get the rmspe_t average for RMSPE_THRESHOLD
     const rmspe_t = rmspe_t_result.get(RMSPE_THRESHOLD)[0]
     return Number.parseFloat(rmspe_t.toFixed(5))
 }
@@ -115,14 +120,14 @@ function cartesian(...args) {
     return r
 }
 
-export function generateAggregatedValue(
+export function generateSummaryValue(
     metric,
     deterministicValue,
     dailyConversionCount,
-    batchingFrequency
+    batchingFrequency,
+    zeroPct
 ) {
     // every 20th bucket gets 0 conversions -> ~5%
-    var zeroPct = getZeroConversionsPercentageFromDom()
 
     if (
         zeroPct > 0 &&
@@ -132,30 +137,31 @@ export function generateAggregatedValue(
         return 0
 
     // Calculate deterministic Number - variation between 0 and metric max
-    // If the avg and max are equal, all buckets will be calculated with this value, no variation added 
+    // If the avg and max are equal, all buckets will be calculated with this value, no variation added
     if (metric.avgValue == metric.maxValue)
         var deterministicNumber = metric.avgValue
     else {
-        var deterministicNumber =
-            Math.abs(metric.avgValue * 1 +
-                deterministicValue * 1 * (deterministicValue % 2 == 0 ? 1 : -1))
-        if (deterministicNumber == 0) 
-            deterministicNumber = metric.avgValue
+        var deterministicNumber = Math.abs(
+            metric.avgValue * 1 +
+                deterministicValue * 1 * (deterministicValue % 2 == 0 ? 1 : -1)
+        )
+        if (deterministicNumber == 0) deterministicNumber = metric.avgValue
         deterministicNumber = Math.min(deterministicNumber, metric.maxValue)
     }
 
-
     // calculate variation for conversions/bucket
     // we are adding/deducting the deterministic value
-    var dailyConversionValue = (deterministicValue % 2 == 0 && deterministicValue > 0)
-        ? Number(dailyConversionCount) + Number(deterministicValue)
-        : Number(dailyConversionCount) - Number(deterministicValue)
-
-
+    var dailyConversionValue =
+        deterministicValue % 2 == 0 && deterministicValue > 0
+            ? Number(dailyConversionCount) + Number(deterministicValue)
+            : Number(dailyConversionCount) - Number(deterministicValue)
 
     // Limit the number of conversaion per current bucket to double the avg
     dailyConversionValue =
-        (dailyConversionValue > 0 && dailyConversionValue < 2 * Number(dailyConversionCount)) ? dailyConversionValue : dailyConversionCount
+        dailyConversionValue > 0 &&
+        dailyConversionValue < 2 * Number(dailyConversionCount)
+            ? dailyConversionValue
+            : dailyConversionCount
 
     // result is the product between variated metric value, variated conversion count per current bucket and frequency
     var res = Math.floor(
@@ -163,29 +169,4 @@ export function generateAggregatedValue(
     )
 
     return res
-}
-
-export function generateAggregatedValueTemp(
-    metric,
-    deterministicValue,
-    dailyConversionCount,
-    batchingFrequency
-) {
-    // Calculate deterministic Number
-    var deterministicNumber =
-        metric.avgValue * 1 +
-        deterministicValue * 1 * (deterministicValue % 2 == 0 ? 1 : -1)
-
-    var calculationValue =
-        deterministicNumber > 0 &&
-            (metric.maxValue == metric.avgValue ||
-                metric.maxValue > deterministicNumber)
-            ? deterministicNumber
-            : metric.maxValue
-
-    console.log('deter', deterministicNumber)
-    console.log('calcVal', calculationValue)
-    return Math.floor(
-        calculationValue * dailyConversionCount * batchingFrequency
-    )
 }

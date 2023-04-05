@@ -41,10 +41,8 @@ const quickGuideUrl =
 const detailedGuideUrl =
     'https://docs.google.com/document/d/1bU0a_njpDcRd9vDR0AJjwJjrf3Or8vAzyfuK8JZDEfo/view'
 
- const apeDescriptionUrl = `${quickGuideUrl}#ape`
- const rmspe_tDescriptionUrl = `${quickGuideUrl}#rmspe`
-
-
+const apeDescriptionUrl = `${quickGuideUrl}#ape`
+const rmspe_tDescriptionUrl = `${quickGuideUrl}#rmspe`
 
 const learnMoreHtml = `<br/>Learn more:<br/><a href='${quickGuideUrl}'>Quick guide</a> · <a href='${detailedGuideUrl}'>Detailed guide</a>`
 
@@ -159,7 +157,7 @@ export function updateTooltips() {
     })
 
     tippy('.help-data', {
-        content: `Based on your input, Noise Lab generates dummy data⏤but applies to it noise in the exact same way as the aggregation service. key and noisyScaledSummaryValue in the table below represent a noisy summary report (for this measurement goal) you would typically get from a real system.
+        content: `Based on your input, Noise Lab generates dummy data⏤but applies to it noise in the exact same way as the aggregation service. key and summaryValue_scaled_noisy in the table below represent a noisy summary report (for this measurement goal) you would typically get from a real system.
         <br/>
         Each row in this table represents an {aggregation key, noisy post-aggregation summary value} pair. Noise Lab generates that data as follows:
         <ol>

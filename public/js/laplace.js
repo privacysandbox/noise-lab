@@ -25,6 +25,8 @@ import {
     getBudgetValueForMetricIdFromDom,
     displayBudgetSplit,
     getIsPercentageBudgetSplitFromDom,
+    loadPython,
+    getZeroConversionsPercentageFromDom,
 } from './dom'
 import { generateSimulationId, tempSaveTable, downloadAll } from './utils.misc'
 import { CONTRIBUTION_BUDGET, MODES } from './config'
@@ -34,7 +36,7 @@ import {
     getScalingFactorForMetric,
     calculateNoisePercentage,
     generateKeyCombinationArray,
-    generateAggregatedValue,
+    generateSummaryValue,
     calculateAverageNoisePercentageRaw,
     getNoise_Rmspe,
 } from './utils.noise'
@@ -67,6 +69,7 @@ const defaultDimensions = [
 ]
 
 export function initializeDisplayAdvancedModeWithParams() {
+    loadPython()
     initializeDisplayAdvancedMode(
         defaultMetrics,
         defaultDimensions,
@@ -118,37 +121,38 @@ function simulatePerMetric(
     for (let i = 0; i < keyCombinations.combinations.length; i++) {
         const noise = getRandomLaplacianNoise(contributionBudget, epsilon)
 
-        const randCount = generateAggregatedValue(
+        const randCount = generateSummaryValue(
             metric,
             i,
             dailyCount,
-            batchingFrequency
+            batchingFrequency,
+            getZeroConversionsPercentageFromDom()
         )
 
         const noisePercentage = calculateNoisePercentage(
             noise,
-            // unnoisy aggregated value for APE
+            // Unnoisy summary value
             randCount * scalingFactor
         )
         noisePercentageSum += noisePercentage
 
-        const noisyScaledSummaryValue = randCount * scalingFactor + noise
+        const summaryValue_scaled_noisy = randCount * scalingFactor + noise
 
         report.push({
             key: keyCombinations.combinations[i],
             summaryValue: randCount,
-            scaledSummaryValue: randCount * scalingFactor,
-            noisyScaledSummaryValue: noisyScaledSummaryValue,
+            summaryValue_scaled_unnoisy: randCount * scalingFactor,
+            summaryValue_scaled_noisy: summaryValue_scaled_noisy,
             noise: noise,
             noisePercentage: noisePercentage,
         })
     }
 
     const allSummaryValuesPreNoise = Object.values(report).map(
-        (v) => v.scaledSummaryValue
+        (v) => v.summaryValue_scaled_unnoisy
     )
     const allSummaryValuesPostNoise = Object.values(report).map(
-        (v) => v.noisyScaledSummaryValue
+        (v) => v.summaryValue_scaled_noisy
     )
 
     const noise_ape = calculateAverageNoisePercentageRaw(

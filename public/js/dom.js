@@ -1258,8 +1258,11 @@ function validateBudgetPercentages(metrics, errors) {
         errors.push('The sum of all budget split percentages exceeds 100')
     }
 
-    if (
-        !getIsPercentageBudgetSplitFromDom() &&
+    if (getIsPercentageBudgetSplitFromDom() && !getIsGranularFromDom() && sumOfAllPercentages > Math.floor(100/getKeyStrategiesNumberFromDom())){
+        errors.push('The sum of all budget split percentages exceeds the maximum allowed per key: 100/<the number of all keys>')
+    }
+
+    if (!getIsPercentageBudgetSplitFromDom() &&
         sumOfAllPercentages > getContributionBudgetFromDom()
     ) {
         errors.push(
@@ -1267,6 +1270,16 @@ function validateBudgetPercentages(metrics, errors) {
                 getContributionBudgetFromDom()
         )
     }
+
+
+
+    if (!getIsPercentageBudgetSplitFromDom() && !getIsGranularFromDom() &&
+    sumOfAllPercentages> Math.floor(getContributionBudgetFromDom()/getKeyStrategiesNumberFromDom())
+    ) {
+    errors.push(
+        'The sum of all budget split values exceeds the total contribution budget per key - <total contribution budget>/<total number of keys>'
+    )
+}
 }
 
 function validateDimensions(dimensions, errors) {

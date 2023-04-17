@@ -294,7 +294,7 @@ function triggerSimulation(
                 contributionBudget,
                 isUseScaling,
                 batchingFrequency,
-                getIsGranularFromDom() ? dailyConversionCount : Math.floor(dailyConversionCount/keyCombList[i].size),
+                getIsGranularFromDom() ? getDailyValue() : Math.floor(dailyConversionCount/keyCombList[i].size),
                 i
             )
         }

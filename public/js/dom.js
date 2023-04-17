@@ -809,13 +809,16 @@ export function getDimensionsArrayFromDom() {
 export function addKeyStrategyListener() {
     const keyStrategySelector = document.getElementById('granularity')
     const granularDiv = document.getElementById('granular')
+    const budgetSplitWarn = document.getElementById('help-budget-split-warning')
 
     keyStrategySelector.addEventListener('change', function () {
         if (keyStrategySelector.value == 'A') {
             granularDiv.style.display = 'none'
+            budgetSplitWarn.style.display = 'none'
 
         } else {
             granularDiv.style.display = 'block'
+            budgetSplitWarn.style.display = 'block'
         }
         displayBudgetSplit()
     })

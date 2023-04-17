@@ -142,10 +142,14 @@ export function displayBudgetSplit() {
     const numberOfMeasurementGoals = measurementGoals.length
     const budgetSplitOption = getBudgetSplitOptionFromDom()
 
+    const noKeys = getIsGranularFromDom() ? 1 : getKeyStrategiesNumberFromDom()
+
+    console.log("key strategies:"+ noKeys)
+
     const defaultValueOfBudgetPerMeasurementGoal =
         budgetSplitOption == 'percentage'
-            ? (100 / numberOfMeasurementGoals).toFixed(0)
-            : (contributionBudget / numberOfMeasurementGoals).toFixed(0)
+            ? (100 / numberOfMeasurementGoals / noKeys).toFixed(0)
+            : (contributionBudget / numberOfMeasurementGoals / noKeys ).toFixed(0)
 
     measurementGoals.forEach((m) => {
         const { id } = m
@@ -807,9 +811,11 @@ export function addKeyStrategyListener() {
     keyStrategySelector.addEventListener('change', function () {
         if (keyStrategySelector.value == 'A') {
             granularDiv.style.display = 'none'
+
         } else {
             granularDiv.style.display = 'block'
         }
+        displayBudgetSplit()
     })
 }
 

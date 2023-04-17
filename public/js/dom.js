@@ -1340,10 +1340,6 @@ export function loadPython(){
 
 }
 
-export function getBucketAverageConversions() {
-
-}
-
 window.generateKeyStructures = generateKeyStructures
 window.capEpsilon = capEpsilon
 window.updateDailyPerBucket = updateDailyPerBucket

@@ -117,7 +117,6 @@ function simulatePerMetric(
         : 1
     const keyCombinationString = getKeyCombinationString(keyCombinations.names)
 
-
     const report = []
     var noisePercentageSum = 0
     for (let i = 0; i < keyCombinations.combinations.length; i++) {
@@ -258,10 +257,6 @@ function triggerSimulation(
                     return acc;
                  }, 1)
             })
-
-            console.log("!!COMB SIZE")
-            console.log(keyCombList)
-
         }
     }
 
@@ -279,8 +274,6 @@ function triggerSimulation(
         batchingFrequency,
         dailyConversionCount,
     })
-
-    const dailyConversions = 
 
     metrics.forEach((element) => {
         for (let i = 0; i < keyCombList.length; i++) {

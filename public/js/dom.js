@@ -144,7 +144,6 @@ export function displayBudgetSplit() {
 
     const noKeys = getIsGranularFromDom() ? 1 : getKeyStrategiesNumberFromDom()
 
-    console.log("key strategies:"+ noKeys)
 
     const defaultValueOfBudgetPerMeasurementGoal =
         budgetSplitOption == 'percentage'

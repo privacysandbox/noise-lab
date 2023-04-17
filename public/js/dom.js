@@ -612,6 +612,9 @@ export function getDailyValue() {
     return document.getElementById('daily').value
 }
 
+export function getEventCount() {
+    return document.getElementById('event-count').value
+}
 export function getMaxCountPerPurchaseValue() {
     return document.getElementById('count').value
 }
@@ -1334,6 +1337,9 @@ export function loadPython(){
 
 }
 
+export function getBucketAverageConversions() {
+
+}
 
 window.generateKeyStructures = generateKeyStructures
 window.capEpsilon = capEpsilon

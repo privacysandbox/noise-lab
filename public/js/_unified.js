@@ -5,10 +5,6 @@ function initialize() {
     initializeDisplay()
 }
 
-export function downloadAll_advancedMode() {
-    downloadAll(allSimulationDataTables_advancedMode)
-}
-
 // UI
 function resetUi() {
     // reset form validation

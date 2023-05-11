@@ -27,6 +27,7 @@ import {
     getIsPercentageBudgetSplitFromDom,
     loadPython,
     getZeroConversionsPercentageFromDom,
+    getEventCount,
 } from './dom'
 import { generateSimulationId, tempSaveTable, downloadAll } from './utils.misc'
 import { CONTRIBUTION_BUDGET, MODES } from './config'
@@ -121,6 +122,7 @@ function simulatePerMetric(
     for (let i = 0; i < keyCombinations.combinations.length; i++) {
         const noise = getRandomLaplacianNoise(contributionBudget, epsilon)
 
+
         const randCount = generateSummaryValue(
             metric,
             i,
@@ -197,7 +199,7 @@ export function simulateAndDisplayResultsAdvancedMode() {
         getIsUseScalingFromDom(),
         getIsGranularFromDom(),
         getFrequencyValue(),
-        getDailyValue()
+        getEventCount()
     )
 }
 
@@ -249,9 +251,16 @@ function triggerSimulation(
                 combinations: generateKeyCombinationArray(
                     allCombs[i].combinations
                 ),
+                // Calculate the size of the sub-key
+                size: allCombs[i].combinations.reduce((acc, val) => {
+                    acc = acc * val;
+                    return acc;
+                 }, 1)
             })
         }
     }
+
+
 
     const simulationId = generateSimulationId()
 
@@ -278,7 +287,7 @@ function triggerSimulation(
                 contributionBudget,
                 isUseScaling,
                 batchingFrequency,
-                dailyConversionCount,
+                getIsGranularFromDom() ? getDailyValue() : Math.floor(dailyConversionCount/keyCombList[i].size),
                 i
             )
         }

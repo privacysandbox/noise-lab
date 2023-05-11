@@ -142,10 +142,13 @@ export function displayBudgetSplit() {
     const numberOfMeasurementGoals = measurementGoals.length
     const budgetSplitOption = getBudgetSplitOptionFromDom()
 
+    const noKeys = getIsGranularFromDom() ? 1 : getKeyStrategiesNumberFromDom()
+
+
     const defaultValueOfBudgetPerMeasurementGoal =
         budgetSplitOption == 'percentage'
-            ? (100 / numberOfMeasurementGoals).toFixed(0)
-            : (contributionBudget / numberOfMeasurementGoals).toFixed(0)
+            ? (100 / numberOfMeasurementGoals / noKeys).toFixed(0)
+            : (contributionBudget / numberOfMeasurementGoals / noKeys ).toFixed(0)
 
     measurementGoals.forEach((m) => {
         const { id } = m
@@ -609,6 +612,9 @@ export function getDailyValue() {
     return document.getElementById('daily').value
 }
 
+export function getEventCount() {
+    return document.getElementById('event-count').value
+}
 export function getMaxCountPerPurchaseValue() {
     return document.getElementById('count').value
 }
@@ -803,13 +809,18 @@ export function getDimensionsArrayFromDom() {
 export function addKeyStrategyListener() {
     const keyStrategySelector = document.getElementById('granularity')
     const granularDiv = document.getElementById('granular')
+    const budgetSplitWarn = document.getElementById('help-budget-split-warning')
 
     keyStrategySelector.addEventListener('change', function () {
         if (keyStrategySelector.value == 'A') {
             granularDiv.style.display = 'none'
+            budgetSplitWarn.style.display = 'none'
+
         } else {
             granularDiv.style.display = 'block'
+            budgetSplitWarn.style.display = 'block'
         }
+        displayBudgetSplit()
     })
 }
 
@@ -1247,8 +1258,11 @@ function validateBudgetPercentages(metrics, errors) {
         errors.push('The sum of all budget split percentages exceeds 100')
     }
 
-    if (
-        !getIsPercentageBudgetSplitFromDom() &&
+    if (getIsPercentageBudgetSplitFromDom() && !getIsGranularFromDom() && sumOfAllPercentages > Math.floor(100/getKeyStrategiesNumberFromDom())){
+        errors.push('The sum of all budget split percentages exceeds the maximum allowed per key: 100/<the number of all keys>')
+    }
+
+    if (!getIsPercentageBudgetSplitFromDom() &&
         sumOfAllPercentages > getContributionBudgetFromDom()
     ) {
         errors.push(
@@ -1256,6 +1270,16 @@ function validateBudgetPercentages(metrics, errors) {
                 getContributionBudgetFromDom()
         )
     }
+
+
+
+    if (!getIsPercentageBudgetSplitFromDom() && !getIsGranularFromDom() &&
+    sumOfAllPercentages> Math.floor(getContributionBudgetFromDom()/getKeyStrategiesNumberFromDom())
+    ) {
+    errors.push(
+        'The sum of all budget split values exceeds the total contribution budget per key - <total contribution budget>/<total number of keys>'
+    )
+}
 }
 
 function validateDimensions(dimensions, errors) {
@@ -1328,7 +1352,6 @@ export function loadPython(){
     pyScriptSection.appendChild(pyCodeText)
 
 }
-
 
 window.generateKeyStructures = generateKeyStructures
 window.capEpsilon = capEpsilon

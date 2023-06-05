@@ -19,7 +19,7 @@ import {
     generateSimulationWrapperElId,
     generateConfirmMessage,
 } from './utils.misc'
-import { MODES, RMSPE_THRESHOLD } from './config'
+import { MODES, RMSRE_THRESHOLD } from './config'
 
 import { tempSaveTable_simpleMode } from './simple-mode'
 import { tempSaveTable_advancedMode } from './laplace'
@@ -389,29 +389,50 @@ export function displaySimulationResults_simpleMode(
     simulationWrapperDiv.scrollIntoView({ block: 'end' })
 }
 
-function getNoiseBadgeType(noiseValue) {
-    if (noiseValue >= 100) {
-        return 'over-100'
-    } else if (noiseValue >= 20) {
-        return 'over-20'
-    } else if (noiseValue >= 15) {
-        return 'over-15'
-    } else if (noiseValue >= 10) {
-        return 'over-10'
-    } else if (noiseValue >= 5) {
-        return 'over-5'
-    } else if (noiseValue >= 1) {
-        return 'over-1'
-    } else {
-        return 'under-1'
+function getNoiseBadgeType(noiseValue, percentage) {
+    if(percentage){
+        
+        if (noiseValue >= 100) {
+            return 'over-100'
+        } else if (noiseValue >= 20) {
+            return 'over-20'
+        } else if (noiseValue >= 15) {
+            return 'over-15'
+        } else if (noiseValue >= 10) {
+            return 'over-10'
+        } else if (noiseValue >= 5) {
+            return 'over-5'
+        } else if (noiseValue >= 1) {
+            return 'over-1'
+        } else {
+            return 'under-1'
+        }
+    }
+    else{
+        if (noiseValue >= 1) {
+            return 'r-over-1'
+        } else if (noiseValue >= 0.2) {
+            return 'r-over-02'
+        } else if (noiseValue >= 0.15) {
+            return 'r-over-015'
+        } else if (noiseValue >= 0.1) {
+            return 'r-over-01'
+        } else if (noiseValue >= 0.05) {
+            return 'r-over-005'
+        } else if (noiseValue >= 0.01) {
+            return 'r-over-001'
+        } else {
+            return 'r-under-001'
+        }
     }
 }
 
 function displayNoiseAsPercentageWithBadge(
     parentDomEl,
-    noise_value_percent,
+    noise_value,
     noiseMetricDisplayName,
-    noiseMetricId
+    noiseMetricId,
+    percentage
 ) {
     // noiseMetricName = Average percentage error (APE)
     const labelEl = document.createElement('h5')
@@ -420,12 +441,15 @@ function displayNoiseAsPercentageWithBadge(
     // Set a class to display noise in color
     valueEl.setAttribute(
         'class',
-        `noise ${getNoiseBadgeType(noise_value_percent)} has-helper`
+        `noise ${getNoiseBadgeType(noise_value, percentage)} has-helper`
     )
 
     const exactValueEl = document.createElement('div')
     exactValueEl.setAttribute('class', 'has-helper mono')
-    exactValueEl.innerText = `Exact value = ${noise_value_percent} %`
+    var exactValueText = `Exact value = ${noise_value}`
+    if(percentage)  exactValueText+='%' 
+
+    exactValueEl.innerText = exactValueText
 
     const helper = document.createElement('div')
     helper.setAttribute('class', `help help-noise-${noiseMetricId}`)
@@ -472,7 +496,7 @@ function displayScalingFactor(parentDomEl, scalingFactor) {
 function displayNoiseAsPercentage(
     parentDomEl,
     noise_ape_percent,
-    noise_rmspe_percent
+    noise_rmsre_value
 ) {
     const noiseWrapperDiv = document.createElement('div')
     noiseWrapperDiv.setAttribute('class', 'noise-wrapper')
@@ -482,13 +506,15 @@ function displayNoiseAsPercentage(
         noiseWrapperDiv,
         noise_ape_percent,
         'Average percentage error (APE)',
-        'ape'
+        'ape',
+        true
     )
     displayNoiseAsPercentageWithBadge(
         noiseWrapperDiv,
-        noise_rmspe_percent,
-        `RMSPE with t=${RMSPE_THRESHOLD}`,
-        'rmspe'
+        noise_rmsre_value,
+        `RMSRE with t=${RMSRE_THRESHOLD}`,
+        'rmsre',
+        false
     )
 }
 
@@ -506,7 +532,7 @@ function displayReportSimpleMode(
 ) {
     const {
         noise_ape_percent,
-        noise_rmspe_percent,
+        noise_rmsre_value,
         data,
         title,
         scalingFactor,
@@ -520,7 +546,7 @@ function displayReportSimpleMode(
     displayNoiseAsPercentage(
         parentDomEl,
         noise_ape_percent,
-        noise_rmspe_percent
+        noise_rmsre_value
     )
     // Display details section title
     displayDataDetailsTitle(parentDomEl)
@@ -659,9 +685,9 @@ export function displaySimulationResults_advancedMode(
 
     const allSimulationsWrapper = mainDiv
 
-    const { data, noise_ape_percent, noise_rmspe_percent } = simulation
+    const { data, noise_ape_percent, noise_rmsre_value } = simulation
     // TODO make simulationID part of the sim object
-    // const { data, noise_ape_percent, noise_rmspe_percent, simulationId } = simulation
+    // const { data, noise_ape_percent, noise_rmsre_value, simulationId } = simulation
 
     // Prepare wrapper div that will contain the simulation
     const simulationWrapperDiv = document.createElement('div')
@@ -679,7 +705,7 @@ export function displaySimulationResults_advancedMode(
     displayNoiseAsPercentage(
         allSimulationsWrapper,
         noise_ape_percent,
-        noise_rmspe_percent
+        noise_rmsre_value
     )
     // Display details section title
     displayDataDetailsTitle(allSimulationsWrapper)

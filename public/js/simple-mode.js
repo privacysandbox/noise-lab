@@ -30,7 +30,7 @@ import {
     calculateNoisePercentage,
     calculateAverageNoisePercentage,
     generateKeyCombinationArray,
-    getNoise_Rmspe,
+    getNoise_Rmsre,
     generateSummaryValue,
 } from './utils.noise'
 import {
@@ -176,16 +176,14 @@ function simulate(
             )
 
         const noise_ape = calculateAverageNoisePercentage(dailyReportWithNoise)
-        const noise_rmspe = dailyReportWithNoise.noise_rmspe
+        const noise_rmsre = dailyReportWithNoise.noise_rmsre
 
         simulation.reports.push({
             data: dailyReportWithNoise,
             noise_ape: noise_ape,
             noise_ape_percent: Number.parseFloat((noise_ape * 100).toFixed(3)),
-            noise_rmspe: noise_rmspe,
-            noise_rmspe_percent: Number.parseFloat(
-                (noise_rmspe * 100).toFixed(3)
-            ),
+            noise_rmsre: noise_rmsre,
+            noise_rmsre_value:noise_rmsre,
             scalingFactor: scalingFactorForThisMetric,
             title: metric.name,
         })
@@ -257,7 +255,7 @@ function generateNoisyReportFromUnnoisyKeyValuePairsReport(
         (v) => v.summaryValue_scaled_noisy
     )
 
-    noisyReport.noise_rmspe = getNoise_Rmspe(
+    noisyReport.noise_rmsre = getNoise_Rmsre(
         allSummaryValuesPostNoise,
         allSummaryValuesPreNoise,
         scalingFactor

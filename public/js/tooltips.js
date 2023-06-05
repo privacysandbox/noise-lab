@@ -42,7 +42,7 @@ const detailedGuideUrl =
     'https://docs.google.com/document/d/1bU0a_njpDcRd9vDR0AJjwJjrf3Or8vAzyfuK8JZDEfo/view'
 
 const apeDescriptionUrl = `${quickGuideUrl}#ape`
-const rmspe_tDescriptionUrl = `${quickGuideUrl}#rmspe`
+const rmsre_tDescriptionUrl = `${quickGuideUrl}#rmsre`
 
 const learnMoreHtml = `<br/>Learn more:<br/><a href='${quickGuideUrl}'>Quick guide</a> · <a href='${detailedGuideUrl}'>Detailed guide</a>`
 
@@ -151,8 +151,8 @@ export function updateTooltips() {
         ...defaultOptions,
     })
 
-    tippy('.help-noise-rmspe', {
-        content: `<a href='${rmspe_tDescriptionUrl}'>RMSPE_T explanation</a>`,
+    tippy('.help-noise-rmsre', {
+        content: `<a href='${rmsre_tDescriptionUrl}'>RMSRE_T explanation</a>`,
         ...defaultOptions,
     })
 

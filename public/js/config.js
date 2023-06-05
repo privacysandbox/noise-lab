@@ -27,7 +27,7 @@ export const MODES = {
     },
 }
 
-export const RMSPE_THRESHOLD = 5
+export const RMSRE_THRESHOLD = 5
 
 export const CONTRIBUTION_BUDGET = 65536
 

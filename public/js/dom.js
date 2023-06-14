@@ -389,8 +389,8 @@ export function displaySimulationResults_simpleMode(
     simulationWrapperDiv.scrollIntoView({ block: 'end' })
 }
 
-function getNoiseBadgeType(noiseValue, percentage) {
-    if(percentage){
+function getNoiseBadgeType(noiseValue, isPercentage) {
+    if(isPercentage){
         
         if (noiseValue >= 100) {
             return 'over-100'
@@ -432,7 +432,7 @@ function displayNoiseAsPercentageWithBadge(
     noise_value,
     noiseMetricDisplayName,
     noiseMetricId,
-    percentage
+    isPercentage
 ) {
     // noiseMetricName = Average percentage error (APE)
     const labelEl = document.createElement('h5')
@@ -441,13 +441,13 @@ function displayNoiseAsPercentageWithBadge(
     // Set a class to display noise in color
     valueEl.setAttribute(
         'class',
-        `noise ${getNoiseBadgeType(noise_value, percentage)} has-helper`
+        `noise ${getNoiseBadgeType(noise_value, isPercentage)} has-helper`
     )
 
     const exactValueEl = document.createElement('div')
     exactValueEl.setAttribute('class', 'has-helper mono')
     var exactValueText = `Exact value = ${noise_value}`
-    if(percentage)  exactValueText+='%' 
+    if(isPercentage)  exactValueText+='%' 
 
     exactValueEl.innerText = exactValueText
 

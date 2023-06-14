@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import laplace from '@stdlib/random-base-laplace'
-import { RMSPE_THRESHOLD } from './config'
+import { RMSRE_THRESHOLD } from './config'
 
 // SHARED UTILS
 
@@ -55,27 +55,27 @@ export function calculateAverageNoisePercentageRaw(sum, count) {
     return Number.parseFloat(averageNoisePercentage.toFixed(5))
 }
 
-export function getNoise_Rmspe(
+export function getNoise_Rmsre(
     allSummaryValuesPostNoise,
     allSummaryValuesPreNoise,
     scalingFactor
 ) {
-    rmspe_t_function_js = pyscript.runtime.globals.get('rmspe_t')
-    // rmspe_t_result is a JS Map.
-    // Each key is a RMSPE_T value (so we could in theory get RMSPE_T for e.g. t=4, t=1 etc. if we decided to change the value of t or to parametrize it in the frontend for users to change).
+    rmsre_t_function_js = pyscript.runtime.globals.get('rmsre_t')
+    // rmsre_t_result is a JS Map.
+    // Each key is a RMSRE_T value (so we could in theory get RMSRE_T for e.g. t=4, t=1 etc. if we decided to change the value of t or to parametrize it in the frontend for users to change).
     // Each key's corresponding value is an array:
-    // Index 0: rmspe_t averaged over all entries i.e. all buckets
-    // Index 1: array of individual rmspe_t value for each entry i.e. each bucket
-    const rmspe_t_result = rmspe_t_function_js(
+    // Index 0: rmsre_t averaged over all entries i.e. all buckets
+    // Index 1: array of individual rmsre_t value for each entry i.e. each bucket
+    const rmsre_t_result = rmsre_t_function_js(
         allSummaryValuesPostNoise,
         allSummaryValuesPreNoise,
         // python code needs an integer as scaling factor
         Math.floor(scalingFactor),
-        RMSPE_THRESHOLD
+        RMSRE_THRESHOLD
     ).toJs()
-    // Get the rmspe_t average for RMSPE_THRESHOLD
-    const rmspe_t = rmspe_t_result.get(RMSPE_THRESHOLD)[0]
-    return Number.parseFloat(rmspe_t.toFixed(5))
+    // Get the rmsre_t average for RMSRE_THRESHOLD
+    const rmsre_t = rmsre_t_result.get(RMSRE_THRESHOLD)[0]
+    return Number.parseFloat(rmsre_t.toFixed(5))
 }
 
 // ADVANCED MODE UTILS

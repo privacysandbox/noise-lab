@@ -281,6 +281,42 @@ main {
     content: '< 1%';
 }
 
+
+.r-over-1::after {
+    background-color: rgb(0, 0, 0);
+    content: '> 1';
+}
+
+.r-over-02::after {
+    background-color: rgb(207, 34, 0);
+    content: '0.2 - 1';
+}
+
+.r-over-015::after {
+    background-color: rgb(254, 97, 0);
+    content: '0.15 - 0.2';
+}
+
+.r-over-01::after {
+    background-color: rgb(181, 21, 229);
+    content: '0.1 - 0.15';
+}
+
+.r-over-005::after {
+    background-color: rgb(121, 32, 216);
+    content: '0.05 - 0.1';
+}
+
+.r-over-001::after {
+    background-color: rgb(35, 32, 216);
+    content: '0.01 - 0.05';
+}
+
+.r-under-001::after {
+    background-color: #2361ff;
+    content: '< 0.01';
+}
+
 .simulation-id {
     text-align: center;
 }

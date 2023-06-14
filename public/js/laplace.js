@@ -39,7 +39,7 @@ import {
     generateKeyCombinationArray,
     generateSummaryValue,
     calculateAverageNoisePercentageRaw,
-    getNoise_Rmspe,
+    getNoise_Rmsre,
 } from './utils.noise'
 
 // define default metrics
@@ -162,7 +162,7 @@ function simulatePerMetric(
         keyCombinations.combinations.length
     )
 
-    const noise_rmspe = getNoise_Rmspe(
+    const noise_rmsre = getNoise_Rmsre(
         allSummaryValuesPostNoise,
         allSummaryValuesPreNoise,
         scalingFactor
@@ -172,8 +172,8 @@ function simulatePerMetric(
         data: report,
         noise_ape: noise_ape,
         noise_ape_percent: Number.parseFloat((noise_ape * 100).toFixed(3)),
-        noise_rmspe: noise_rmspe,
-        noise_rmspe_percent: Number.parseFloat((noise_rmspe * 100).toFixed(3)),
+        noise_rmsre: noise_rmsre,
+        noise_rmsre_value: noise_rmsre,
     }
 
     displaySimulationResults_advancedMode(

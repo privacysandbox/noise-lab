@@ -114,9 +114,9 @@ limitations under the License. -->
                         <h3>Your aggregation strategy</h3>
                         <div>
                             <label for="batching-frequency">Batching frequency:</label>
+                            <!-- Options are populated automatically -->
                             <select name="batching-frequency" id="batching-frequency-select"></select>
                             <div class="help" id="help-batching-frequency"></div>
-                            <!-- Options are populated automatically -->
                         </div>
                         <div>
                             <label for="scaling">Scaling:</label>
@@ -259,16 +259,12 @@ limitations under the License. -->
                     </div>
                     <div>
                         <h3>Your aggregation strategy</h3>
-                        <label for="frequency">Batching frequency:</label>
-                        <select name="frequency" id="frequency">
-                            <option value="0.041666666666666664">
-                                hourly
-                            </option>
-                            <option value="1" selected>daily</option>
-                            <option value="7">weekly</option>
-                            <option value="30">monthly</option>
-                        </select>
-                        <div class="help" id="help-batching-frequency"></div>
+                        <div>
+                            <label for="batching-frequency">Batching frequency:</label>
+                            <select name="batching-frequency" id="batching-frequency-select"></select>
+                            <div class="help" id="help-batching-frequency"></div>
+                            <!-- Options are populated automatically -->
+                        </div>
                         <div>
                             <label for="scaling">Scaling:</label>
                             <select name="scaling" id="scaling">
@@ -297,11 +293,12 @@ limitations under the License. -->
                             </div>
                         </div>
                         <label for="granularity">Key strategy:</label>
-                        <select name="granularity" id="granularity">
-                            <option value="A">A</option>
-                            <option value="B">B</option>
-                        </select>
-                        <div class="help" id="help-key-strategy-advanced-mode"></div>
+                        <div>
+                            <label for="key-strategy">Key strategy:</label>
+                            <!-- Options are populated automatically -->
+                            <select name="key-strategy" id="key-strategy-select" disabled></select>
+                            <div class="help" id="help-key-strategy-advanced-mode"></div>
+                        </div>
                     </div>
                     <div id="granular" hidden>
                         <h4>Key structures</h4>

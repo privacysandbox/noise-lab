@@ -19,7 +19,13 @@ import {
     generateSimulationWrapperElId,
     generateConfirmMessage,
 } from './utils.misc'
-import { MODES, RMSRE_THRESHOLD } from './config'
+import {
+    CONTRIBUTION_BUDGET,
+    KEY_STRATEGIES,
+    MODES,
+    RMSRE_THRESHOLD,
+    BATCHING_FREQUENCIES,
+} from './config'
 
 import { tempSaveTable_simpleMode } from './simple-mode'
 import { tempSaveTable_advancedMode } from './laplace'
@@ -48,6 +54,12 @@ export function getIsUseScalingFromDom() {
 
 export function getKeyStrategyFromDom() {
     return document.getElementById('key-strategy-select').value
+}
+
+export function getIsKeyStrategyGranularFromDom() {
+    return document.getElementById('key-strategy-select').value == 'A'
+        ? true
+        : false
 }
 
 export function getBatchingFrequencyFromDom() {
@@ -133,7 +145,9 @@ export function displayBudgetSplit() {
     const numberOfMeasurementGoals = measurementGoals.length
     const budgetSplitOption = getBudgetSplitOptionFromDom()
 
-    const noKeys = getIsGranularFromDom() ? 1 : getKeyStrategiesNumberFromDom()
+    const noKeys = getIsKeyStrategyGranularFromDom()
+        ? 1
+        : getKeyStrategiesNumberFromDom()
 
     const defaultValueOfBudgetPerMeasurementGoal =
         budgetSplitOption == 'percentage'
@@ -167,6 +181,19 @@ export function addScalingListener() {
             budgetSplitDiv.style.display = 'block'
         }
     })
+}
+
+export function initializeDisplayGeneric() {
+    displayContributionBudget(CONTRIBUTION_BUDGET)
+    populateSelectDomElement(
+        document.getElementById('key-strategy-select'),
+        Object.values(KEY_STRATEGIES)
+    )
+    populateSelectDomElement(
+        document.getElementById('batching-frequency-select'),
+        Object.values(BATCHING_FREQUENCIES)
+    )
+    addScalingListener()
 }
 
 export function initializeDisplaySimpleMode(
@@ -636,7 +663,6 @@ export function displayDimensionInputFields(id) {
 export function getFrequencyValue() {
     return document.getElementById('frequency').value
 }
-
 export function getDailyValue() {
     return document.getElementById('daily').value
 }
@@ -836,7 +862,7 @@ export function getDimensionsArrayFromDom() {
 }
 
 export function addKeyStrategyListener() {
-    const keyStrategySelector = document.getElementById('granularity')
+    const keyStrategySelector = document.getElementById('key-strategy-select')
     const granularDiv = document.getElementById('granular')
     const budgetSplitWarn = document.getElementById('help-budget-split-warning')
 
@@ -888,10 +914,6 @@ function addCheckboxStrategy(id, parentDomEl) {
         strategyDiv.appendChild(cbLabel)
         strategyDiv.appendChild(document.createElement('br'))
     })
-}
-
-export function getIsGranularFromDom() {
-    return document.getElementById('granularity').value == 'A' ? true : false
 }
 
 export function getKeyStrategiesNumberFromDom() {
@@ -1290,7 +1312,7 @@ function validateBudgetPercentages(metrics, errors) {
 
     if (
         getIsPercentageBudgetSplitFromDom() &&
-        !getIsGranularFromDom() &&
+        !getIsKeyStrategyGranularFromDom() &&
         sumOfAllPercentages > Math.floor(100 / getKeyStrategiesNumberFromDom())
     ) {
         errors.push(
@@ -1310,7 +1332,7 @@ function validateBudgetPercentages(metrics, errors) {
 
     if (
         !getIsPercentageBudgetSplitFromDom() &&
-        !getIsGranularFromDom() &&
+        !getIsKeyStrategyGranularFromDom() &&
         sumOfAllPercentages >
             Math.floor(
                 getContributionBudgetFromDom() / getKeyStrategiesNumberFromDom()

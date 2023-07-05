@@ -1,20 +1,37 @@
+/* Copyright 2022 Google LLC
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License. */
+
 import {
+    addKeyStrategyListener,
+    addMetricsButtons,
+    addDimensionsButtons,
     getEpsilonFromDom,
-    getFrequencyValue,
     getDailyValue,
+    getBatchingFrequencyFromDom,
     getAllDimensionSizes,
     displaySimulationResults_advancedMode,
     getMetricsArrayFromDom,
     createSimulationDiv,
     getDimensionsArrayFromDom,
-    getIsGranularFromDom,
+    getIsKeyStrategyGranularFromDom,
     getStrategiesKeyCombinations,
     getAllDimensionNamesFromDom,
     displayMetrics,
     displayDimensions,
     addMetric,
     removeMetric,
-    initializeDisplayAdvancedMode,
+    initializeDisplayGeneric,
     addDimension,
     removeDimension,
     getIsUseScalingFromDom,
@@ -28,7 +45,11 @@ import {
     getEventCount,
 } from './dom'
 import { generateSimulationId, tempSaveTable, downloadAll } from './utils.misc'
-import { CONTRIBUTION_BUDGET, MODES } from './config'
+import {
+    CONTRIBUTION_BUDGET,
+    DEFAULT_MEASUREMENT_GOALS,
+    DEFAULT_DIMENSIONS,
+} from './config'
 
 import {
     getRandomLaplacianNoise,
@@ -39,12 +60,6 @@ import {
     calculateAverageNoisePercentageRaw,
     getNoise_Rmsre,
 } from './utils.noise'
-
-// define default metrics
-const defaultMetrics = [
-    { id: 1, name: 'purchaseValue', maxValue: 1000, avgValue: 120 },
-    { id: 2, name: 'purchaseCount', maxValue: 1, avgValue: 1 },
-]
 
 let allSimulationDataTables_advancedMode = {}
 
@@ -60,36 +75,17 @@ export function downloadAll_advancedMode() {
     downloadAll(allSimulationDataTables_advancedMode)
 }
 
-// define default dimensions
-const defaultDimensions = [
-    { id: '1', size: '3', name: 'geography' },
-    { id: '2', size: '4', name: 'campaignId' },
-    { id: '3', size: '2', name: 'productCategory' },
-]
-
-export function initializeDisplayAdvancedModeWithParams() {
+export function initializeDisplay_advancedMode() {
     loadPython()
-    initializeDisplayAdvancedMode(
-        defaultMetrics,
-        defaultDimensions,
-        CONTRIBUTION_BUDGET
-    )
+    initializeDisplayGeneric()
+    updateDailyPerBucket()
+    addKeyStrategyListener()
+    displayMetrics(DEFAULT_MEASUREMENT_GOALS)
+    addMetricsButtons()
+    displayDimensions(DEFAULT_DIMENSIONS)
+    addDimensionsButtons()
+    displayBudgetSplit()
 }
-
-/* Copyright 2022 Google LLC
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    https://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License. */
-
 function simulatePerMetric(
     mainDiv,
     keyCombinations,
@@ -194,8 +190,8 @@ export function simulateAndDisplayResultsAdvancedMode() {
         getEpsilonFromDom(),
         CONTRIBUTION_BUDGET,
         getIsUseScalingFromDom(),
-        getIsGranularFromDom(),
-        getFrequencyValue(),
+        getIsKeyStrategyGranularFromDom(),
+        getBatchingFrequencyFromDom(),
         getEventCount()
     )
 }
@@ -209,7 +205,7 @@ export function resetBudgetSplit() {
 }
 
 export function resetDimensions() {
-    displayDimensions(defaultDimensions)
+    displayDimensions(DEFAULT_DIMENSIONS)
 }
 
 // generate dataset
@@ -282,7 +278,7 @@ function triggerSimulation(
                 contributionBudget,
                 isUseScaling,
                 batchingFrequency,
-                getIsGranularFromDom()
+                getIsKeyStrategyGranularFromDom()
                     ? getDailyValue()
                     : Math.floor(dailyConversionCount / keyCombList[i].size),
                 i

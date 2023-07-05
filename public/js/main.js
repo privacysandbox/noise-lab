@@ -13,8 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import { generateConfirmMessage } from './utils.misc'
-import { initializeDisplaySimpleModeWithParams } from './simple-mode'
-import { initializeDisplayAdvancedModeWithParams } from './laplace'
+import { initializeDisplay_simpleMode } from './simple-mode'
+import { initializeDisplay_advancedMode } from './laplace'
 import { APP_VERSION, MODES, modeSearchQueryParams } from './config'
 
 // Generate navigation menu automatically based on the available modes
@@ -76,9 +76,9 @@ window.addEventListener('load', function (event) {
     // Initialize parameters and fields for the current mode
     const mode = getCurrentModeFromUrl()
     if (mode === MODES.simple.searchQueryParam) {
-        initializeDisplaySimpleModeWithParams()
+        initializeDisplay_simpleMode()
     } else if (mode === MODES.advanced.searchQueryParam) {
-        initializeDisplayAdvancedModeWithParams()
+        initializeDisplay_advancedMode()
     } else {
         throw new Error('mode unkown')
     }

@@ -136,7 +136,7 @@ function simulatePerMetric(
         report.push({
             key: keyCombinations.combinations[i],
             summaryValue: randCount,
-            summaryValue_scaled_unnoisy: randCount * scalingFactor,
+            summaryValue_scaled_noiseless: randCount * scalingFactor,
             summaryValue_scaled_noisy: summaryValue_scaled_noisy,
             noise: noise,
             noisePercentage: noisePercentage,
@@ -144,7 +144,7 @@ function simulatePerMetric(
     }
 
     const allSummaryValuesPreNoise = Object.values(report).map(
-        (v) => v.summaryValue_scaled_unnoisy
+        (v) => v.summaryValue_scaled_noiseless
     )
     const allSummaryValuesPostNoise = Object.values(report).map(
         (v) => v.summaryValue_scaled_noisy

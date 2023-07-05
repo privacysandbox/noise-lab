@@ -189,14 +189,14 @@ function generateUnnoisyKeyValuePairsReport(
             0
         )
 
-        const summaryValue_scaled_unnoisy =
+        const summaryValue_scaled_noiseless =
             summaryValue * scalingFactorForThisMetric
 
         report.push({
             // TODO, though the exact key doesn't really matter
             key: k,
             summaryValue,
-            summaryValue_scaled_unnoisy,
+            summaryValue_scaled_noiseless,
         })
     })
     return report
@@ -209,22 +209,22 @@ function generateNoisyReportFromUnnoisyKeyValuePairsReport(
     scalingFactor
 ) {
     const noisyReport = unnoisyKeyValuePairReport.map((entry) => {
-        const { key, summaryValue, summaryValue_scaled_unnoisy } = entry
+        const { key, summaryValue, summaryValue_scaled_noiseless } = entry
         const noise = getRandomLaplacianNoise(budget, epsilon)
         return {
             key,
             summaryValue,
-            summaryValue_scaled_unnoisy,
-            summaryValue_scaled_noisy: summaryValue_scaled_unnoisy + noise,
+            summaryValue_scaled_noiseless,
+            summaryValue_scaled_noisy: summaryValue_scaled_noiseless + noise,
             noise_ape_individual: calculateNoisePercentage(
                 noise,
-                summaryValue_scaled_unnoisy
+                summaryValue_scaled_noiseless
             ),
         }
     })
 
     const allSummaryValuesPreNoise = Object.values(noisyReport).map(
-        (v) => v.summaryValue_scaled_unnoisy
+        (v) => v.summaryValue_scaled_noiseless
     )
     const allSummaryValuesPostNoise = Object.values(noisyReport).map(
         (v) => v.summaryValue_scaled_noisy

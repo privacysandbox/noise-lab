@@ -63,25 +63,57 @@ function simulate() {
 function generateSimulation() {}
 
 // simulation object
+// One simulation is per goal
 const simulation = {
-    data: {
-        report: [],
-        noiseMetrics: {
-            noise_ape: 12,
-            noise_ape_percent: 12,
-            noise_rmspe: 12,
-            noise_rmspe_percent: 12,
-        },
-    },
     metadata: {
         // TODO rename to 'id'
-        simulationId: 123,
-        measurementGoalDisplayName: 'dfgh',
-        scalingFactor: 123,
-        keyCombinationString: 'werewrew',
+        simulationTitle: 'Simulation 13:30:27 05/07/2023',
+        simulationId: 'e3b77a88',
     },
-    // TODO remove once made unnecessary
-    simulationNo,
-    // TODO remove once made unnecessary
-    metricsNo,
+    inputParameters: {
+        dailyConversionCount: '100',
+        dimensions: [
+            {
+                name: 'campaignId',
+                numberOfDistinctValues: 4,
+            },
+        ],
+        epsilon: '10',
+        keyStrategy: 'A',
+        metrics: [
+            {
+                id: 2,
+                name: 'purchaseCount',
+                maxValue: 1,
+                avgValue: 1,
+            },
+        ],
+        batchingFrequency: '1',
+        isUseScaling: true,
+    },
+    outputReports: [
+        {
+            data: [
+                {
+                    key: [0, 0, 0],
+                    summaryValue: 12000,
+                    summaryValue_scaled_noiseless: 393599.99999999994,
+                    summaryValue_scaled_noisy: 389797.99999999994,
+                    noise: 23232, // NEW for simple
+                    noise_ape_individual: 0.009659552845528456,
+                },
+            ],
+            noiseMetrics: {
+                noise_ape_percent: 1.508,
+                noise_rmsre: 0.02115,
+            },
+            scalingFactor: 32.8,
+            measurementGoal: 'purchaseValue', // formerly "title"
+            dimensionsString: 'campaignId x geography x productCategory', // formerly keyCombinationString
+        },
+        // Another report { ... }
+    ],
+    // Used for table display to disambiguate / Have unique IDs
+    simulationNo: 1,
+    metricsNo: 1,
 }

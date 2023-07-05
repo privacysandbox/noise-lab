@@ -349,7 +349,7 @@ export function displaySimulationResults_simpleMode(
     simulation,
     keyCombinationDisplay
 ) {
-    hideEmptyState('simple')
+    hideEmptyState()
 
     const allSimulationsWrapper = document.getElementById(
         'all-simulations-wrapper-simple-mode'
@@ -710,7 +710,7 @@ export function displaySimulationResults_advancedMode(
     simulationNo,
     metricsNo
 ) {
-    hideEmptyState('advanced')
+    hideEmptyState()
 
     const allSimulationsWrapper = mainDiv
 

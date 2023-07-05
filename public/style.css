@@ -610,7 +610,7 @@ hr {
 
 /* EMPTY STATE */
 
-.empty-state {
+.empty-state-inner {
     color: var(--text-color-x-x-lighter);
     margin: 0 auto;
     text-align: center;

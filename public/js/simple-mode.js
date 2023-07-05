@@ -13,14 +13,14 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import {
-    initializeDisplaySimpleMode,
+    displayTabularData,
+    initializeDisplayGeneric,
     getBatchingFrequencyFromDom,
     getDailyConversionCountFromDom,
     getEpsilonFromDom,
     getKeyStrategyFromDom,
     displaySimulationResults_simpleMode,
     getIsUseScalingFromDom,
-    clearAll,
     getBudgetValueForMetricIdFromDom,
     loadPython,
 } from './dom'
@@ -39,51 +39,26 @@ import {
     downloadAll,
     tempSaveTable,
 } from './utils.misc'
-import { CONTRIBUTION_BUDGET, MODES } from './config'
-
-const keyStrategies = {
-    A: { value: 'A', name: 'A' },
-    B: { value: 'B', name: 'B' },
-}
-
-const batchingFrequencies = {
-    // value represents the multiplier on a daily reference value
-    hourly: { name: 'hourly', value: 1 / 24 },
-    daily: { name: 'daily', value: 1, isDefault: true },
-    weekly: { name: 'weekly', value: 7 },
-    monthly: { name: 'monthly', value: 30 },
-}
+import {
+    CONTRIBUTION_BUDGET,
+    DEFAULT_MEASUREMENT_GOALS,
+    DEFAULT_DIMENSIONS,
+} from './config'
 
 let allSimulationDataTables_simpleMode = {}
 
-const dimensions = [
-    {
-        name: 'campaignId',
-        numberOfDistinctValues: 4,
-    },
-    {
-        name: 'geography',
-        numberOfDistinctValues: 3,
-    },
-    {
-        name: 'productCategory',
-        numberOfDistinctValues: 2,
-    },
-]
-
-const metrics = [
-    { name: 'purchaseValue', avgValue: 120, maxValue: 1000 },
-    { name: 'purchaseCount', avgValue: 1, maxValue: 1 },
-]
-
-export function initializeDisplaySimpleModeWithParams() {
+export function initializeDisplay_simpleMode() {
     loadPython()
-    initializeDisplaySimpleMode(
-        Object.values(keyStrategies),
-        Object.values(batchingFrequencies),
-        metrics,
-        dimensions,
-        CONTRIBUTION_BUDGET
+    initializeDisplayGeneric()
+    displayTabularData(
+        document.getElementById('metrics'),
+        DEFAULT_MEASUREMENT_GOALS,
+        false
+    )
+    displayTabularData(
+        document.getElementById('dimensions-table'),
+        DEFAULT_DIMENSIONS,
+        false
     )
 }
 
@@ -102,17 +77,17 @@ export function downloadAll_simpleMode() {
 export function simulateAndDisplayResultsSimpleMode() {
     const simulation = simulate(
         getDailyConversionCountFromDom(),
-        dimensions,
+        DEFAULT_DIMENSIONS,
         getEpsilonFromDom(),
         getKeyStrategyFromDom(),
-        metrics,
+        DEFAULT_MEASUREMENT_GOALS,
         getBatchingFrequencyFromDom(),
         CONTRIBUTION_BUDGET,
         getIsUseScalingFromDom()
     )
     displaySimulationResults_simpleMode(
         simulation,
-        dimensions.map((d) => d.name).join(' x ')
+        DEFAULT_DIMENSIONS.map((d) => d.name).join(' x ')
     )
 }
 
@@ -183,7 +158,7 @@ function simulate(
             noise_ape: noise_ape,
             noise_ape_percent: Number.parseFloat((noise_ape * 100).toFixed(3)),
             noise_rmsre: noise_rmsre,
-            noise_rmsre_value:noise_rmsre,
+            noise_rmsre_value: noise_rmsre,
             scalingFactor: scalingFactorForThisMetric,
             title: metric.name,
         })
@@ -264,10 +239,5 @@ function generateNoisyReportFromUnnoisyKeyValuePairsReport(
     return noisyReport
 }
 
-function clearAllSimpleMode() {
-    clearAll(MODES.simple.name)
-}
-
 window.downloadAll_simpleMode = downloadAll_simpleMode
 window.simulateAndDisplayResultsSimpleMode = simulateAndDisplayResultsSimpleMode
-window.clearAllSimpleMode = clearAllSimpleMode

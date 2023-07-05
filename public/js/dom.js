@@ -110,15 +110,6 @@ export function populateSelectDomElement(selectDomElement, options) {
     })
 }
 
-export function clearAll(mode) {
-    if (window.confirm(generateConfirmMessage())) {
-        document.getElementById(
-            `all-simulations-wrapper-${mode}-mode`
-        ).innerHTML = ''
-    }
-    displayEmptyState(mode)
-}
-
 export function initializeDisplayAdvancedMode(metrics, dimensions, budget) {
     updateDailyPerBucket()
     displayContributionBudget(budget)
@@ -144,11 +135,12 @@ export function displayBudgetSplit() {
 
     const noKeys = getIsGranularFromDom() ? 1 : getKeyStrategiesNumberFromDom()
 
-
     const defaultValueOfBudgetPerMeasurementGoal =
         budgetSplitOption == 'percentage'
             ? (100 / numberOfMeasurementGoals / noKeys).toFixed(0)
-            : (contributionBudget / numberOfMeasurementGoals / noKeys ).toFixed(0)
+            : (contributionBudget / numberOfMeasurementGoals / noKeys).toFixed(
+                  0
+              )
 
     measurementGoals.forEach((m) => {
         const { id } = m
@@ -315,18 +307,15 @@ export function displayInputParameters(
     })
 }
 
-function displayEmptyState(mode) {
-    const emptyState = document.getElementById(`empty-state-${mode}`)
-    if (emptyState) {
-        emptyState.className = 'visible'
-    }
+// TODO toggle didplay/hide function instead
+function displayEmptyState() {
+    const emptyStateDivs = document.querySelectorAll(`.empty-state`)
+    emptyStateDivs.forEach((el) => (el.className = 'empty-state visible'))
 }
 
-function hideEmptyState(mode) {
-    const emptyState = document.getElementById(`empty-state-${mode}`)
-    if (emptyState) {
-        emptyState.className = 'hidden'
-    }
+function hideEmptyState() {
+    const emptyStateDivs = document.querySelectorAll(`.empty-state`)
+    emptyStateDivs.forEach((el) => (el.className = 'empty-state hidden'))
 }
 
 export function displaySimulationResults_simpleMode(
@@ -390,8 +379,7 @@ export function displaySimulationResults_simpleMode(
 }
 
 function getNoiseBadgeType(noiseValue, isPercentage) {
-    if(isPercentage){
-        
+    if (isPercentage) {
         if (noiseValue >= 100) {
             return 'over-100'
         } else if (noiseValue >= 20) {
@@ -407,8 +395,7 @@ function getNoiseBadgeType(noiseValue, isPercentage) {
         } else {
             return 'under-1'
         }
-    }
-    else{
+    } else {
         if (noiseValue >= 1) {
             return 'r-over-1'
         } else if (noiseValue >= 0.2) {
@@ -447,7 +434,7 @@ function displayNoiseAsPercentageWithBadge(
     const exactValueEl = document.createElement('div')
     exactValueEl.setAttribute('class', 'has-helper mono')
     var exactValueText = `Exact value = ${noise_value}`
-    if(isPercentage)  exactValueText+='%' 
+    if (isPercentage) exactValueText += '%'
 
     exactValueEl.innerText = exactValueText
 
@@ -530,24 +517,15 @@ function displayReportSimpleMode(
     simulationId,
     keyCombinationDisplay
 ) {
-    const {
-        noise_ape_percent,
-        noise_rmsre_value,
-        data,
-        title,
-        scalingFactor,
-    } = report
+    const { noise_ape_percent, noise_rmsre_value, data, title, scalingFactor } =
+        report
 
     // Display report table title
     const titleDiv = document.createElement('h4')
     titleDiv.innerText = 'Measurement goal: ' + title
     parentDomEl.appendChild(titleDiv)
     // Display noise
-    displayNoiseAsPercentage(
-        parentDomEl,
-        noise_ape_percent,
-        noise_rmsre_value
-    )
+    displayNoiseAsPercentage(parentDomEl, noise_ape_percent, noise_rmsre_value)
     // Display details section title
     displayDataDetailsTitle(parentDomEl)
     parentDomEl.appendChild(document.createElement('br'))
@@ -593,6 +571,31 @@ function displayReportSimpleMode(
 
     // Update tooltips
     updateTooltips()
+}
+
+export function resetUi() {
+    // reset form validation
+    // clear output
+    resetFormValidation()
+    clearSimulationArea()
+}
+
+function resetFormValidation() {
+    const formValidationWrapperEl = getFormValidationElFromDom()
+    if (formValidationWrapperEl) {
+        formValidationWrapperEl.innerText = ''
+        formValidationWrapperEl.className = 'hidden'
+    }
+}
+function clearSimulationArea() {
+    // Prompt user to confirm
+    if (window.confirm(generateConfirmMessage())) {
+        // TODO check absence of mode OK
+        document
+            .querySelectorAll(`.all-simulations-wrapper`)
+            .forEach((el) => (el.innerHTML = ''))
+    }
+    displayEmptyState()
 }
 
 // !!!!!!!!!!
@@ -841,7 +844,6 @@ export function addKeyStrategyListener() {
         if (keyStrategySelector.value == 'A') {
             granularDiv.style.display = 'none'
             budgetSplitWarn.style.display = 'none'
-
         } else {
             granularDiv.style.display = 'block'
             budgetSplitWarn.style.display = 'block'
@@ -1228,8 +1230,10 @@ export function updateDailyPerBucket() {
 
 export function resetFormValidation() {
     const formValidationWrapperEl = getFormValidationElFromDom()
-    formValidationWrapperEl.innerText = ''
-    formValidationWrapperEl.className = 'hidden'
+    if (formValidationWrapperEl) {
+        formValidationWrapperEl.innerText = ''
+        formValidationWrapperEl.className = 'hidden'
+    }
 }
 
 // Validate the inputs are correct
@@ -1284,11 +1288,18 @@ function validateBudgetPercentages(metrics, errors) {
         errors.push('The sum of all budget split percentages exceeds 100')
     }
 
-    if (getIsPercentageBudgetSplitFromDom() && !getIsGranularFromDom() && sumOfAllPercentages > Math.floor(100/getKeyStrategiesNumberFromDom())){
-        errors.push('The sum of all budget split percentages exceeds the maximum allowed per key: 100/<the number of all keys>')
+    if (
+        getIsPercentageBudgetSplitFromDom() &&
+        !getIsGranularFromDom() &&
+        sumOfAllPercentages > Math.floor(100 / getKeyStrategiesNumberFromDom())
+    ) {
+        errors.push(
+            'The sum of all budget split percentages exceeds the maximum allowed per key: 100/<the number of all keys>'
+        )
     }
 
-    if (!getIsPercentageBudgetSplitFromDom() &&
+    if (
+        !getIsPercentageBudgetSplitFromDom() &&
         sumOfAllPercentages > getContributionBudgetFromDom()
     ) {
         errors.push(
@@ -1297,15 +1308,18 @@ function validateBudgetPercentages(metrics, errors) {
         )
     }
 
-
-
-    if (!getIsPercentageBudgetSplitFromDom() && !getIsGranularFromDom() &&
-    sumOfAllPercentages> Math.floor(getContributionBudgetFromDom()/getKeyStrategiesNumberFromDom())
+    if (
+        !getIsPercentageBudgetSplitFromDom() &&
+        !getIsGranularFromDom() &&
+        sumOfAllPercentages >
+            Math.floor(
+                getContributionBudgetFromDom() / getKeyStrategiesNumberFromDom()
+            )
     ) {
-    errors.push(
-        'The sum of all budget split values exceeds the total contribution budget per key - <total contribution budget>/<total number of keys>'
-    )
-}
+        errors.push(
+            'The sum of all budget split values exceeds the total contribution budget per key - <total contribution budget>/<total number of keys>'
+        )
+    }
 }
 
 function validateDimensions(dimensions, errors) {
@@ -1369,16 +1383,15 @@ export function getZeroConversionsPercentageFromDom() {
     return document.getElementById('zero-pct').value
 }
 
-export function loadPython(){
-
+export function loadPython() {
     // pyCode is the var declared in python-file.js and containing the full python code
     var pyCodeText = document.createTextNode(pyCode)
 
     var pyScriptSection = document.getElementById('py-script')
     pyScriptSection.appendChild(pyCodeText)
-
 }
 
 window.generateKeyStructures = generateKeyStructures
 window.capEpsilon = capEpsilon
 window.updateDailyPerBucket = updateDailyPerBucket
+window.resetUi = resetUi

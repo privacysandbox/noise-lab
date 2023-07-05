@@ -20,8 +20,6 @@ import {
     getIsUseScalingFromDom,
     getKeyCombinationString,
     validateInputsBeforeSimulation,
-    resetFormValidation,
-    clearAll,
     getBudgetValueForMetricIdFromDom,
     displayBudgetSplit,
     getIsPercentageBudgetSplitFromDom,
@@ -121,7 +119,6 @@ function simulatePerMetric(
     var noisePercentageSum = 0
     for (let i = 0; i < keyCombinations.combinations.length; i++) {
         const noise = getRandomLaplacianNoise(contributionBudget, epsilon)
-
 
         const randCount = generateSummaryValue(
             metric,
@@ -253,14 +250,12 @@ function triggerSimulation(
                 ),
                 // Calculate the size of the sub-key
                 size: allCombs[i].combinations.reduce((acc, val) => {
-                    acc = acc * val;
-                    return acc;
-                 }, 1)
+                    acc = acc * val
+                    return acc
+                }, 1),
             })
         }
     }
-
-
 
     const simulationId = generateSimulationId()
 
@@ -287,16 +282,13 @@ function triggerSimulation(
                 contributionBudget,
                 isUseScaling,
                 batchingFrequency,
-                getIsGranularFromDom() ? getDailyValue() : Math.floor(dailyConversionCount/keyCombList[i].size),
+                getIsGranularFromDom()
+                    ? getDailyValue()
+                    : Math.floor(dailyConversionCount / keyCombList[i].size),
                 i
             )
         }
     })
-}
-
-function clearAllAdvancedMode() {
-    resetFormValidation()
-    clearAll(MODES.advanced.name)
 }
 
 window.simulateAndDisplayResultsAdvancedMode =
@@ -309,5 +301,4 @@ window.resetMetrics = resetMetrics
 window.addDimension = addDimension
 window.removeDimension = removeDimension
 window.resetDimensions = resetDimensions
-window.clearAllAdvancedMode = clearAllAdvancedMode
 window.resetBudgetSplit = resetBudgetSplit

@@ -20,7 +20,6 @@ import {
     getKeyStrategyFromDom,
     displaySimulationResults_simpleMode,
     getIsUseScalingFromDom,
-    clearAll,
     getBudgetValueForMetricIdFromDom,
     loadPython,
 } from './dom'
@@ -183,7 +182,7 @@ function simulate(
             noise_ape: noise_ape,
             noise_ape_percent: Number.parseFloat((noise_ape * 100).toFixed(3)),
             noise_rmsre: noise_rmsre,
-            noise_rmsre_value:noise_rmsre,
+            noise_rmsre_value: noise_rmsre,
             scalingFactor: scalingFactorForThisMetric,
             title: metric.name,
         })
@@ -264,10 +263,5 @@ function generateNoisyReportFromUnnoisyKeyValuePairsReport(
     return noisyReport
 }
 
-function clearAllSimpleMode() {
-    clearAll(MODES.simple.name)
-}
-
 window.downloadAll_simpleMode = downloadAll_simpleMode
 window.simulateAndDisplayResultsSimpleMode = simulateAndDisplayResultsSimpleMode
-window.clearAllSimpleMode = clearAllSimpleMode

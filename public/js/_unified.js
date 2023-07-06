@@ -107,13 +107,13 @@ const simulation = {
                 noise_ape_percent: 1.508,
                 noise_rmsre: 0.02115,
             },
-            scalingFactor: 32.8,
+            scalingFactor: "32.8",
             measurementGoal: 'purchaseValue', // formerly "title"
             dimensionsString: 'campaignId x geography x productCategory', // formerly keyCombinationString
         },
         // Another report { ... }
     ],
-    // Used for table display to disambiguate / Have unique IDs
+    // Used for table display, to have unique IDs
     simulationNo: 1,
     metricsNo: 1,
 }

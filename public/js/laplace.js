@@ -126,7 +126,7 @@ function simulatePerMetric(
 
         const noisePercentage = calculateNoisePercentage(
             noise,
-            // Unnoisy summary value
+            // Noiseless summary value
             randCount * scalingFactor
         )
         noisePercentageSum += noisePercentage
@@ -166,7 +166,6 @@ function simulatePerMetric(
         noise_ape: noise_ape,
         noise_ape_percent: Number.parseFloat((noise_ape * 100).toFixed(3)),
         noise_rmsre: noise_rmsre,
-        noise_rmsre_value: noise_rmsre,
     }
 
     displaySimulationResults_advancedMode(

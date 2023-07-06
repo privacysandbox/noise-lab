@@ -141,7 +141,6 @@ export function displayBudgetSplit() {
     budgetSplitWrapperEl.innerHTML = ''
     const measurementGoals = getMetricsArrayFromDom()
     const contributionBudget = getContributionBudgetFromDom()
-    console.log(measurementGoals)
     const numberOfMeasurementGoals = measurementGoals.length
     const budgetSplitOption = getBudgetSplitOptionFromDom()
 
@@ -345,16 +344,15 @@ function hideEmptyState() {
     emptyStateDivs.forEach((el) => (el.className = 'empty-state hidden'))
 }
 
-export function displaySimulationResults_simpleMode(
-    simulation,
-    keyCombinationDisplay
-) {
+export function displaySimulationResults_simpleMode(simulation) {
     hideEmptyState()
+    console.log(simulation)
 
     const allSimulationsWrapper = document.getElementById(
         'all-simulations-wrapper-simple-mode'
     )
-    const { title, inputParameters, reports, simulationId } = simulation
+    const { metadata, inputParameters, summaryReports } = simulation
+    const { simulationTitle, simulationId } = metadata
 
     // Prepare wrapper div that will contain the simulation
     const simulationWrapperDiv = document.createElement('div')
@@ -369,7 +367,7 @@ export function displaySimulationResults_simpleMode(
 
     // Display simulation main info in the simulation wrapper div
     const simulationTitleDiv = document.createElement('h2')
-    simulationTitleDiv.innerText = title
+    simulationTitleDiv.innerText = simulationTitle
     simulationWrapperDiv.appendChild(simulationTitleDiv)
 
     const simulationIdDiv = document.createElement('div')
@@ -393,12 +391,12 @@ export function displaySimulationResults_simpleMode(
     reportsTitleDiv.innerText = 'Summary reports (output)'
     simulationOutputWrapperDiv.appendChild(reportsTitleDiv)
 
-    reports.forEach((report) => {
+    summaryReports.forEach((report) => {
         displayReportSimpleMode(
             simulationOutputWrapperDiv,
             report,
             simulationId,
-            keyCombinationDisplay
+            report.dimensionsString
         )
     })
 
@@ -507,11 +505,7 @@ function displayScalingFactor(parentDomEl, scalingFactor) {
     parentDomEl.appendChild(scalingFactorHelper)
 }
 
-function displayNoiseAsPercentage(
-    parentDomEl,
-    noise_ape_percent,
-    noise_rmsre_value
-) {
+function displayNoiseAsPercentage(parentDomEl, noise_ape_percent, noise_rmsre) {
     const noiseWrapperDiv = document.createElement('div')
     noiseWrapperDiv.setAttribute('class', 'noise-wrapper')
     parentDomEl.appendChild(noiseWrapperDiv)
@@ -525,7 +519,7 @@ function displayNoiseAsPercentage(
     )
     displayNoiseAsPercentageWithBadge(
         noiseWrapperDiv,
-        noise_rmsre_value,
+        noise_rmsre,
         `RMSRE with t=${RMSRE_THRESHOLD}`,
         'rmsre',
         false
@@ -544,15 +538,15 @@ function displayReportSimpleMode(
     simulationId,
     keyCombinationDisplay
 ) {
-    const { noise_ape_percent, noise_rmsre_value, data, title, scalingFactor } =
-        report
+    const { noiseMetrics, data, measurementGoal, scalingFactor } = report
+    const { noise_ape_percent, noise_rmsre } = noiseMetrics
 
     // Display report table title
     const titleDiv = document.createElement('h4')
-    titleDiv.innerText = 'Measurement goal: ' + title
+    titleDiv.innerText = 'Measurement goal: ' + measurementGoal
     parentDomEl.appendChild(titleDiv)
     // Display noise
-    displayNoiseAsPercentage(parentDomEl, noise_ape_percent, noise_rmsre_value)
+    displayNoiseAsPercentage(parentDomEl, noise_ape_percent, noise_rmsre)
     // Display details section title
     displayDataDetailsTitle(parentDomEl)
     parentDomEl.appendChild(document.createElement('br'))
@@ -565,7 +559,7 @@ function displayReportSimpleMode(
     const dataTableTitle = document.createElement('h6')
     dataTableTitle.innerText = 'Data table:'
     parentDomEl.appendChild(dataTableTitle)
-    const tableId = `output-data-table-${simulationId}-${title}`
+    const tableId = `output-data-table-${simulationId}-${measurementGoal}`
     const detailsDiv = document.createElement('details')
     detailsDiv.setAttribute('id', tableId)
     detailsDiv.setAttribute('class', 'offset-left')
@@ -582,7 +576,7 @@ function displayReportSimpleMode(
     })
 
     // Save table temporarily; used for XLSX multi-table download
-    tempSaveTable_simpleMode(table, `${simulationId}-${title}`)
+    tempSaveTable_simpleMode(table, `${simulationId}-${measurementGoal}`)
 
     // Create download button
     const downloadButton = document.createElement('button')
@@ -593,7 +587,10 @@ function displayReportSimpleMode(
 
     // Create eventListener for download of csv file
     downloadButton.addEventListener('click', function () {
-        table.download('csv', generateCsvFileName(simulationId, title))
+        table.download(
+            'csv',
+            generateCsvFileName(simulationId, measurementGoal)
+        )
     })
 
     // Update tooltips
@@ -714,9 +711,8 @@ export function displaySimulationResults_advancedMode(
 
     const allSimulationsWrapper = mainDiv
 
-    const { data, noise_ape_percent, noise_rmsre_value } = simulation
+    const { data, noise_ape_percent, noise_rmsre } = simulation
     // TODO make simulationID part of the sim object
-    // const { data, noise_ape_percent, noise_rmsre_value, simulationId } = simulation
 
     // Prepare wrapper div that will contain the simulation
     const simulationWrapperDiv = document.createElement('div')
@@ -734,7 +730,7 @@ export function displaySimulationResults_advancedMode(
     displayNoiseAsPercentage(
         allSimulationsWrapper,
         noise_ape_percent,
-        noise_rmsre_value
+        noise_rmsre
     )
     // Display details section title
     displayDataDetailsTitle(allSimulationsWrapper)
@@ -1345,7 +1341,6 @@ function validateBudgetPercentages(metrics, errors) {
 }
 
 function validateDimensions(dimensions, errors) {
-    console.log(dimensions)
     var totalNumberOfPossibleDistinctValues = 1
 
     dimensions.forEach((dimension) => {

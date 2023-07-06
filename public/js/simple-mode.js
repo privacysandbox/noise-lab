@@ -85,15 +85,12 @@ export function simulateAndDisplayResultsSimpleMode() {
         CONTRIBUTION_BUDGET,
         getIsUseScalingFromDom()
     )
-    displaySimulationResults_simpleMode(
-        simulation,
-        DEFAULT_DIMENSIONS.map((d) => d.name).join(' x ')
-    )
+    displaySimulationResults_simpleMode(simulation)
 }
 
 function getNumberOfDistinctKeyValuesPerKey(dimensions) {
     return dimensions
-        .map((dimension) => dimension.numberOfDistinctValues)
+        .map((dimension) => dimension.size)
         .reduce((prev, current) => prev * current, 1)
 }
 
@@ -108,8 +105,10 @@ function simulate(
     isUseScaling
 ) {
     const simulation = {
-        title: generateSimulationTitle(new Date(Date.now())),
-        simulationId: generateSimulationId(),
+        metadata: {
+            simulationTitle: generateSimulationTitle(new Date(Date.now())),
+            simulationId: generateSimulationId(),
+        },
         inputParameters: {
             // Used later for display
             dailyConversionCount,
@@ -120,7 +119,7 @@ function simulate(
             batchingFrequency,
             isUseScaling,
         },
-        reports: [],
+        summaryReports: [],
     }
     const numberOfMetrics = metrics.length
     for (let i = 0; i < numberOfMetrics; i++) {
@@ -135,38 +134,41 @@ function simulate(
                   budget
               )
             : 1
-        const dailyReportPreNoise = generateUnnoisyKeyValuePairsReport(
+        const dailyReport_noiseless = generateNoiselessReport(
             metric,
             dailyConversionCount,
             batchingFrequency,
             dimensions,
             scalingFactorForThisMetric
         )
-        const dailyReportWithNoise =
-            generateNoisyReportFromUnnoisyKeyValuePairsReport(
-                dailyReportPreNoise,
-                budget,
-                epsilon,
-                scalingFactorForThisMetric
-            )
+        const dailyReport_noisy = generateNoisyReportFromNoiselessReport(
+            dailyReport_noiseless,
+            budget,
+            epsilon,
+            scalingFactorForThisMetric
+        )
 
-        const noise_ape = calculateAverageNoisePercentage(dailyReportWithNoise)
-        const noise_rmsre = dailyReportWithNoise.noise_rmsre
+        const noise_ape = calculateAverageNoisePercentage(dailyReport_noisy)
+        const noise_rmsre = dailyReport_noisy.noise_rmsre
 
-        simulation.reports.push({
-            data: dailyReportWithNoise,
-            noise_ape: noise_ape,
-            noise_ape_percent: Number.parseFloat((noise_ape * 100).toFixed(3)),
-            noise_rmsre: noise_rmsre,
-            noise_rmsre_value: noise_rmsre,
+        simulation.summaryReports.push({
+            data: dailyReport_noisy,
             scalingFactor: scalingFactorForThisMetric,
-            title: metric.name,
+            measurementGoal: metric.name,
+            dimensionsString: dimensions.map((d) => d.name).join(' x '),
+            noiseMetrics: {
+                noise_ape_percent: Number.parseFloat(
+                    (noise_ape * 100).toFixed(3)
+                ),
+                noise_rmsre: noise_rmsre,
+            },
         })
     }
+    console.log(simulation)
     return simulation
 }
 
-function generateUnnoisyKeyValuePairsReport(
+function generateNoiselessReport(
     metric,
     dailyConversionCount,
     batchingFrequency,
@@ -174,7 +176,7 @@ function generateUnnoisyKeyValuePairsReport(
     scalingFactorForThisMetric
 ) {
     const keyCombinations = generateKeyCombinationArray(
-        dimensions.map((dim) => dim.numberOfDistinctValues)
+        dimensions.map((dim) => dim.size)
     )
 
     // TODO fix - right now we're using j to add a deterministic variation to the numbers, so that they remain the same across simulations. It does the job but is clunky.
@@ -202,19 +204,20 @@ function generateUnnoisyKeyValuePairsReport(
     return report
 }
 
-function generateNoisyReportFromUnnoisyKeyValuePairsReport(
-    unnoisyKeyValuePairReport,
+function generateNoisyReportFromNoiselessReport(
+    noiselessReport,
     budget,
     epsilon,
     scalingFactor
 ) {
-    const noisyReport = unnoisyKeyValuePairReport.map((entry) => {
+    const noisyReport = noiselessReport.map((entry) => {
         const { key, summaryValue, summaryValue_scaled_noiseless } = entry
         const noise = getRandomLaplacianNoise(budget, epsilon)
         return {
             key,
             summaryValue,
             summaryValue_scaled_noiseless,
+            noise,
             summaryValue_scaled_noisy: summaryValue_scaled_noiseless + noise,
             noise_ape_individual: calculateNoisePercentage(
                 noise,

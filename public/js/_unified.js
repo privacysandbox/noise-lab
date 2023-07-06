@@ -91,7 +91,7 @@ const simulation = {
         batchingFrequency: '1',
         isUseScaling: true,
     },
-    outputReports: [
+    summaryReports: [
         {
             data: [
                 {

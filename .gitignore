@@ -1,5 +1,6 @@
 node_modules/
-.parcel-cache
 dist/
 .vscode
 .DS_store
+.cache/
+.parcel-cache/

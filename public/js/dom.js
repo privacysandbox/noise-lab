@@ -1217,6 +1217,8 @@ export function removeDimension() {
 }
 
 export function getKeyCombinationString(names) {
+    console.log("generate string")
+    console.log(names)
     return names.join(' x ')
 }
 
@@ -1407,6 +1409,159 @@ export function loadPython() {
     var pyScriptSection = document.getElementById('py-script')
     pyScriptSection.appendChild(pyCodeText)
 }
+
+
+
+
+
+
+/*
+
+
+TEST NEW DISPLAY UNIFIED FUNCTION
+
+
+FIX THIS ON MONDAY
+
+
+*/
+
+
+
+export function displaySimulationResults_unified(simulation, mode) {
+
+    console.log("unified display function")
+    hideEmptyState()
+    console.log(simulation)
+
+    const allSimulationsWrapper = document.getElementById(
+        `all-simulations-wrapper-${mode}-mode`
+    )
+    const { metadata, inputParameters, summaryReports } = simulation
+    const { simulationTitle, simulationId } = metadata
+
+    // Prepare wrapper div that will contain the simulation
+    const simulationWrapperDiv = document.createElement('div')
+    simulationWrapperDiv.setAttribute(
+        'id',
+        generateSimulationWrapperElId(simulationId)
+    )
+    simulationWrapperDiv.setAttribute('class', `simulation-wrapper-${mode}-mode`)
+    allSimulationsWrapper.appendChild(simulationWrapperDiv)
+    const simulationInputWrapperDiv = document.createElement('div')
+    const simulationOutputWrapperDiv = document.createElement('div')
+
+    // Display simulation main info in the simulation wrapper div
+    const simulationTitleDiv = document.createElement('h2')
+    simulationTitleDiv.innerText = simulationTitle
+    simulationWrapperDiv.appendChild(simulationTitleDiv)
+
+    const simulationIdDiv = document.createElement('div')
+    simulationIdDiv.setAttribute('class', 'simulation-id')
+    simulationIdDiv.innerText = `Unique simulation ID: ${simulationId}`
+    simulationWrapperDiv.appendChild(simulationIdDiv)
+
+    simulationWrapperDiv.appendChild(simulationInputWrapperDiv)
+    simulationWrapperDiv.appendChild(simulationOutputWrapperDiv)
+
+    // Display input parameters in the input simulation wrapper div
+    displayInputParameters(
+        simulationInputWrapperDiv,
+        inputParameters,
+        simulationId,
+        MODES.simple.name
+    )
+
+    // Display reports in the output simulation wrapper div
+    const reportsTitleDiv = document.createElement('h3')
+    reportsTitleDiv.innerText = 'Summary reports (output)'
+    simulationOutputWrapperDiv.appendChild(reportsTitleDiv)
+
+    summaryReports.forEach((report, index) => {
+        displayReportUnified(
+            simulationOutputWrapperDiv,
+            report,
+            simulationId,
+            index,
+            report.dimensionsString
+        )
+    })
+
+    simulationWrapperDiv.scrollIntoView({ block: 'end' })
+}
+
+
+
+function displayReportUnified(
+    parentDomEl,
+    report,
+    simulationId,
+    simulationNo,
+    keyCombinationDisplay
+) {
+
+    console.log("______________")
+    console.log(keyCombinationDisplay)
+    console.log("______________")
+    const { noiseMetrics, data, measurementGoal, scalingFactor } = report
+    const { noise_ape_percent, noise_rmsre } = noiseMetrics
+
+    // Display report table title
+    const titleDiv = document.createElement('h4')
+    titleDiv.innerText = 'Measurement goal: ' + measurementGoal
+    parentDomEl.appendChild(titleDiv)
+    // Display noise
+    displayNoiseAsPercentage(parentDomEl, noise_ape_percent, noise_rmsre)
+    // Display details section title
+    displayDataDetailsTitle(parentDomEl)
+    parentDomEl.appendChild(document.createElement('br'))
+    // Display dimensions
+    displayDimensionsInOutput(parentDomEl, keyCombinationDisplay)
+    // Display scaling factor
+    displayScalingFactor(parentDomEl, scalingFactor)
+
+    // Display table containing report data
+    const dataTableTitle = document.createElement('h6')
+    dataTableTitle.innerText = 'Data table:'
+    parentDomEl.appendChild(dataTableTitle)
+    const tableId = `output-data-table-${simulationId}-${measurementGoal}-${simulationNo}`
+    const detailsDiv = document.createElement('details')
+    detailsDiv.setAttribute('id', tableId)
+    detailsDiv.setAttribute('class', 'offset-left')
+    parentDomEl.appendChild(detailsDiv)
+
+    // Generate data table
+    const table = new TabulatorFull(`#${tableId}`, {
+        data,
+        // Create columns from data field names
+        autoColumns: true,
+        layout: 'fitColumns',
+        pagination: true,
+        paginationSize: 5,
+    })
+
+    // Save table temporarily; used for XLSX multi-table download
+    tempSaveTable_simpleMode(table, `${simulationId}-${measurementGoal}`)
+
+    // Create download button
+    const downloadButton = document.createElement('button')
+    downloadButton.innerHTML = '⬇️ Download table (CSV)'
+    downloadButton.setAttribute('id', 'download-csv' + tableId)
+    downloadButton.setAttribute('class', 'ternary offset-left')
+    parentDomEl.appendChild(downloadButton)
+
+    // Create eventListener for download of csv file
+    downloadButton.addEventListener('click', function () {
+        table.download(
+            'csv',
+            generateCsvFileName(simulationId, measurementGoal)
+        )
+    })
+
+    // Update tooltips
+    updateTooltips()
+}
+
 
 window.generateKeyStructures = generateKeyStructures
 window.capEpsilon = capEpsilon

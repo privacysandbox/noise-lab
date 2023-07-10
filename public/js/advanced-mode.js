@@ -21,6 +21,8 @@ import {
     getBatchingFrequencyFromDom,
     getAllDimensionSizes,
     displaySimulationResults_advancedMode,
+    displaySimulationResults_simpleMode,
+    displaySimulationResults_unified,
     getMetricsArrayFromDom,
     createSimulationDiv,
     getDimensionsArrayFromDom,
@@ -43,8 +45,13 @@ import {
     loadPython,
     getZeroConversionsPercentageFromDom,
     getEventCount,
+    getKeyStrategy,
+    getKeyStrategyFromDom
 } from './dom'
-import { generateSimulationId, tempSaveTable, downloadAll } from './utils.misc'
+import { generateSimulationId, 
+         generateSimulationTitle,
+         tempSaveTable, 
+         downloadAll } from './utils.misc'
 import {
     CONTRIBUTION_BUDGET,
     DEFAULT_MEASUREMENT_GOALS,
@@ -87,11 +94,8 @@ export function initializeDisplay_advancedMode() {
     displayBudgetSplit()
 }
 function simulatePerMetric(
-    mainDiv,
     keyCombinations,
-    metricsNo,
     metric,
-    simulationId,
     epsilon,
     contributionBudget,
     isUseScaling,
@@ -110,8 +114,11 @@ function simulatePerMetric(
           )
         : 1
     const keyCombinationString = getKeyCombinationString(keyCombinations.names)
-
+    console.log("generate string")
+    console.log(keyCombinationString)
+   
     const report = []
+
     var noisePercentageSum = 0
     for (let i = 0; i < keyCombinations.combinations.length; i++) {
         const noise = getRandomLaplacianNoise(contributionBudget, epsilon)
@@ -124,12 +131,12 @@ function simulatePerMetric(
             getZeroConversionsPercentageFromDom()
         )
 
-        const noisePercentage = calculateNoisePercentage(
+        const noiseValueAPE = calculateNoisePercentage(
             noise,
             // Noiseless summary value
             randCount * scalingFactor
         )
-        noisePercentageSum += noisePercentage
+        noisePercentageSum += noiseValueAPE
 
         const summaryValue_scaled_noisy = randCount * scalingFactor + noise
 
@@ -139,7 +146,7 @@ function simulatePerMetric(
             summaryValue_scaled_noiseless: randCount * scalingFactor,
             summaryValue_scaled_noisy: summaryValue_scaled_noisy,
             noise: noise,
-            noisePercentage: noisePercentage,
+            noise_ape_individual: noiseValueAPE,
         })
     }
 
@@ -163,21 +170,18 @@ function simulatePerMetric(
 
     const simulationReport = {
         data: report,
-        noise_ape: noise_ape,
-        noise_ape_percent: Number.parseFloat((noise_ape * 100).toFixed(3)),
-        noise_rmsre: noise_rmsre,
+        noiseMetrics: {
+            noise_ape_percent: noise_ape,
+            noise_rmsre: noise_rmsre 
+        },
+        scalingFactor: scalingFactor,
+        measurementGoal: metric.name,
+        dimensionsString: keyCombinationString,
+        simulationNo: simulationNo
+       
     }
 
-    displaySimulationResults_advancedMode(
-        mainDiv,
-        simulationReport,
-        metric.name,
-        scalingFactor,
-        keyCombinationString,
-        simulationId,
-        simulationNo,
-        metricsNo
-    )
+      return simulationReport
 }
 
 export function simulateAndDisplayResultsAdvancedMode() {
@@ -252,27 +256,45 @@ function triggerSimulation(
         }
     }
 
-    const simulationId = generateSimulationId()
+    
+   // const simulationId = generateSimulationId()
+    const keyStrategy = getKeyStrategyFromDom()
 
-    var simulationDiv = createSimulationDiv(simulationId, {
-        metrics,
-        dimensions,
-        epsilon,
-        contributionBudget,
-        isUseScaling,
-        isGranular,
-        batchingFrequency,
-        dailyConversionCount,
-    })
+    // var simulationDiv = createSimulationDiv(simulationId, {
+    //     metrics,
+    //     dimensions,
+    //     epsilon,
+    //     contributionBudget,
+    //     isUseScaling,
+    //     isGranular,
+    //     batchingFrequency,
+    //     dailyConversionCount,
+    // })
+
+    const simulation = {
+        metadata: {
+            simulationTitle: generateSimulationTitle(new Date(Date.now())),
+            simulationId: generateSimulationId(),
+        },
+        inputParameters: {
+            // Used later for display
+            dailyConversionCount,
+            dimensions,
+            epsilon,
+            keyStrategy,
+            metrics,
+            batchingFrequency,
+            isUseScaling,
+        },
+        summaryReports: [],
+    }
 
     metrics.forEach((element) => {
         for (let i = 0; i < keyCombList.length; i++) {
+            simulation.summaryReports.push(
             simulatePerMetric(
-                simulationDiv,
                 keyCombList[i],
-                metrics.length,
                 element,
-                simulationId,
                 epsilon,
                 contributionBudget,
                 isUseScaling,
@@ -281,9 +303,15 @@ function triggerSimulation(
                     ? getDailyValue()
                     : Math.floor(dailyConversionCount / keyCombList[i].size),
                 i
-            )
+            ))
         }
+
+
+
     })
+
+    console.log(simulation);
+    displaySimulationResults_unified(simulation, "advanced")
 }
 
 window.simulateAndDisplayResultsAdvancedMode =

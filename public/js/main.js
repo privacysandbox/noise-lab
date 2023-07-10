@@ -14,7 +14,7 @@ limitations under the License. */
 
 import { generateConfirmMessage } from './utils.misc'
 import { initializeDisplay_simpleMode } from './simple-mode'
-import { initializeDisplay_advancedMode } from './laplace'
+import { initializeDisplay_advancedMode } from './advanced-mode'
 import { APP_VERSION, MODES, modeSearchQueryParams } from './config'
 
 // Generate navigation menu automatically based on the available modes

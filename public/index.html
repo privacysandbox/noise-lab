@@ -18,17 +18,19 @@ limitations under the License. -->
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script type="module" src="js/main.js" defer></script>
+    <!-- <script type="module" src="js/main.js" defer></script> -->
     <script type="text/javascript" src="./third_party/xlsx.full.min.js"></script>
     <script defer src="./third_party/pyscript.js"></script>
     <script src="js/python-file.js"></script>
+    <script type="module" src="js/index.js"></script>
+    <script type="module" src="js/tooltips.js"></script>
+
     <link href="./third_party/tabulator.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="./third_party/pyscript.css" />
     <link rel="stylesheet" href="./style.css" />
     <link rel="icon"
         href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧪</text></svg>" />
 </head>
-
 <body>
     <py-script>
         print('Hello World, from python!')
@@ -41,23 +43,7 @@ limitations under the License. -->
    <py-script id="py-script">
 
    </py-script>
-    <div id="menu">
-        <div class="flex">
-            <div class="app-name">
-                🧪 Noise Lab
-                <!-- Version number is programmatically -->
-                <div id="app-version" class="version"></div>
-            </div>
-            <div class="app-info">
-                <div id="about-info">About</div>
-                <div id="user-guide">How to use Noise Lab?</div>
-            </div>
-        </div>
-        <nav id="nav">
-            <!-- Populated automatically, see main.js -->
-        </nav>
-        <button id="feedback">Give feedback</button>
-    </div>
+   <div id="app"></div>
     <!-- SIMPLE MODE START -->
     <div id="simple-mode" class="mode-section">
         <div class="launch-panel">

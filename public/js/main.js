@@ -16,6 +16,28 @@ import { generateConfirmMessage } from './utils.misc'
 import { initializeDisplay_simpleMode } from './simple-mode'
 import { initializeDisplay_advancedMode } from './advanced-mode'
 import { APP_VERSION, MODES, modeSearchQueryParams } from './config'
+import { 
+    validateInputsBeforeSimulation,
+    getKeyStrategyFromDom,
+    getIsKeyStrategyGranularFromDom,
+    getDailyValue,
+    getBudgetValueForMetricIdFromDom,
+    getIsPercentageBudgetSplitFromDom,
+    getKeyCombinationString,
+    getZeroConversionsPercentageFromDom
+ } from './dom'
+ import { generateSimulationId, 
+    generateSimulationTitle,
+ } from './utils.misc'
+import {
+    getRandomLaplacianNoise,
+    getScalingFactorForMetric,
+    calculateNoisePercentage,
+    generateKeyCombinationArray,
+    generateSummaryValue,
+    calculateAverageNoisePercentageRaw,
+    getNoise_Rmsre,
+} from './utils.noise'
 
 // Generate navigation menu automatically based on the available modes
 function generateMenu() {
@@ -42,7 +64,7 @@ function displayVersionNumber() {
     document.getElementById('app-version').innerText = APP_VERSION
 }
 
-function getCurrentModeFromUrl() {
+export function getCurrentModeFromUrl() {
     const urlParams = new URLSearchParams(window.location.search)
     let mode = urlParams.get('mode')
     return mode
@@ -83,3 +105,183 @@ window.addEventListener('load', function (event) {
         throw new Error('mode unkown')
     }
 })
+
+// generate dataset
+export function triggerSimulation(
+    metrics,
+    dimensions,
+    dimensionNames,
+    dimensionSizes,
+    epsilon,
+    contributionBudget,
+    isUseScaling,
+    isGranular,
+    batchingFrequency,
+    dailyConversionCount
+) {
+    // Validate inputs are correct
+    if (!validateInputsBeforeSimulation(metrics, dimensions, isGranular)) return
+
+    // declare array containing possible combinations for keys
+    var r = []
+    var keyCombList = []
+
+    // logic for generating one dataset with all keys - string parameter 'all' is used
+    if (isGranular) {
+        var keyComb = generateKeyCombinationArray(dimensionSizes)
+        keyCombList.push({
+            names: dimensionNames,
+            combinations: keyComb,
+        })
+    } else {
+        const allCombs = getStrategiesKeyCombinations(dimensions)
+
+        for (let i = 0; i < allCombs.length; i++) {
+            keyCombList.push({
+                names: allCombs[i].names,
+                combinations: generateKeyCombinationArray(
+                    allCombs[i].combinations
+                ),
+                // Calculate the size of the sub-key
+                size: allCombs[i].combinations.reduce((acc, val) => {
+                    acc = acc * val
+                    return acc
+                }, 1),
+            })
+        }
+    }
+
+    
+    const keyStrategy = getKeyStrategyFromDom()
+
+
+    const simulation = {
+        metadata: {
+            simulationTitle: generateSimulationTitle(new Date(Date.now())),
+            simulationId: generateSimulationId(),
+        },
+        inputParameters: {
+            // Used later for display
+            dailyConversionCount,
+            dimensions,
+            epsilon,
+            keyStrategy,
+            metrics,
+            batchingFrequency,
+            isUseScaling,
+        },
+        summaryReports: [],
+    }
+
+    metrics.forEach((element) => {
+        for (let i = 0; i < keyCombList.length; i++) {
+            simulation.summaryReports.push(
+            simulatePerMetric(
+                keyCombList[i],
+                element,
+                epsilon,
+                contributionBudget,
+                isUseScaling,
+                batchingFrequency,
+                getIsKeyStrategyGranularFromDom()
+                    ? getDailyValue()
+                    : Math.floor(dailyConversionCount / keyCombList[i].size),
+                i
+            ))
+        }
+
+
+
+    })
+    
+    return simulation
+}
+
+function simulatePerMetric(
+    keyCombinations,
+    metric,
+    epsilon,
+    contributionBudget,
+    isUseScaling,
+    batchingFrequency,
+    dailyCount,
+    simulationNo
+) {
+    const value = getBudgetValueForMetricIdFromDom(metric.id)
+    const isPercentage = getIsPercentageBudgetSplitFromDom()
+    const scalingFactor = isUseScaling
+        ? getScalingFactorForMetric(
+              metric,
+              value,
+              isPercentage,
+              contributionBudget
+          )
+        : 1
+    const keyCombinationString = getKeyCombinationString(keyCombinations.names)
+    
+    const report = []
+
+    var noisePercentageSum = 0
+    for (let i = 0; i < keyCombinations.combinations.length; i++) {
+        const noise = getRandomLaplacianNoise(contributionBudget, epsilon)
+
+        const randCount = generateSummaryValue(
+            metric,
+            i,
+            dailyCount,
+            batchingFrequency,
+            getZeroConversionsPercentageFromDom()
+        )
+
+        const noiseValueAPE = calculateNoisePercentage(
+            noise,
+            // Noiseless summary value
+            randCount * scalingFactor
+        )
+        noisePercentageSum += noiseValueAPE
+
+        const summaryValue_scaled_noisy = randCount * scalingFactor + noise
+
+        report.push({
+            key: keyCombinations.combinations[i],
+            summaryValue: randCount,
+            summaryValue_scaled_noiseless: randCount * scalingFactor,
+            summaryValue_scaled_noisy: summaryValue_scaled_noisy,
+            noise: noise,
+            noise_ape_individual: noiseValueAPE,
+        })
+    }
+
+    const allSummaryValuesPreNoise = Object.values(report).map(
+        (v) => v.summaryValue_scaled_noiseless
+    )
+    const allSummaryValuesPostNoise = Object.values(report).map(
+        (v) => v.summaryValue_scaled_noisy
+    )
+
+    const noise_ape = calculateAverageNoisePercentageRaw(
+        noisePercentageSum,
+        keyCombinations.combinations.length
+    ) * 100
+
+    const noise_rmsre = getNoise_Rmsre(
+        allSummaryValuesPostNoise,
+        allSummaryValuesPreNoise,
+        scalingFactor
+    )
+
+    const simulationReport = {
+        data: report,
+        noiseMetrics: {
+            noise_ape_percent: noise_ape,
+            noise_rmsre: noise_rmsre 
+        },
+        scalingFactor: scalingFactor,
+        measurementGoal: metric.name,
+        dimensionsString: keyCombinationString,
+        simulationNo: simulationNo
+       
+    }
+
+      return simulationReport
+}

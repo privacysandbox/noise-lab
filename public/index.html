@@ -13,6 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License. -->
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Noise Lab</title>
     <meta charset="utf-8" />
@@ -34,13 +35,13 @@ limitations under the License. -->
         print('Hello World, from python!')
     </py-script>
     <py-config>
-      packages = ["matplotlib", "pandas", "numpy"]
+        packages = ["matplotlib", "pandas", "numpy"]
     </py-config>
 
     <!-- Content of the py-script below will be populated from python-file.js -->
-   <py-script id="py-script">
+    <py-script id="py-script">
 
-   </py-script>
+    </py-script>
     <div id="menu">
         <div class="flex">
             <div class="app-name">
@@ -277,18 +278,24 @@ limitations under the License. -->
                             <label class="long">Budget split (used for Scaling):</label>
 
                             <div>
-                                
+
                                 <div id="budget-split-options-selection">
                                     <p>Please how you prefer to split the budget:</p>
-                                     <input type="radio" id="percentage" name="budget-split-option" value="percentage" onclick="resetBudgetSplit()" checked>
-                                     <label for="percentage">percentage</label><br>
-                                     <input type="radio" id="value" name="budget-split-option" value="value" onclick="resetBudgetSplit()">
-                                     <label for="value">value</label><br>
+                                    <input type="radio" id="percentage" name="budget-split-option" value="percentage"
+                                        onclick="resetBudgetSplit()" checked>
+                                    <label for="percentage">percentage</label><br>
+                                    <input type="radio" id="value" name="budget-split-option" value="value"
+                                        onclick="resetBudgetSplit()">
+                                    <label for="value">value</label><br>
                                 </div>
                                 <div class="input-hint">⚠️ The total contribution budget is split across measurement
-                                    goals following the percentages/values below, so the sum of all percentages/values can't exceed
+                                    goals following the percentages/values below, so the sum of all percentages/values
+                                    can't exceed
                                     100/total contribution budget.</div>
-                                <div class="input-hint" id="help-budget-split-warning" hidden> ⚠️ Because you're using Key Strategy 'B' the total contribution budget is now evenly split between all sub-keys. Note that the total number of sub-keys is: (number of key structures per measurement goal) * (number of measurement goals). </div>
+                                <div class="input-hint" id="help-budget-split-warning" hidden> ⚠️ Because you're using
+                                    Key Strategy 'B' the total contribution budget is now evenly split between all
+                                    sub-keys. Note that the total number of sub-keys is: (number of key structures per
+                                    measurement goal) * (number of measurement goals). </div>
                                 <div id="budget-split-wrapper-el"></div>
                             </div>
                         </div>
@@ -296,7 +303,7 @@ limitations under the License. -->
                         <div>
                             <label for="key-strategy">Key strategy:</label>
                             <!-- Options are populated automatically -->
-                            <select name="key-strategy" id="key-strategy-select" ></select>
+                            <select name="key-strategy" id="key-strategy-select"></select>
                             <div class="help" id="help-key-strategy-advanced-mode"></div>
                         </div>
                     </div>

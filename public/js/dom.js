@@ -27,8 +27,10 @@ import {
     BATCHING_FREQUENCIES,
 } from './config'
 
+import { getCurrentModeFromUrl } from './main'
+
 import { tempSaveTable_simpleMode } from './simple-mode'
-import { tempSaveTable_advancedMode } from './laplace'
+import { tempSaveTable_advancedMode } from './advanced-mode'
 import { updateTooltips, updateOutlierNote } from './tooltips'
 
 export function displayContributionBudget(budget) {
@@ -71,6 +73,8 @@ export function getEpsilonFromDom() {
 }
 
 export function getIsPercentageBudgetSplitFromDom() {
+    if (getCurrentModeFromUrl() == 'simple')
+        return true
     return document.getElementById('percentage').checked
 }
 function getFormValidationElFromDom() {
@@ -152,8 +156,8 @@ export function displayBudgetSplit() {
         budgetSplitOption == 'percentage'
             ? (100 / numberOfMeasurementGoals / noKeys).toFixed(0)
             : (contributionBudget / numberOfMeasurementGoals / noKeys).toFixed(
-                  0
-              )
+                0
+            )
 
     measurementGoals.forEach((m) => {
         const { id } = m
@@ -340,8 +344,8 @@ function displayEmptyState() {
 }
 
 function hideEmptyState() {
-    const emptyStateDivs = document.querySelectorAll(`.empty-state`)
-    emptyStateDivs.forEach((el) => (el.className = 'empty-state hidden'))
+    const emptyStateDiv = document.getElementById('empty-state')
+    emptyStateDiv.className = "empty-state hidden"
 }
 
 export function displaySimulationResults_simpleMode(simulation) {
@@ -1217,8 +1221,6 @@ export function removeDimension() {
 }
 
 export function getKeyCombinationString(names) {
-    console.log("generate string")
-    console.log(names)
     return names.join(' x ')
 }
 
@@ -1260,8 +1262,7 @@ export function resetFormValidation() {
 export function validateInputsBeforeSimulation(
     metrics,
     dimensions,
-    isGranular,
-    keyCombinationNumber
+    isGranular
 ) {
     var errors = []
     validateBudgetPercentages(metrics, errors)
@@ -1294,7 +1295,7 @@ function validateMetrics(metrics, errors) {
         if (element.avgValue * 1 > element.maxValue * 1)
             errors.push(
                 element.name +
-                    ' - maximum value cannot be smaller than average value'
+                ' - maximum value cannot be smaller than average value'
             )
     })
 }
@@ -1324,7 +1325,7 @@ function validateBudgetPercentages(metrics, errors) {
     ) {
         errors.push(
             'The sum of all budget split values exceeds the total contribution budget ' +
-                getContributionBudgetFromDom()
+            getContributionBudgetFromDom()
         )
     }
 
@@ -1332,9 +1333,9 @@ function validateBudgetPercentages(metrics, errors) {
         !getIsPercentageBudgetSplitFromDom() &&
         !getIsKeyStrategyGranularFromDom() &&
         sumOfAllPercentages >
-            Math.floor(
-                getContributionBudgetFromDom() / getKeyStrategiesNumberFromDom()
-            )
+        Math.floor(
+            getContributionBudgetFromDom() / getKeyStrategiesNumberFromDom()
+        )
     ) {
         errors.push(
             'The sum of all budget split values exceeds the total contribution budget per key - <total contribution budget>/<total number of keys>'
@@ -1378,8 +1379,8 @@ function validateKeyStrategy(errors) {
         if (noChecked < 2)
             errors.push(
                 'Key structure ' +
-                    i +
-                    ': at least 2 dimensions should be checked for each key structure'
+                i +
+                ': at least 2 dimensions should be checked for each key structure'
             )
     }
 }
@@ -1399,6 +1400,8 @@ export function getScalingApproachFromDom() {
 }
 
 export function getZeroConversionsPercentageFromDom() {
+    if (getCurrentModeFromUrl() == 'simple')
+        return true
     return document.getElementById('zero-pct').value
 }
 
@@ -1417,12 +1420,7 @@ export function loadPython() {
 
 /*
 
-
-TEST NEW DISPLAY UNIFIED FUNCTION
-
-
-FIX THIS ON MONDAY
-
+NEW DISPLAY UNIFIED FUNCTION
 
 */
 
@@ -1430,7 +1428,6 @@ FIX THIS ON MONDAY
 
 export function displaySimulationResults_unified(simulation, mode) {
 
-    console.log("unified display function")
     hideEmptyState()
     console.log(simulation)
 
@@ -1499,10 +1496,6 @@ function displayReportUnified(
     simulationNo,
     keyCombinationDisplay
 ) {
-
-    console.log("______________")
-    console.log(keyCombinationDisplay)
-    console.log("______________")
     const { noiseMetrics, data, measurementGoal, scalingFactor } = report
     const { noise_ape_percent, noise_rmsre } = noiseMetrics
 

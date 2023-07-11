@@ -1534,7 +1534,18 @@ function displayReportUnified(
     })
 
     // Save table temporarily; used for XLSX multi-table download
-    tempSaveTable_simpleMode(table, `${simulationId}-${measurementGoal}`)
+    console.log("CURRENT MODE:")
+    console.log(getCurrentModeFromUrl())
+
+    if (getCurrentModeFromUrl() == 'simple') {
+        tempSaveTable_simpleMode(table, `${simulationId}-${measurementGoal}`)
+    }
+    else {
+        tempSaveTable_advancedMode(
+            table,
+            `${simulationId}-${measurementGoal}-${simulationNo}`
+        )
+    }
 
     // Create download button
     const downloadButton = document.createElement('button')

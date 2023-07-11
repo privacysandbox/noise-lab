@@ -24,7 +24,8 @@ import {
     getBudgetValueForMetricIdFromDom,
     getIsPercentageBudgetSplitFromDom,
     getKeyCombinationString,
-    getZeroConversionsPercentageFromDom
+    getZeroConversionsPercentageFromDom,
+    getStrategiesKeyCombinations
  } from './dom'
  import { generateSimulationId, 
     generateSimulationTitle,

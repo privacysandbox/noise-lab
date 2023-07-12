@@ -14,8 +14,9 @@ limitations under the License. */
 
 import { generateConfirmMessage } from './utils.misc'
 import { initializeDisplay_simpleMode } from './simple-mode'
-import { initializeDisplay_advancedMode } from './laplace'
+import { initializeDisplay_advancedMode } from './advanced-mode'
 import { APP_VERSION, MODES, modeSearchQueryParams } from './config'
+import { resetData } from './store'
 
 // Generate navigation menu automatically based on the available modes
 function generateMenu() {
@@ -31,6 +32,7 @@ function generateMenu() {
         a.addEventListener('click', () => {
             if (window.confirm(generateConfirmMessage())) {
                 window.location = `${location.origin}${location.pathname}?mode=${mode.searchQueryParam}`
+                resetData()
             }
         })
         a.innerText = displayName
@@ -42,7 +44,7 @@ function displayVersionNumber() {
     document.getElementById('app-version').innerText = APP_VERSION
 }
 
-function getCurrentModeFromUrl() {
+export function getCurrentModeFromUrl() {
     const urlParams = new URLSearchParams(window.location.search)
     let mode = urlParams.get('mode')
     return mode

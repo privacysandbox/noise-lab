@@ -13,6 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License. -->
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Noise Lab</title>
     <meta charset="utf-8" />
@@ -34,13 +35,13 @@ limitations under the License. -->
         print('Hello World, from python!')
     </py-script>
     <py-config>
-      packages = ["matplotlib", "pandas", "numpy"]
+        packages = ["matplotlib", "pandas", "numpy"]
     </py-config>
 
     <!-- Content of the py-script below will be populated from python-file.js -->
-   <py-script id="py-script">
+    <py-script id="py-script">
 
-   </py-script>
+    </py-script>
     <div id="menu">
         <div class="flex">
             <div class="app-name">
@@ -82,9 +83,9 @@ limitations under the License. -->
                     <div>
                         <h3>Your conversion data</h3>
                         <div>
-                            <label for="daily">Average daily attributable conversion
+                            <label for="event-count-daily-bucket">Average daily attributable conversion
                                 count PER BUCKET:</label>
-                            <select name="daily" id="daily">
+                            <select name="event-count-daily-bucket" id="event-count-daily-bucket">
                                 <option value="5">5</option>
                                 <option value="10">10</option>
                                 <option value="100" selected>100</option>
@@ -148,7 +149,7 @@ limitations under the License. -->
                     </div>
                 </div>
                 <div class="buttons-wrapper-launch-panel">
-                    <button id="button-simulate" class="primary" onclick="simulateAndDisplayResultsSimpleMode()">
+                    <button id="button-simulate" class="primary" onclick="simulateAndDisplayResults_simpleMode()">
                         ▶️ SIMULATE
                     </button>
                 </div>
@@ -157,14 +158,14 @@ limitations under the License. -->
         <main>
             <h2>Simulations</h2>
             <div class="global-buttons">
-                <button class="primary" onclick="downloadAll_simpleMode()">
+                <button class="primary" onclick="downloadAllDom()">
                     ⬇️ Download all (.xlsx)
                 </button>
                 <button class="secondary destructive" onclick="resetUi()">
                     🗑 Clear all
                 </button>
             </div>
-            <div class="empty-state">
+            <div id="empty-state">
                 <div class="empty-state-inner">
                     <img src="./assets/test-tube.png" alt="">
                     <p>
@@ -174,7 +175,7 @@ limitations under the License. -->
                 </div>
             </div>
 
-            <div class="all-simulations-wrapper" id="all-simulations-wrapper-simple-mode">
+            <div class="all-simulations-wrapper" id="all-simulations-wrapper">
             </div>
         </main>
     </div>
@@ -202,9 +203,9 @@ limitations under the License. -->
                     </div>
                     <div>
                         <h3>Your conversion data</h3>
-                        <label for="event-count">TOTAL daily attributable conversion
+                        <label for="event-count-daily-total">TOTAL daily attributable conversion
                             count:</label>
-                        <select name="event-count" id="event-count" oninput="updateDailyPerBucket()">
+                        <select name="event-count-daily-total" id="event-count-daily-total" oninput="updateDailyPerBucket()">
                             <option value="5">5</option>
                             <option value="10">10</option>
                             <option value="100">100</option>
@@ -214,9 +215,9 @@ limitations under the License. -->
                             <option value="100000">100000</option>
                         </select>
                         <div class="help" id="help-daily-total"></div>
-                        <label for="daily">Average daily attributable conversion
+                        <label for="event-count-daily-bucket">Average daily attributable conversion
                             count PER BUCKET:</label>
-                        <input name="daily" id="daily" disabled>
+                        <input name="event-count-daily-bucket" id="event-count-daily-bucket" disabled>
                         </input>
                         <div class="help" id="help-daily"></div>
                         <label for="zero-pct"> Percentage of buckets with 0 conversions: </label>
@@ -277,26 +278,31 @@ limitations under the License. -->
                             <label class="long">Budget split (used for Scaling):</label>
 
                             <div>
-                                
+
                                 <div id="budget-split-options-selection">
                                     <p>Please how you prefer to split the budget:</p>
-                                     <input type="radio" id="percentage" name="budget-split-option" value="percentage" onclick="resetBudgetSplit()" checked>
-                                     <label for="percentage">percentage</label><br>
-                                     <input type="radio" id="value" name="budget-split-option" value="value" onclick="resetBudgetSplit()">
-                                     <label for="value">value</label><br>
+                                    <input type="radio" id="percentage" name="budget-split-option" value="percentage"
+                                        onclick="resetBudgetSplit()" checked>
+                                    <label for="percentage">percentage</label><br>
+                                    <input type="radio" id="value" name="budget-split-option" value="value"
+                                        onclick="resetBudgetSplit()">
+                                    <label for="value">value</label><br>
                                 </div>
                                 <div class="input-hint">⚠️ The total contribution budget is split across measurement
-                                    goals following the percentages/values below, so the sum of all percentages/values can't exceed
+                                    goals following the percentages/values below, so the sum of all percentages/values
+                                    can't exceed
                                     100/total contribution budget.</div>
-                                <div class="input-hint" id="help-budget-split-warning" hidden> ⚠️ Because you're using Key Strategy 'B' the total contribution budget is now evenly split between all sub-keys. Note that the total number of sub-keys is: (number of key structures per measurement goal) * (number of measurement goals). </div>
+                                <div class="input-hint" id="help-budget-split-warning" hidden> ⚠️ Because you're using
+                                    Key Strategy 'B' the total contribution budget is now evenly split between all
+                                    sub-keys. Note that the total number of sub-keys is: (number of key structures per
+                                    measurement goal) * (number of measurement goals). </div>
                                 <div id="budget-split-wrapper-el"></div>
                             </div>
                         </div>
-                        <label for="granularity">Key strategy:</label>
                         <div>
                             <label for="key-strategy">Key strategy:</label>
                             <!-- Options are populated automatically -->
-                            <select name="key-strategy" id="key-strategy-select" disabled></select>
+                            <select name="key-strategy" id="key-strategy-select"></select>
                             <div class="help" id="help-key-strategy-advanced-mode"></div>
                         </div>
                     </div>
@@ -314,7 +320,7 @@ limitations under the License. -->
                     </div>
                 </div>
                 <div class="buttons-wrapper-launch-panel">
-                    <button class="primary" onclick="simulateAndDisplayResultsAdvancedMode()">
+                    <button class="primary" onclick="simulateAndDisplayResults_advancedMode()">
                         ▶️ Simulate
                     </button>
                 </div>
@@ -324,14 +330,14 @@ limitations under the License. -->
             <div id="form-validation-wrapper" class="hidden"></div>
             <h2>Simulations</h2>
             <div class="global-buttons">
-                <button class="primary" onclick="downloadAll_advancedMode()">
+                <button class="primary" onclick="downloadAllDom()">
                     ⬇️ Download all (.xlsx)
                 </button>
                 <button class="secondary destructive" onclick="resetUi()">
                     🗑 Clear all
                 </button>
             </div>
-            <div class="empty-state">
+            <div id="empty-state">
                 <div class="empty-state-inner">
                     <img src="./assets/test-tube.png" alt="">
                     <p>
@@ -340,7 +346,7 @@ limitations under the License. -->
                     </p>
                 </div>
             </div>
-            <div class="all-simulations-wrapper" id="all-simulations-wrapper-advanced-mode"></div>
+            <div class="all-simulations-wrapper" id="all-simulations-wrapper"></div>
         </main>
     </div>
 </body>

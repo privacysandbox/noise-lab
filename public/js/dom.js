@@ -15,23 +15,22 @@ limitations under the License. */
 import { TabulatorFull } from 'tabulator-tables'
 import {
     generateCsvFileName,
-    generateSimulationTitle,
     generateSimulationWrapperElId,
     generateConfirmMessage,
 } from './utils.misc'
 import {
     CONTRIBUTION_BUDGET,
     KEY_STRATEGIES,
-    MODES,
     RMSRE_THRESHOLD,
     BATCHING_FREQUENCIES,
 } from './config'
-
 import { getCurrentModeFromUrl } from './main'
-
-import { tempSaveTable_simpleMode } from './simple-mode'
-import { tempSaveTable_advancedMode } from './advanced-mode'
+import { resetData, saveTable, downloadAll } from './store'
 import { updateTooltips, updateOutlierNote } from './tooltips'
+
+export function downloadAllDom() {
+    downloadAll()
+}
 
 export function displayContributionBudget(budget) {
     document.getElementById('contribution-budget').innerText = budget
@@ -43,10 +42,6 @@ export function displayEpsilon(epsilon) {
 
 export function displayMaxPurchaseAmount(amount) {
     document.getElementById('amount').value = amount
-}
-
-export function getDailyConversionCountFromDom() {
-    return document.getElementById('daily').value
 }
 
 export function getIsUseScalingFromDom() {
@@ -73,8 +68,7 @@ export function getEpsilonFromDom() {
 }
 
 export function getIsPercentageBudgetSplitFromDom() {
-    if (getCurrentModeFromUrl() == 'simple')
-        return true
+    if (getCurrentModeFromUrl() == 'simple') return true
     return document.getElementById('percentage').checked
 }
 function getFormValidationElFromDom() {
@@ -156,8 +150,8 @@ export function displayBudgetSplit() {
         budgetSplitOption == 'percentage'
             ? (100 / numberOfMeasurementGoals / noKeys).toFixed(0)
             : (contributionBudget / numberOfMeasurementGoals / noKeys).toFixed(
-                0
-            )
+                  0
+              )
 
     measurementGoals.forEach((m) => {
         const { id } = m
@@ -224,12 +218,7 @@ export function initializeDisplaySimpleMode(
     addScalingListener()
 }
 
-export function displayInputParameters(
-    parentDomEl,
-    inputParameters,
-    simulationId,
-    mode
-) {
+export function displayInputParameters(parentDomEl, inputParameters, simulationId) {
     const parametersTitleDiv = document.createElement('h3')
     parametersTitleDiv.innerText = 'Parameters (input)'
     parentDomEl.appendChild(parametersTitleDiv)
@@ -292,7 +281,8 @@ export function displayInputParameters(
                 'Value (formatted)': keyStrategy,
             },
             {
-                Parameter: 'Average daily attributable conversion count',
+                Parameter:
+                    'Average daily attributable conversion count PER BUCKET',
                 'Value (raw)': dailyConversionCount,
                 'Value (formatted)': dailyConversionCount,
             },
@@ -319,11 +309,8 @@ export function displayInputParameters(
         ],
         true
     )
-    if (mode === MODES.simple.name) {
-        tempSaveTable_simpleMode(table, `${simulationId}-params`)
-    } else if (mode === MODES.advanced.name) {
-        tempSaveTable_advancedMode(table, `${simulationId}-params`)
-    }
+
+    saveTable(table, `${simulationId}-params`)
 
     // Create download button
     const downloadButton = document.createElement('button')
@@ -345,66 +332,7 @@ function displayEmptyState() {
 
 function hideEmptyState() {
     const emptyStateDiv = document.getElementById('empty-state')
-    emptyStateDiv.className = "empty-state hidden"
-}
-
-export function displaySimulationResults_simpleMode(simulation) {
-    hideEmptyState()
-    console.log(simulation)
-
-    const allSimulationsWrapper = document.getElementById(
-        'all-simulations-wrapper-simple-mode'
-    )
-    const { metadata, inputParameters, summaryReports } = simulation
-    const { simulationTitle, simulationId } = metadata
-
-    // Prepare wrapper div that will contain the simulation
-    const simulationWrapperDiv = document.createElement('div')
-    simulationWrapperDiv.setAttribute(
-        'id',
-        generateSimulationWrapperElId(simulationId)
-    )
-    simulationWrapperDiv.setAttribute('class', 'simulation-wrapper-simple-mode')
-    allSimulationsWrapper.appendChild(simulationWrapperDiv)
-    const simulationInputWrapperDiv = document.createElement('div')
-    const simulationOutputWrapperDiv = document.createElement('div')
-
-    // Display simulation main info in the simulation wrapper div
-    const simulationTitleDiv = document.createElement('h2')
-    simulationTitleDiv.innerText = simulationTitle
-    simulationWrapperDiv.appendChild(simulationTitleDiv)
-
-    const simulationIdDiv = document.createElement('div')
-    simulationIdDiv.setAttribute('class', 'simulation-id')
-    simulationIdDiv.innerText = `Unique simulation ID: ${simulationId}`
-    simulationWrapperDiv.appendChild(simulationIdDiv)
-
-    simulationWrapperDiv.appendChild(simulationInputWrapperDiv)
-    simulationWrapperDiv.appendChild(simulationOutputWrapperDiv)
-
-    // Display input parameters in the input simulation wrapper div
-    displayInputParameters(
-        simulationInputWrapperDiv,
-        inputParameters,
-        simulationId,
-        MODES.simple.name
-    )
-
-    // Display reports in the output simulation wrapper div
-    const reportsTitleDiv = document.createElement('h3')
-    reportsTitleDiv.innerText = 'Summary reports (output)'
-    simulationOutputWrapperDiv.appendChild(reportsTitleDiv)
-
-    summaryReports.forEach((report) => {
-        displayReportSimpleMode(
-            simulationOutputWrapperDiv,
-            report,
-            simulationId,
-            report.dimensionsString
-        )
-    })
-
-    simulationWrapperDiv.scrollIntoView({ block: 'end' })
+    emptyStateDiv.className = 'empty-state hidden'
 }
 
 function getNoiseBadgeType(noiseValue, isPercentage) {
@@ -536,76 +464,12 @@ export function getBudgetValueForMetricIdFromDom(metricId) {
     )
 }
 
-function displayReportSimpleMode(
-    parentDomEl,
-    report,
-    simulationId,
-    keyCombinationDisplay
-) {
-    const { noiseMetrics, data, measurementGoal, scalingFactor } = report
-    const { noise_ape_percent, noise_rmsre } = noiseMetrics
-
-    // Display report table title
-    const titleDiv = document.createElement('h4')
-    titleDiv.innerText = 'Measurement goal: ' + measurementGoal
-    parentDomEl.appendChild(titleDiv)
-    // Display noise
-    displayNoiseAsPercentage(parentDomEl, noise_ape_percent, noise_rmsre)
-    // Display details section title
-    displayDataDetailsTitle(parentDomEl)
-    parentDomEl.appendChild(document.createElement('br'))
-    // Display dimensions
-    displayDimensionsInOutput(parentDomEl, keyCombinationDisplay)
-    // Display scaling factor
-    displayScalingFactor(parentDomEl, scalingFactor)
-
-    // Display table containing report data
-    const dataTableTitle = document.createElement('h6')
-    dataTableTitle.innerText = 'Data table:'
-    parentDomEl.appendChild(dataTableTitle)
-    const tableId = `output-data-table-${simulationId}-${measurementGoal}`
-    const detailsDiv = document.createElement('details')
-    detailsDiv.setAttribute('id', tableId)
-    detailsDiv.setAttribute('class', 'offset-left')
-    parentDomEl.appendChild(detailsDiv)
-
-    // Generate data table
-    const table = new TabulatorFull(`#${tableId}`, {
-        data,
-        // Create columns from data field names
-        autoColumns: true,
-        layout: 'fitColumns',
-        pagination: true,
-        paginationSize: 5,
-    })
-
-    // Save table temporarily; used for XLSX multi-table download
-    tempSaveTable_simpleMode(table, `${simulationId}-${measurementGoal}`)
-
-    // Create download button
-    const downloadButton = document.createElement('button')
-    downloadButton.innerHTML = '⬇️ Download table (CSV)'
-    downloadButton.setAttribute('id', 'download-csv' + tableId)
-    downloadButton.setAttribute('class', 'ternary offset-left')
-    parentDomEl.appendChild(downloadButton)
-
-    // Create eventListener for download of csv file
-    downloadButton.addEventListener('click', function () {
-        table.download(
-            'csv',
-            generateCsvFileName(simulationId, measurementGoal)
-        )
-    })
-
-    // Update tooltips
-    updateTooltips()
-}
-
 export function resetUi() {
     // reset form validation
     // clear output
     resetFormValidation()
     clearSimulationArea()
+    resetData()
 }
 
 function resetFormValidation() {
@@ -618,9 +482,8 @@ function resetFormValidation() {
 function clearSimulationArea() {
     // Prompt user to confirm
     if (window.confirm(generateConfirmMessage())) {
-        // TODO check absence of mode OK
         document
-            .querySelectorAll(`.all-simulations-wrapper`)
+            .querySelectorAll('.all-simulations-wrapper')
             .forEach((el) => (el.innerHTML = ''))
     }
     displayEmptyState()
@@ -664,13 +527,14 @@ export function displayDimensionInputFields(id) {
 export function getFrequencyValue() {
     return document.getElementById('frequency').value
 }
-export function getDailyValue() {
-    return document.getElementById('daily').value
+export function getDailyEventCountPerBucket() {
+    return document.getElementById('event-count-daily-bucket').value
 }
 
-export function getEventCount() {
-    return document.getElementById('event-count').value
+export function getDailyEventCountTotal() {
+    return document.getElementById('event-count-daily-total').value
 }
+
 export function getMaxCountPerPurchaseValue() {
     return document.getElementById('count').value
 }
@@ -701,93 +565,6 @@ export function getAllDimensionNamesFromDom() {
     return ids
 }
 
-export function displaySimulationResults_advancedMode(
-    mainDiv,
-    simulation,
-    metricName,
-    scalingFactor,
-    keyCombinationString,
-    simulationId,
-    simulationNo,
-    metricsNo
-) {
-    hideEmptyState()
-
-    const allSimulationsWrapper = mainDiv
-
-    const { data, noise_ape_percent, noise_rmsre } = simulation
-    // TODO make simulationID part of the sim object
-
-    // Prepare wrapper div that will contain the simulation
-    const simulationWrapperDiv = document.createElement('div')
-    simulationWrapperDiv.setAttribute(
-        'id',
-        generateSimulationWrapperElId(`${simulationId}-${metricsNo}`)
-    )
-    allSimulationsWrapper.appendChild(simulationWrapperDiv)
-
-    const metricTag = document.createElement('h4')
-    metricTag.innerText = 'Measurement goal: ' + metricName
-    allSimulationsWrapper.appendChild(metricTag)
-
-    // Display noise
-    displayNoiseAsPercentage(
-        allSimulationsWrapper,
-        noise_ape_percent,
-        noise_rmsre
-    )
-    // Display details section title
-    displayDataDetailsTitle(allSimulationsWrapper)
-    allSimulationsWrapper.appendChild(document.createElement('br'))
-    // Display dimensions
-    displayDimensionsInOutput(allSimulationsWrapper, keyCombinationString)
-    // Display scaling factor
-    displayScalingFactor(allSimulationsWrapper, scalingFactor)
-
-    // Add current report in the simulation wrapper div
-    // Display table containing report data
-    const dataTableTitle = document.createElement('h6')
-    dataTableTitle.innerText = 'Data table:'
-    simulationWrapperDiv.appendChild(dataTableTitle)
-    const tableId = `output-data-table-${simulationId}-${metricName}-${simulationNo}`
-    const tableWrapperEl = document.createElement('details')
-    tableWrapperEl.setAttribute('id', tableId)
-    tableWrapperEl.setAttribute('class', 'offset-left')
-    simulationWrapperDiv.appendChild(tableWrapperEl)
-
-    var table = new TabulatorFull(`#${tableId}`, {
-        data: data,
-        // Create columns from data field names
-        autoColumns: true,
-        layout: 'fitColumns',
-        pagination: true,
-        paginationSize: 5,
-    })
-
-    tempSaveTable_advancedMode(
-        table,
-        `${simulationId}-${metricName}-${simulationNo}`
-    )
-
-    // Create download button
-    const downloadButton = document.createElement('button')
-    downloadButton.innerHTML = '⬇️ Download table (CSV)'
-    downloadButton.setAttribute('class', 'ternary offset-left')
-    simulationWrapperDiv.appendChild(downloadButton)
-
-    // Create eventListener for download of csv file
-    downloadButton.addEventListener('click', function () {
-        table.download('csv', generateCsvFileName(simulationId, metricName))
-    })
-
-    allSimulationsWrapper.appendChild(simulationWrapperDiv)
-
-    simulationWrapperDiv.scrollIntoView({ block: 'end' })
-
-    // Update tooltips
-    updateTooltips()
-}
-
 export function resetDimensionsDiv() {
     const dimensionsConfigDiv = document.getElementById('dimensions-div')
     dimensionsConfigDiv.innerHTML = ''
@@ -806,45 +583,6 @@ export function getMetricsArrayFromDom() {
     }
 
     return metrics
-}
-
-export function createSimulationDiv(simulationId, inputParameters) {
-    var allSimulationsWrapper = document.getElementById(
-        'all-simulations-wrapper-advanced-mode'
-    )
-
-    var simulationDiv = document.createElement('div')
-    simulationDiv.setAttribute('id', 'simulation-div' + simulationId)
-    simulationDiv.setAttribute('class', 'simulation-wrapper-advanced-mode')
-
-    // Display simulation main info in the simulation wrapper div
-    const simulationTitleDiv = document.createElement('h2')
-    simulationTitleDiv.innerText = generateSimulationTitle(new Date(Date.now()))
-    simulationDiv.appendChild(simulationTitleDiv)
-
-    const simulationIdDiv = document.createElement('div')
-    simulationIdDiv.setAttribute('class', 'simulation-id')
-    simulationIdDiv.innerText = `Unique simulation ID: ${simulationId}`
-    simulationDiv.appendChild(simulationIdDiv)
-
-    allSimulationsWrapper.appendChild(simulationDiv)
-
-    // Display simulation parameters:
-    displayInputParameters(
-        simulationDiv,
-        inputParameters,
-        simulationId,
-        MODES.advanced.name
-    )
-
-    // TODO BUG BATCHING FREQUENCY NOT DISPLAYED -> Should be done later as part of the field unification (populate options dynamically etc)
-    // TODO TWEAK isGranular VS keyStrategy
-
-    // Start reports section in div
-    const reportsTitleDiv = document.createElement('h3')
-    reportsTitleDiv.innerText = 'Summary reports (output)'
-    simulationDiv.appendChild(reportsTitleDiv)
-    return simulationDiv
 }
 
 export function getDimensionsArrayFromDom() {
@@ -1244,9 +982,9 @@ export function getNumberOfBuckets() {
 }
 
 export function updateDailyPerBucket() {
-    const dailyTotal = document.getElementById('event-count').value
+    const dailyTotal = document.getElementById('event-count-daily-total').value
     const nbOfBuckets = getNumberOfBuckets()
-    const d = document.getElementById('daily')
+    const d = document.getElementById('event-count-daily-bucket')
     d.value = Math.floor(dailyTotal / nbOfBuckets)
 }
 
@@ -1295,7 +1033,7 @@ function validateMetrics(metrics, errors) {
         if (element.avgValue * 1 > element.maxValue * 1)
             errors.push(
                 element.name +
-                ' - maximum value cannot be smaller than average value'
+                    ' - maximum value cannot be smaller than average value'
             )
     })
 }
@@ -1325,7 +1063,7 @@ function validateBudgetPercentages(metrics, errors) {
     ) {
         errors.push(
             'The sum of all budget split values exceeds the total contribution budget ' +
-            getContributionBudgetFromDom()
+                getContributionBudgetFromDom()
         )
     }
 
@@ -1333,9 +1071,9 @@ function validateBudgetPercentages(metrics, errors) {
         !getIsPercentageBudgetSplitFromDom() &&
         !getIsKeyStrategyGranularFromDom() &&
         sumOfAllPercentages >
-        Math.floor(
-            getContributionBudgetFromDom() / getKeyStrategiesNumberFromDom()
-        )
+            Math.floor(
+                getContributionBudgetFromDom() / getKeyStrategiesNumberFromDom()
+            )
     ) {
         errors.push(
             'The sum of all budget split values exceeds the total contribution budget per key - <total contribution budget>/<total number of keys>'
@@ -1379,14 +1117,14 @@ function validateKeyStrategy(errors) {
         if (noChecked < 2)
             errors.push(
                 'Key structure ' +
-                i +
-                ': at least 2 dimensions should be checked for each key structure'
+                    i +
+                    ': at least 2 dimensions should be checked for each key structure'
             )
     }
 }
 
 function validateConversionsPerBucket(errors) {
-    var convPerBucket = getDailyConversionCountFromDom()
+    var convPerBucket = getDailyEventCountPerBucket()
 
     if (convPerBucket < 1) {
         errors.push(
@@ -1400,8 +1138,7 @@ export function getScalingApproachFromDom() {
 }
 
 export function getZeroConversionsPercentageFromDom() {
-    if (getCurrentModeFromUrl() == 'simple')
-        return true
+    if (getCurrentModeFromUrl() == 'simple') return true
     return document.getElementById('zero-pct').value
 }
 
@@ -1413,26 +1150,11 @@ export function loadPython() {
     pyScriptSection.appendChild(pyCodeText)
 }
 
-
-
-
-
-
-/*
-
-NEW DISPLAY UNIFIED FUNCTION
-
-*/
-
-
-
-export function displaySimulationResults_unified(simulation, mode) {
-
+export function displaySimulationResults(simulation) {
     hideEmptyState()
-    console.log(simulation)
 
     const allSimulationsWrapper = document.getElementById(
-        `all-simulations-wrapper-${mode}-mode`
+        'all-simulations-wrapper'
     )
     const { metadata, inputParameters, summaryReports } = simulation
     const { simulationTitle, simulationId } = metadata
@@ -1443,7 +1165,7 @@ export function displaySimulationResults_unified(simulation, mode) {
         'id',
         generateSimulationWrapperElId(simulationId)
     )
-    simulationWrapperDiv.setAttribute('class', `simulation-wrapper-${mode}-mode`)
+    simulationWrapperDiv.setAttribute('class', 'simulation-wrapper')
     allSimulationsWrapper.appendChild(simulationWrapperDiv)
     const simulationInputWrapperDiv = document.createElement('div')
     const simulationOutputWrapperDiv = document.createElement('div')
@@ -1465,8 +1187,7 @@ export function displaySimulationResults_unified(simulation, mode) {
     displayInputParameters(
         simulationInputWrapperDiv,
         inputParameters,
-        simulationId,
-        MODES.simple.name
+        simulationId
     )
 
     // Display reports in the output simulation wrapper div
@@ -1475,7 +1196,7 @@ export function displaySimulationResults_unified(simulation, mode) {
     simulationOutputWrapperDiv.appendChild(reportsTitleDiv)
 
     summaryReports.forEach((report, index) => {
-        displayReportUnified(
+        displayReport(
             simulationOutputWrapperDiv,
             report,
             simulationId,
@@ -1487,14 +1208,12 @@ export function displaySimulationResults_unified(simulation, mode) {
     simulationWrapperDiv.scrollIntoView({ block: 'end' })
 }
 
-
-
-function displayReportUnified(
+function displayReport(
     parentDomEl,
     report,
     simulationId,
     simulationNo,
-    keyCombinationDisplay
+    dimensionsString
 ) {
     const { noiseMetrics, data, measurementGoal, scalingFactor } = report
     const { noise_ape_percent, noise_rmsre } = noiseMetrics
@@ -1509,7 +1228,7 @@ function displayReportUnified(
     displayDataDetailsTitle(parentDomEl)
     parentDomEl.appendChild(document.createElement('br'))
     // Display dimensions
-    displayDimensionsInOutput(parentDomEl, keyCombinationDisplay)
+    displayDimensionsInOutput(parentDomEl, dimensionsString)
     // Display scaling factor
     displayScalingFactor(parentDomEl, scalingFactor)
 
@@ -1534,18 +1253,7 @@ function displayReportUnified(
     })
 
     // Save table temporarily; used for XLSX multi-table download
-    console.log("CURRENT MODE:")
-    console.log(getCurrentModeFromUrl())
-
-    if (getCurrentModeFromUrl() == 'simple') {
-        tempSaveTable_simpleMode(table, `${simulationId}-${measurementGoal}`)
-    }
-    else {
-        tempSaveTable_advancedMode(
-            table,
-            `${simulationId}-${measurementGoal}-${simulationNo}`
-        )
-    }
+    saveTable(table, `${simulationId}-${measurementGoal}-${simulationNo}`)
 
     // Create download button
     const downloadButton = document.createElement('button')
@@ -1566,8 +1274,8 @@ function displayReportUnified(
     updateTooltips()
 }
 
-
 window.generateKeyStructures = generateKeyStructures
 window.capEpsilon = capEpsilon
 window.updateDailyPerBucket = updateDailyPerBucket
 window.resetUi = resetUi
+window.downloadAllDom = downloadAllDom

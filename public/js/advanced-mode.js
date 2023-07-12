@@ -19,7 +19,7 @@ import {
     getEpsilonFromDom,
     getBatchingFrequencyFromDom,
     getAllDimensionSizes,
-    displaySimulationResults_unified,
+    displaySimulationResults,
     getMetricsArrayFromDom,
     getDimensionsArrayFromDom,
     getIsKeyStrategyGranularFromDom,
@@ -34,33 +34,17 @@ import {
     getIsUseScalingFromDom,
     displayBudgetSplit,
     loadPython,
-    getEventCount,
+    getDailyEventCountPerBucket,
+    getDailyEventCountTotal,
+    updateDailyPerBucket,
 } from './dom'
-import {
-    tempSaveTable,
-    downloadAll
-} from './utils.misc'
 import {
     CONTRIBUTION_BUDGET,
     DEFAULT_MEASUREMENT_GOALS,
     DEFAULT_DIMENSIONS,
 } from './config'
 
-import { triggerSimulation } from './main'
-
-let allSimulationDataTables_advancedMode = {}
-
-export function tempSaveTable_advancedMode(table, tableTitle) {
-    allSimulationDataTables_advancedMode = tempSaveTable(
-        table,
-        tableTitle,
-        allSimulationDataTables_advancedMode
-    )
-}
-
-export function downloadAll_advancedMode() {
-    downloadAll(allSimulationDataTables_advancedMode)
-}
+import { simulate } from './utils.simulate'
 
 export function initializeDisplay_advancedMode() {
     loadPython()
@@ -74,8 +58,8 @@ export function initializeDisplay_advancedMode() {
     displayBudgetSplit()
 }
 
-export function simulateAndDisplayResultsAdvancedMode() {
-    const simulation = triggerSimulation(
+export function simulateAndDisplayResults_advancedMode() {
+    const simulation = simulate(
         getMetricsArrayFromDom(),
         getDimensionsArrayFromDom(),
         getAllDimensionNamesFromDom(),
@@ -85,10 +69,11 @@ export function simulateAndDisplayResultsAdvancedMode() {
         getIsUseScalingFromDom(),
         getIsKeyStrategyGranularFromDom(),
         getBatchingFrequencyFromDom(),
-        getEventCount()
+        getDailyEventCountPerBucket(),
+        getDailyEventCountTotal()
     )
 
-    displaySimulationResults_unified(simulation, "advanced")
+    displaySimulationResults(simulation)
 }
 
 export function resetMetrics() {
@@ -103,10 +88,8 @@ export function resetDimensions() {
     displayDimensions(DEFAULT_DIMENSIONS)
 }
 
-window.simulateAndDisplayResultsAdvancedMode =
-    simulateAndDisplayResultsAdvancedMode
-window.downloadAll_advancedMode = downloadAll_advancedMode
-
+window.simulateAndDisplayResults_advancedMode =
+    simulateAndDisplayResults_advancedMode
 window.addMetric = addMetric
 window.removeMetric = removeMetric
 window.resetMetrics = resetMetrics

@@ -18,23 +18,17 @@ import {
     getBatchingFrequencyFromDom,
     getEpsilonFromDom,
     getIsUseScalingFromDom,
-    getBudgetValueForMetricIdFromDom,
     loadPython,
-    displaySimulationResults_unified,
-    getIsKeyStrategyGranularFromDom
+    displaySimulationResults,
+    getIsKeyStrategyGranularFromDom,
+    getDailyEventCountPerBucket,
 } from './dom'
-import {
-    downloadAll,
-    tempSaveTable,
-} from './utils.misc'
 import {
     CONTRIBUTION_BUDGET,
     DEFAULT_MEASUREMENT_GOALS,
     DEFAULT_DIMENSIONS,
 } from './config'
-import { triggerSimulation } from './main'
-
-let allSimulationDataTables_simpleMode = {}
+import { simulate } from './utils.simulate'
 
 export function initializeDisplay_simpleMode() {
     loadPython()
@@ -51,26 +45,11 @@ export function initializeDisplay_simpleMode() {
     )
 }
 
-export function tempSaveTable_simpleMode(table, tableTitle) {
-    allSimulationDataTables_simpleMode = tempSaveTable(
-        table,
-        tableTitle,
-        allSimulationDataTables_simpleMode
-    )
-}
-
-export function downloadAll_simpleMode() {
-    downloadAll(allSimulationDataTables_simpleMode)
-}
-
-export function simulateAndDisplayResultsSimpleMode() {
-
+export function simulateAndDisplayResults_simpleMode() {
     const dimensionNames = DEFAULT_DIMENSIONS.map((dim) => dim.name)
-    console.log(dimensionNames)
     const dimensionSizes = DEFAULT_DIMENSIONS.map((dim) => dim.size)
-    console.log(dimensionSizes)
 
-    const simulation = triggerSimulation(
+    const simulation = simulate(
         DEFAULT_MEASUREMENT_GOALS,
         DEFAULT_DIMENSIONS,
         dimensionNames,
@@ -80,12 +59,13 @@ export function simulateAndDisplayResultsSimpleMode() {
         getIsUseScalingFromDom(),
         getIsKeyStrategyGranularFromDom(),
         getBatchingFrequencyFromDom(),
-        getBatchingFrequencyFromDom()
+        getDailyEventCountPerBucket(),
+        // last param not needed in the simple mode
+        undefined
     )
 
-    displaySimulationResults_unified(simulation, "simple")
+    displaySimulationResults(simulation)
 }
 
-
-window.downloadAll_simpleMode = downloadAll_simpleMode
-window.simulateAndDisplayResultsSimpleMode = simulateAndDisplayResultsSimpleMode
+window.simulateAndDisplayResults_simpleMode =
+    simulateAndDisplayResults_simpleMode

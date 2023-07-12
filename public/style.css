@@ -213,8 +213,7 @@ main {
     max-width: 100%;
 }
 
-.simulation-wrapper-simple-mode,
-.simulation-wrapper-advanced-mode {
+.simulation-wrapper {
     width: calc(100% - 6rem);
     padding: 1rem 2rem 2rem 2rem;
     margin: 3rem 1rem;

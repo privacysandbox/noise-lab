@@ -77,7 +77,7 @@ export function simulateAndDisplayResults_advancedMode() {
 }
 
 export function resetMetrics() {
-    displayMetrics(defaultMetrics)
+    displayMetrics(DEFAULT_MEASUREMENT_GOALS)
 }
 
 export function resetBudgetSplit() {

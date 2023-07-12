@@ -120,18 +120,6 @@ export function populateSelectDomElement(selectDomElement, options) {
     })
 }
 
-export function initializeDisplayAdvancedMode(metrics, dimensions, budget) {
-    updateDailyPerBucket()
-    displayContributionBudget(budget)
-    addKeyStrategyListener()
-    addScalingListener()
-    displayMetrics(metrics)
-    displayBudgetSplit()
-    addMetricsButtons()
-    displayDimensions(dimensions)
-    addDimensionsButtons()
-}
-
 export function displayBudgetSplit() {
     const budgetSplitWrapperEl = document.getElementById(
         'budget-split-wrapper-el'
@@ -189,31 +177,6 @@ export function initializeDisplayGeneric() {
     populateSelectDomElement(
         document.getElementById('batching-frequency-select'),
         Object.values(BATCHING_FREQUENCIES)
-    )
-    addScalingListener()
-}
-
-export function initializeDisplaySimpleMode(
-    keyStrategies, // as array
-    batchingFrequencies, // as array
-    metrics,
-    dimensions,
-    budget
-) {
-    displayContributionBudget(budget)
-    populateSelectDomElement(
-        document.getElementById('key-strategy-select'),
-        keyStrategies
-    )
-    populateSelectDomElement(
-        document.getElementById('batching-frequency-select'),
-        batchingFrequencies
-    )
-    displayTabularData(document.getElementById('metrics'), metrics, false)
-    displayTabularData(
-        document.getElementById('dimensions-table'),
-        dimensions,
-        false
     )
     addScalingListener()
 }
@@ -493,50 +456,12 @@ function clearSimulationArea() {
 // Functions needed for ADVANCED MODE
 // !!!!!!!!!
 
-export function getNumberOfKeysFromDom() {
-    return document.getElementById('dimensions-number').value
-}
-
-export function displayDimensionInputFields(id) {
-    const dimensionsConfigDiv = document.getElementById('dimensions-div')
-    const dimensionId = document.createElement('div')
-    const dimensionTitle = document.createElement('h3')
-    dimensionTitle.innerHTML = 'Dimension ' + id
-    dimensionId.id = 'dimension' + id
-    dimensionId.appendChild(dimensionTitle)
-
-    const dimensionSize = document.createElement('input')
-    dimensionSize.type = 'number'
-    dimensionSize.id = 'dimension' + id + '-size'
-    dimensionSize.setAttribute('placeholder', 'Dimension size')
-    dimensionSize.setAttribute('class', 'dimension-size')
-
-    const dimensionName = document.createElement('input')
-    dimensionName.type = 'text'
-    dimensionName.id = 'dimension' + id + '-name'
-    dimensionName.setAttribute('placeholder', 'Dimension name')
-
-    dimensionId.appendChild(dimensionSize)
-    dimensionId.appendChild(document.createElement('br'))
-    dimensionId.appendChild(dimensionName)
-    dimensionsConfigDiv.appendChild(dimensionId)
-
-    updateDailyPerBucket()
-}
-
-export function getFrequencyValue() {
-    return document.getElementById('frequency').value
-}
 export function getDailyEventCountPerBucket() {
     return document.getElementById('event-count-daily-bucket').value
 }
 
 export function getDailyEventCountTotal() {
     return document.getElementById('event-count-daily-total').value
-}
-
-export function getMaxCountPerPurchaseValue() {
-    return document.getElementById('count').value
 }
 
 export function getElementValueById(id) {
@@ -563,11 +488,6 @@ export function getAllDimensionNamesFromDom() {
         ids.push(document.getElementById('dimension' + i + '-name').value)
     }
     return ids
-}
-
-export function resetDimensionsDiv() {
-    const dimensionsConfigDiv = document.getElementById('dimensions-div')
-    dimensionsConfigDiv.innerHTML = ''
 }
 
 export function getMetricsArrayFromDom() {
@@ -1131,10 +1051,6 @@ function validateConversionsPerBucket(errors) {
             'The daily conversion count is too low. Please increase it so there is at least 1 conversion per bucket'
         )
     }
-}
-
-export function getScalingApproachFromDom() {
-    return document.getElementById('scaling-approach').value
 }
 
 export function getZeroConversionsPercentageFromDom() {

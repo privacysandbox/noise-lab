@@ -20,10 +20,6 @@ export function generateSimulationTitle(dateTime) {
     return `Simulation ${dateTime.toLocaleTimeString()} ${dateTime.toLocaleDateString()} `
 }
 
-export function generateCsvFileName(simulationId, tableName) {
-    return `${simulationId}-${tableName}-noiseLab.csv`
-}
-
 export function generateRandomTableId(prefix = '') {
     return `data-table-${prefix}-${crypto.randomUUID().substring(0, 5)}`
 }
@@ -34,36 +30,4 @@ export function generateSimulationWrapperElId(simulationId) {
 
 export function generateConfirmMessage() {
     return 'This will clear all simulations, so make sure to download your simulation data before you continue. Continue?'
-}
-
-export function tempSaveTable(
-    // newTable must be a TabulatorFull object
-    newTable,
-    newTableTitle,
-    allSimulationDataTables
-) {
-    return {
-        ...allSimulationDataTables,
-        // tableTitle already includes the simulation Id
-        [`${newTableTitle}`]: newTable,
-    }
-}
-
-export function downloadAll(allSimulationDataTables) {
-    const dummyTableId = Object.keys(allSimulationDataTables)[0]
-    const dummyTable = allSimulationDataTables[dummyTableId]
-    // This is a hack; the TabulatorFull lib seems to have a bug where the first table isn't displayed unless we use the `table: true` syntax below
-    delete allSimulationDataTables[dummyTableId]
-
-    const d = new Date()
-    dummyTable.download(
-        'xlsx',
-        `Noise Lab ${d.toLocaleTimeString()} ${d.toLocaleDateString()}.xlsx`,
-        {
-            sheets: {
-                [`${dummyTableId}`]: true,
-                ...allSimulationDataTables,
-            },
-        }
-    )
 }

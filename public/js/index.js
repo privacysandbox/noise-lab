@@ -1,7 +1,8 @@
+import 'preact/debug'
 import { h, render, Component, Fragment } from 'preact'
 import { APP_VERSION, APP_NAME, MODES } from './config'
 import { Header } from './components/Header.jsx'
-// import { Main } from './components/Main.jsx'
+import { Main } from './components/Main.jsx'
 
 // Get the name of the currently selected mode
 // https:<BASE-URL>/?mode=simple
@@ -24,7 +25,7 @@ class App extends Component {
                     version={APP_VERSION}
                     currentMode={getCurrentModeFromUrl()}
                 ></Header>
-                {/* <Main currentMode={getCurrentModeFromUrl()}></Main> */}
+                <Main currentMode={getCurrentModeFromUrl()}></Main>
             </Fragment>
         )
     }

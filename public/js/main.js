@@ -12,74 +12,78 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import { generateConfirmMessage } from './utils.misc'
-import { initializeDisplay_simpleMode } from './simple-mode'
-import { initializeDisplay_advancedMode } from './laplace'
-import { APP_VERSION, MODES, modeSearchQueryParams } from './config'
+// import { generateConfirmMessage } from './utils.misc'
+// import { initializeDisplay_simpleMode } from './simple-mode'
+// import { initializeDisplay_advancedMode } from './advanced-mode'
+// import { APP_VERSION, MODES, modeSearchQueryParams } from './config'
+// import { resetData } from './store'
 
-// Generate navigation menu automatically based on the available modes
-function generateMenu() {
-    const navWrapper = document.getElementById('nav')
-    Object.values(MODES).forEach((mode) => {
-        const { searchQueryParam, displayName } = mode
-        const a = document.createElement('a')
-        a.setAttribute(
-            'data-href',
-            `${location.origin}${location.pathname}?mode=${mode.searchQueryParam}`
-        )
-        a.setAttribute('id', searchQueryParam)
-        a.addEventListener('click', () => {
-            if (window.confirm(generateConfirmMessage())) {
-                window.location = `${location.origin}${location.pathname}?mode=${mode.searchQueryParam}`
-            }
-        })
-        a.innerText = displayName
-        navWrapper.appendChild(a)
-    })
-}
 
-function displayVersionNumber() {
-    document.getElementById('app-version').innerText = APP_VERSION
-}
+// TODO-CLEAN Delete this whole file
+// // Generate navigation menu automatically based on the available modes
+// function generateMenu() {
+//     const navWrapper = document.getElementById('nav')
+//     Object.values(MODES).forEach((mode) => {
+//         const { searchQueryParam, displayName } = mode
+//         const a = document.createElement('a')
+//         a.setAttribute(
+//             'data-href',
+//             `${location.origin}${location.pathname}?mode=${mode.searchQueryParam}`
+//         )
+//         a.setAttribute('id', searchQueryParam)
+//         a.addEventListener('click', () => {
+//             if (window.confirm(generateConfirmMessage())) {
+//                 window.location = `${location.origin}${location.pathname}?mode=${mode.searchQueryParam}`
+//                 resetData()
+//             }
+//         })
+//         a.innerText = displayName
+//         navWrapper.appendChild(a)
+//     })
+// }
 
-function getCurrentModeFromUrl() {
-    const urlParams = new URLSearchParams(window.location.search)
-    let mode = urlParams.get('mode')
-    return mode
-}
+// function displayVersionNumber() {
+//     document.getElementById('app-version').innerText = APP_VERSION
+// }
 
-window.addEventListener('load', function (event) {
-    generateMenu()
-    displayVersionNumber()
+// export function getCurrentModeFromUrl() {
+//     const urlParams = new URLSearchParams(window.location.search)
+//     let mode = urlParams.get('mode')
+//     return mode
+// }
 
-    // If the mode is unknown, redirect to simple mode (= fallback mode)
-    if (!modeSearchQueryParams.includes(getCurrentModeFromUrl())) {
-        window.location.href = `${location.origin}${location.pathname}?mode=${MODES.simple.searchQueryParam}`
-    }
+// window.addEventListener('load', function (event) {
+//     generateMenu()
+//     displayVersionNumber()
 
-    // Highlight current menu item
-    document.querySelectorAll('nav a').forEach((navItem) => {
-        if (navItem.getAttribute('data-href') === document.URL) {
-            navItem.className = 'current-menu-item'
-        }
-    })
+//     // If the mode is unknown, redirect to simple mode (= fallback mode)
+//     if (!modeSearchQueryParams.includes(getCurrentModeFromUrl())) {
+//         window.location.href = `${location.origin}${location.pathname}?mode=${MODES.simple.searchQueryParam}`
+//     }
 
-    // Display correct section and hide the other ones
-    const allSections = document.querySelectorAll('.mode-section')
-    allSections.forEach((section) => {
-        if (section.id !== `${getCurrentModeFromUrl()}-mode`) {
-            // Mode isn't selected => remove it from the DOM
-            section.parentElement.removeChild(section)
-        }
-    })
+//     // Highlight current menu item
+//     document.querySelectorAll('nav a').forEach((navItem) => {
+//         if (navItem.getAttribute('data-href') === document.URL) {
+//             navItem.className = 'current-menu-item'
+//         }
+//     })
 
-    // Initialize parameters and fields for the current mode
-    const mode = getCurrentModeFromUrl()
-    if (mode === MODES.simple.searchQueryParam) {
-        initializeDisplay_simpleMode()
-    } else if (mode === MODES.advanced.searchQueryParam) {
-        initializeDisplay_advancedMode()
-    } else {
-        throw new Error('mode unkown')
-    }
-})
+//     // Display correct section and hide the other ones
+//     const allSections = document.querySelectorAll('.mode-section')
+//     allSections.forEach((section) => {
+//         if (section.id !== `${getCurrentModeFromUrl()}-mode`) {
+//             // Mode isn't selected => remove it from the DOM
+//             section.parentElement.removeChild(section)
+//         }
+//     })
+
+//     // Initialize parameters and fields for the current mode
+//     const mode = getCurrentModeFromUrl()
+//     if (mode === MODES.simple.searchQueryParam) {
+//         initializeDisplay_simpleMode()
+//     } else if (mode === MODES.advanced.searchQueryParam) {
+//         initializeDisplay_advancedMode()
+//     } else {
+//         throw new Error('mode unkown')
+//     }
+// })

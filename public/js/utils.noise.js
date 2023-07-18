@@ -38,8 +38,8 @@ export function getRandomLaplacianNoise(budget, epsilon) {
     return randomLaplacianNoise
 }
 
-export function calculateNoisePercentage(noise, summaryValue_unnoisy) {
-    return Math.abs(noise / summaryValue_unnoisy)
+export function calculateNoisePercentage(noise, summaryValue_noiseless) {
+    return Math.abs(noise / summaryValue_noiseless)
 }
 
 export function calculateAverageNoisePercentage(report) {

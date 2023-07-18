@@ -3,7 +3,6 @@ import { Navigation } from './Navigation'
 
 export function Header(props) {
     const { name, version, currentMode } = props
-    console.log(name)
     return (
         <div id="menu">
             <div class="flex">

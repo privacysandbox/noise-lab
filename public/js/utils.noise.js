@@ -78,6 +78,35 @@ export function getNoise_Rmsre(
     return Number.parseFloat(rmsre_t.toFixed(5))
 }
 
+export function generateDataset(
+    rate_of_size_1,
+    rate_of_size_2,
+    average_conversion_per_impression,
+    impression_side_dimensions,
+    conversion_side_dimensions,
+    mpc
+) {
+    data_function_js = pyscript.runtime.globals.get('generate_dataset')
+    // data_result is a JS Map.
+    // Each key is a unique key MPC value (so we could in theory get data generated for e.g. MPC=4, MPC=1 etc. if we decided to change the value of t or to parametrize it in the frontend for users to change).
+    // Each key's corresponding value is another JS Map
+    // Key of this map is a unique key combination
+    // Value is a number - the synthetically generated summary value
+    const data_result = data_function_js(
+        rate_of_size_1,
+        rate_of_size_2,
+        average_conversion_per_impression,
+        impression_side_dimensions,
+        conversion_side_dimensions,
+        mpc
+    )
+    // Get the rmsre_t average for RMSRE_THRESHOLD
+    console.log(data_result)
+    //const result = data_result.get(mpc)
+    const obj = JSON.parse(data_result)
+    return obj
+}
+
 // ADVANCED MODE UTILS
 
 export function calculateMaximumCount(frequency, daily, count) {
@@ -166,6 +195,40 @@ export function generateSummaryValue(
     // result is the product between variated metric value, variated conversion count per current bucket and frequency
     var res = Math.floor(
         deterministicNumber * dailyConversionValue * batchingFrequency
+    )
+
+    return res
+}
+
+export function generateSummaryValuePro(
+    conversionsNo,
+    metric,
+    deterministicValue,
+    batchingFrequency,
+) {
+    // every 20th bucket gets 0 conversions -> ~5%
+
+
+    // Calculate deterministic Number - variation between 0 and metric max
+    // If the avg and max are equal, all buckets will be calculated with this value, no variation added
+    if (metric.avgValue == metric.maxValue)
+        var deterministicNumber = metric.avgValue
+    else {
+        var deterministicNumber = Math.abs(
+            metric.avgValue * 1 +
+                deterministicValue * 1 * (deterministicValue % 2 == 0 ? 1 : -1)
+        )
+        if (deterministicNumber == 0) deterministicNumber = metric.avgValue
+        deterministicNumber = Math.min(deterministicNumber, metric.maxValue)
+    }
+
+    // calculate variation for conversions/bucket
+    // we are adding/deducting the deterministic value
+
+
+    // result is the product between variated metric value, variated conversion count per current bucket and frequency
+    var res = Math.floor(
+        deterministicNumber * conversionsNo * batchingFrequency
     )
 
     return res

@@ -80,7 +80,8 @@ function getContributionBudgetFromDom() {
 }
 
 function getBudgetSplitOptionFromDom() {
-    return document.querySelector('input[name="budget-split-option"]:checked')
+    const mode = getCurrentModeFromUrl()
+    return document.querySelector('input[name="'+mode+'-budget-split-option"]:checked')
         .value
 }
 export function displayTabularData(
@@ -513,9 +514,12 @@ export function getDimensionsArrayFromDom() {
             id: i,
             size: document.getElementById('dimension' + i + '-size').value,
             name: document.getElementById('dimension' + i + '-name').value,
+            side: (document.getElementById('dimension' + i + '-side')) ? document.getElementById('dimension' + i + '-side').value : undefined
         })
     }
 
+    console.log("Dimensions:")
+    console.log(dimensions)
     return dimensions
 }
 
@@ -800,6 +804,42 @@ export function displayDimensions(dimensions) {
         dimensionDiv.appendChild(dimensionSize)
         dimensionDiv.appendChild(document.createElement('br'))
 
+        const mode = getCurrentModeFromUrl()
+
+        if(mode=='pro') {
+
+            var dimensionSide = document.createElement('select')
+            var dimensionSideImpression = document.createElement('option')
+            dimensionSideImpression.setAttribute('value',0)
+            dimensionSideImpression.appendChild(document.createTextNode( 'impression' ) )
+            dimensionSideImpression.setAttribute('selected', 'selected')
+    
+            var dimensionSideConversion = document.createElement('option')
+            dimensionSideConversion.setAttribute('value', 1)
+            dimensionSideConversion.appendChild(document.createTextNode( 'conversion' ) )
+    
+            dimensionSide.setAttribute('id', 'dimension' + element.id + '-side')
+    
+            dimensionSide.setAttribute('placeholder', 'Dimension side')
+            dimensionSide.setAttribute('class', 'dimension-side')
+            dimensionSide.appendChild(dimensionSideImpression)
+            dimensionSide.appendChild(dimensionSideConversion)
+    
+            console.log("ELEMENT SIDE")
+            console.log(element.side)
+            dimensionSide.value = element.side
+    
+            const dimensionSideLabel = document.createElement('label')
+            dimensionSideLabel.innerText =
+                'What kind of dimension this is:'
+            dimensionDiv.appendChild(dimensionSideLabel)
+    
+            dimensionDiv.appendChild(dimensionSide)
+    
+    
+            dimensionDiv.appendChild(document.createElement('br'))
+        }
+
         dimensionsMainDiv.appendChild(dimensionDiv)
 
         updateDailyPerBucket()
@@ -863,6 +903,27 @@ export function addDimension() {
     dimensionSize.addEventListener('input', () => updateDailyPerBucket())
     dimensionDiv.appendChild(dimensionSize)
     dimensionDiv.appendChild(document.createElement('br'))
+
+    const mode = getCurrentModeFromUrl()
+
+    if(mode=='pro') {
+        var dimensionSide = document.createElement('select')
+        var dimensionSideImpression = document.createElement('option')
+        dimensionSideImpression.setAttribute('value',0)
+        dimensionSideImpression.appendChild(document.createTextNode( 'impression' ) )
+        dimensionSideImpression.setAttribute('selected', 'selected')
+        var dimensionSideConversion = document.createElement('option')
+        dimensionSideConversion.setAttribute('value', 1)
+        dimensionSideConversion.appendChild(document.createTextNode( 'conversion' ) )
+        dimensionSide.setAttribute('id', 'dimension' + dimensionsNo+ '-side')
+        dimensionSide.setAttribute('placeholder', 'Dimension side')
+        dimensionSide.setAttribute('class', 'dimension-side')
+        dimensionSide.appendChild(dimensionSideImpression)
+        dimensionSide.appendChild(dimensionSideConversion)
+        dimensionDiv.appendChild(dimensionSide)
+        dimensionDiv.appendChild(document.createElement('br'))
+    }
+
 
     dimensionsMainDiv.appendChild(dimensionDiv)
 }
@@ -1189,6 +1250,25 @@ function displayReport(
     // Update tooltips
     updateTooltips()
 }
+
+// PRO MODE ONLY:
+
+export function getRateOneFromDom(){
+    return document.getElementById('one-conversion-percentage').value / 100
+}
+
+export function getRateTwoFromDom(){
+    return document.getElementById('two-conversion-percentage').value / 100
+}
+
+export function getMpcFromDom() {
+    return parseInt(document.getElementById('MPC').value)
+}
+
+export function getConversionsPerImpressionFromDom(){
+    return parseInt(document.getElementById('conversions-per-impression').value)
+}
+
 
 window.generateKeyStructures = generateKeyStructures
 window.capEpsilon = capEpsilon

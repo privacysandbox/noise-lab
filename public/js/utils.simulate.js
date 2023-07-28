@@ -22,7 +22,13 @@ import {
     getKeyCombinationString,
     getZeroConversionsPercentageFromDom,
     getStrategiesKeyCombinations,
+    getRateOneFromDom,
+    getRateTwoFromDom,
+    getDimensionsArrayFromDom,
+    getMpcFromDom,
+    getConversionsPerImpressionFromDom
 } from './dom'
+import { getCurrentModeFromUrl } from './main'
 import { generateSimulationId, generateSimulationTitle } from './utils.misc'
 import {
     getRandomLaplacianNoise,
@@ -30,8 +36,10 @@ import {
     calculateNoisePercentage,
     generateKeyCombinationArray,
     generateSummaryValue,
+    generateSummaryValuePro,
     calculateAverageNoisePercentageRaw,
     getNoise_Rmsre,
+    generateDataset,
 } from './utils.noise'
 
 // generate dataset
@@ -113,8 +121,8 @@ export function simulate(
                     getIsKeyStrategyGranularFromDom()
                         ? getDailyEventCountPerBucket()
                         : Math.floor(
-                              dailyConversionCountTotal / keyCombList[i].size
-                          ),
+                            dailyConversionCountTotal / keyCombList[i].size
+                        ),
                     i
                 )
             )
@@ -138,27 +146,71 @@ function simulatePerMetric(
     const isPercentage = getIsPercentageBudgetSplitFromDom()
     const scalingFactor = isUseScaling
         ? getScalingFactorForMetric(
-              metric,
-              value,
-              isPercentage,
-              contributionBudget
-          )
+            metric,
+            value,
+            isPercentage,
+            contributionBudget
+        )
         : 1
     const keyCombinationString = getKeyCombinationString(keyCombinations.names)
 
+
+    const mode = getCurrentModeFromUrl()
+    let syntheticData = undefined
+
+    if (mode == 'pro') {
+        const rateOne = getRateOneFromDom()
+        const rateTwo = getRateTwoFromDom()
+
+        const dimensionsArray = getDimensionsArrayFromDom()
+        const filtered = dimensionsArray.filter((dimension) => dimension.side === '0')
+
+        const impressionDimensionsArray = dimensionsArray.filter((dimension) => dimension.side === '0').map(({size})=> parseInt(size))
+        const conversionDimensionsArray = dimensionsArray.filter((dimension) => dimension.side === '1').map(({size})=> parseInt(size))
+        const conversionsPerImpression = getConversionsPerImpressionFromDom()
+
+        const mpc = getMpcFromDom()
+
+        syntheticData = generateDataset(rateOne, rateTwo, conversionsPerImpression, impressionDimensionsArray, conversionDimensionsArray, mpc)
+        console.log("syntheticData")
+        console.log(syntheticData)
+    }   
+
     const report = []
+
+
 
     var noisePercentageSum = 0
     for (let i = 0; i < keyCombinations.combinations.length; i++) {
         const noise = getRandomLaplacianNoise(contributionBudget, epsilon)
 
-        const randCount = generateSummaryValue(
-            metric,
-            i,
-            dailyCount,
-            batchingFrequency,
-            getZeroConversionsPercentageFromDom()
-        )
+        var randCount = 0;
+
+        if(mode == 'pro') 
+        {
+            const dataKey = keyCombinations.combinations[i].toString()
+            const val = syntheticData[dataKey]
+
+            //randCount = generateSummaryValuePro(val, metric, i, batchingFrequency)
+
+            console.log("avgValue")
+            console.log(metric.avgValue)
+            randCount = val * parseInt(metric.avgValue) * batchingFrequency
+            console.log("randCount")
+            console.log(randCount)
+
+        } 
+        else 
+        {
+            randCount = generateSummaryValue(
+                metric,
+                i,
+                dailyCount,
+                batchingFrequency,
+                getZeroConversionsPercentageFromDom()
+            )
+        }
+
 
         const noiseValueAPE = calculateNoisePercentage(
             noise,

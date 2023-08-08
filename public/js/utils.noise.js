@@ -127,14 +127,14 @@ export function generateSummaryValue(
     batchingFrequency,
     zeroPct
 ) {
-    // every 20th bucket gets 0 conversions -> ~5%
-
+    // Every 20th bucket gets 0 conversions -> ~5%
     if (
         zeroPct > 0 &&
-        deterministicValue != 0 &&
-        deterministicValue % Math.abs(100 / zeroPct) == 0
-    )
+        deterministicValue !== 0 &&
+        deterministicValue % Math.abs(100 / zeroPct) === 0
+    ) {
         return 0
+    }
 
     // Calculate deterministic Number - variation between 0 and metric max
     // If the avg and max are equal, all buckets will be calculated with this value, no variation added

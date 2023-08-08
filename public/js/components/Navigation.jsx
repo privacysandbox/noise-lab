@@ -9,7 +9,7 @@ function getClassNameForNavItem(navItemName, currentMode) {
 
 export function Navigation(props) {
     const { currentMode } = props
-    const menuJsx = Object.keys(MODES).map((mode) => {
+    const menuJsx = MODES.map((mode) => {
         const navItemName = mode
         const href = `${location.origin}${location.pathname}?mode=${mode}`
         return (

@@ -16,18 +16,9 @@ export const APP_NAME = '🧪 Noise Lab'
 
 export const APP_VERSION = 'v3.2.0'
 
-export const MODES = {
-    simple: {
-        name: 'simple',
-        searchQueryParam: 'simple',
-        displayName: 'simple mode',
-    },
-    advanced: {
-        name: 'advanced',
-        searchQueryParam: 'advanced',
-        displayName: 'advanced mode',
-    },
-}
+export const SIMPLE = 'simple'
+export const ADVANCED = 'advanced'
+export const MODES = [SIMPLE, ADVANCED]
 
 export const KEY_STRATEGIES = {
     A: { name: 'A', value: 'A' },

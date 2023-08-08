@@ -3,7 +3,7 @@ import { h, render, Component } from 'preact'
 export function Scaling(props) {
     const { setUseScaling, useScaling } = props
 
-    const handleChange = (event) => {
+    function handleChange(event) {
         const inputUseScaling = event.target.value
         // Hack because the value property of an option element can only be a string
         let useScaling = true

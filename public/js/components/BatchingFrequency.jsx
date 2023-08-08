@@ -7,7 +7,7 @@ export function BatchingFrequency(props) {
         batchingFrequenciesOptions,
     } = props
 
-    const handleChange = (event) => {
+    function handleChange(event) {
         const inputBatchingFrequency = event.target.value
         setBatchingFrequency(inputBatchingFrequency)
     }

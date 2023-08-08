@@ -7,7 +7,7 @@ export function CountPerBucket(props) {
         dailyEventCountPerBucketOptions,
     } = props
 
-    const handleChange = (event) => {
+    function handleChange(event) {
         const inputCountPerBucket = event.target.value
         setDailyEventCountPerBucket(inputCountPerBucket)
     }
@@ -17,11 +17,7 @@ export function CountPerBucket(props) {
             <label>
                 Average daily attributable conversion count PER BUCKET:
             </label>
-            <select
-                onInput={handleChange}
-                name="event-count-daily-bucket"
-                id="event-count-daily-bucket"
-            >
+            <select onInput={handleChange} name="event-count-daily-bucket">
                 {Object.values(dailyEventCountPerBucketOptions).map((c) => (
                     <option
                         selected={c.value === dailyEventCountPerBucket}

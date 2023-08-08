@@ -1,5 +1,6 @@
 import { h, render, Component } from 'preact'
 
+// TODO-refactor make capEpsilon a utility function
 function capEpsilon(inputEpsilon) {
     if (inputEpsilon < 0) {
         return 0
@@ -11,11 +12,10 @@ function capEpsilon(inputEpsilon) {
 export function Epsilon(props) {
     const { setEpsilon, epsilon } = props
 
-    const handleChange = (event) => {
+    function handleChange(event) {
         const inputEpsilon = event.target.value
         const cappedEpsilon = capEpsilon(inputEpsilon)
-
-        // update the state in the parent component
+        // Update the state in the parent component
         setEpsilon(cappedEpsilon)
     }
 

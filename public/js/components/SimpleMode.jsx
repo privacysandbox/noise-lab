@@ -10,7 +10,7 @@ import {
     CONTRIBUTION_BUDGET,
     BATCHING_FREQUENCIES,
     DEFAULT_EPSILON,
-    EVENT_COUNT_PER_BUCKET,
+    EVENT_COUNT_PER_BUCKET_OPTIONS,
     KEY_STRATEGIES,
 } from '../config'
 import { Epsilon } from './Epsilon'
@@ -25,7 +25,8 @@ import { SimulationsList } from './SimulationsList'
 
 // Default values for simulation parameters
 const defaultUseScaling = true
-const defaultDailyEventCountPerBucket = EVENT_COUNT_PER_BUCKET[100].value
+const defaultDailyEventCountPerBucket =
+    EVENT_COUNT_PER_BUCKET_OPTIONS[100].value
 const defaultKeyStrategy = KEY_STRATEGIES.A.value
 const defaultBatchingFrequency = BATCHING_FREQUENCIES.daily.value
 const defaultBudgetSplit = DEFAULT_MEASUREMENT_GOALS.map((m) => ({
@@ -133,7 +134,7 @@ export function SimpleMode(props) {
                             <h3>Your conversion data</h3>
                             <CountPerBucket
                                 dailyEventCountPerBucketOptions={
-                                    EVENT_COUNT_PER_BUCKET
+                                    EVENT_COUNT_PER_BUCKET_OPTIONS
                                 }
                                 dailyEventCountPerBucket={
                                     dailyEventCountPerBucket
@@ -170,13 +171,15 @@ export function SimpleMode(props) {
                             />
                             <ContributionBudgetSplit
                                 budgetSplit={budgetSplit}
-                                setBudgetSplit={setKeyStrategy}
-                                disabled={true}
+                                setBudgetSplit={setBudgetSplit}
+                                disabled
                             />
+                            <h4>Key strategy:</h4>
                             <KeyStrategy
                                 keyStrategiesOptions={KEY_STRATEGIES}
                                 keyStrategy={keyStrategy}
                                 setKeyStrategy={setKeyStrategy}
+                                disabled
                             />
                         </div>
                     </div>

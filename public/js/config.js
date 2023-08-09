@@ -33,16 +33,24 @@ export const BATCHING_FREQUENCIES = {
     monthly: { name: 'monthly', value: 30 },
 }
 
-export const EVENT_COUNT_PER_BUCKET = {
-    // value represents the multiplier on a daily reference value
+export const EVENT_COUNT_PER_BUCKET_OPTIONS = {
+    // `value` represents the multiplier on a daily reference value
     5: { name: '5', value: 5 },
     10: { name: '10', value: 10 },
     100: { name: '100', value: 100 },
     1000: { name: '1000', value: 1000, isDefault: true },
     10000: { name: '10000', value: 10000 },
     100000: { name: '100000', value: 100000 },
+}
 
-
+export const EVENT_COUNT_TOTAL_OPTIONS = {
+    // `value` represents the multiplier on a daily reference value
+    5: { name: '5', value: 5 },
+    10: { name: '10', value: 10 },
+    100: { name: '100', value: 100 },
+    1000: { name: '1000', value: 1000, isDefault: true },
+    10000: { name: '10000', value: 10000 },
+    100000: { name: '100000', value: 100000 },
 }
 
 export const DEFAULT_MEASUREMENT_GOALS = [
@@ -62,7 +70,3 @@ export const RMSRE_THRESHOLD = 5
 export const CONTRIBUTION_BUDGET = 65536
 
 export const DEFAULT_EPSILON = 10
-
-export const modeSearchQueryParams = Object.values(MODES).map(
-    (mode) => mode.searchQueryParam
-)

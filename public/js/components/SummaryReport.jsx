@@ -47,8 +47,8 @@ export function SummaryReport(props) {
             <h6>Dimensions:</h6>
             <div class="offset-left has-helper mono">{dimensionsString}</div>
             <h6>Scaling factor:</h6>
-            <div class="help help-scaling-factor-value"></div>
             <div class="offset-left has-helper mono">{scalingFactor}</div>
+            <div class="help help-scaling-factor-value"></div>
             <h6>Data table:</h6>
             <details id={tableId} class="offset-left"></details>
         </div>

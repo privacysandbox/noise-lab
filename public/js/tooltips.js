@@ -104,12 +104,13 @@ Key structure II: <em>Measurement goal type</em> x <em>Campaign ID</em> x <em>Ge
 
 const advancedModeOnly = `This option is only available in the <strong>Advanced mode</strong>.<br/><br/>`
 
+// TODO clean unneeeded ones
 tippy('#help-key-strategy-simple-mode', {
     content: `${advancedModeOnly}${keyStrategyHelperHTML}`,
     ...defaultOptions,
 })
 
-tippy('#help-key-strategy-advanced-mode', {
+tippy('#help-key-strategy', {
     content: keyStrategyHelperHTML,
     ...defaultOptions,
 })

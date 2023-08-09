@@ -2,9 +2,12 @@ import { h, render, Component } from 'preact'
 
 export function KeyStrategy(props) {
     // TODO-FIX-MINOR Add mode-specific helper <div class="help" id="help-key-strategy-simple-mode"></div>
-    const { setKeyStrategy, keyStrategy, keyStrategiesOptions } = props
+    const { setKeyStrategy, keyStrategy, keyStrategiesOptions, disabled } =
+        props
 
-    const handleChange = (event) => {
+    // TODO update budgetSplit when any of these change: (NONEED budgetSplitOption), numberOfMeasurementGoals, contributionBudget, noKeys
+
+    function handleChange(event) {
         const inputKeyStrategy = event.target.value
         setKeyStrategy(inputKeyStrategy)
     }
@@ -15,7 +18,7 @@ export function KeyStrategy(props) {
             <select
                 name="key-strategy"
                 id="key-strategy-select"
-                disabled
+                disabled={disabled}
                 onInput={handleChange}
             >
                 {Object.values(keyStrategiesOptions).map((k) => (
@@ -24,6 +27,7 @@ export function KeyStrategy(props) {
                     </option>
                 ))}
             </select>
+            <div class="help" id="help-key-strategy"></div>
         </div>
     )
 }

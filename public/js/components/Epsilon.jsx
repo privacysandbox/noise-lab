@@ -1,20 +1,12 @@
 import { h, render, Component } from 'preact'
-
-// TODO-refactor make capEpsilon a utility function
-function capEpsilon(inputEpsilon) {
-    if (inputEpsilon < 0) {
-        return 0
-    } else if (inputEpsilon > 64) {
-        return 64
-    } else return inputEpsilon
-}
+import { cap } from '../utils.misc'
 
 export function Epsilon(props) {
-    const { setEpsilon, epsilon } = props
+    const { setEpsilon, epsilon, minEpsilon, maxEpsilon } = props
 
     function handleChange(event) {
         const inputEpsilon = event.target.value
-        const cappedEpsilon = capEpsilon(inputEpsilon)
+        const cappedEpsilon = cap(inputEpsilon, minEpsilon, maxEpsilon)
         // Update the state in the parent component
         setEpsilon(cappedEpsilon)
     }
@@ -25,12 +17,14 @@ export function Epsilon(props) {
             <input
                 type="number"
                 min="0"
-                max="64"
+                max={maxEpsilon}
                 onInput={handleChange}
                 value={epsilon}
             />
             <div class="help" id="help-epsilon"></div>
-            <div class="input-hint below-input">Min: 0, Max: 64</div>
+            <div class="input-hint below-input">
+                Min: {minEpsilon}, Max: {maxEpsilon}
+            </div>
         </div>
     )
 }

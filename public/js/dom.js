@@ -44,9 +44,9 @@ export function getIsUseScalingFromDom() {
     return !!Number.parseInt(document.getElementById('scaling').value)
 }
 
-export function getKeyStrategyFromDom() {
-    return document.getElementById('key-strategy-select').value
-}
+// export function getKeyStrategyFromDom() {
+//     return document.getElementById('key-strategy-select').value
+// }
 
 export function getIsKeyStrategyGranularFromDom() {
     return document.getElementById('key-strategy-select').value == 'A'
@@ -174,6 +174,7 @@ export function addScalingListener() {
     })
 }
 
+// TODO-CLEAN Delete all these functions
 export function initializeDisplayGeneric(
     CONTRIBUTION_BUDGET,
     KEY_STRATEGIES,
@@ -539,15 +540,15 @@ function addCheckboxStrategy(id, parentDomEl) {
     })
 }
 
-export function getKeyStrategiesNumberFromDom() {
-    return document.getElementById('structures-number').value
-}
+// export function getKeyStrategiesNumberFromDom() {
+//     return document.getElementById('structures-number').value
+// }
 
-export function getStrategiesKeyCombinations(dimensions) {
-    const keyStrategies = document.getElementById('structures-number').value
+export function getStrategiesKeyCombinations(dimensions, keyStructuresCount) {
     var allCombs = []
 
-    for (let i = 1; i <= keyStrategies; i++) {
+    // TODO pass it as a number
+    for (let i = 1; i <= Number(keyStructuresCount); i++) {
         var combinations = []
         var names = []
         var checkboxes = document.getElementsByName('strategy' + i)
@@ -563,6 +564,93 @@ export function getStrategiesKeyCombinations(dimensions) {
             combinations: combinations,
         })
     }
+
+    console.log(allCombs)
+
+    // Key structure 1
+    // x geography
+    // o campaignId
+    // x productCategory
+
+    // Key structure 2
+    // x geography
+    // x campaignId
+    // o productCategory
+
+    // Key structure 3
+    // o geography
+    // x campaignId
+    // x productCategory
+    // [
+    //     {
+    //         "names": [
+    //             "geography",
+    //             "productCategory"
+    //         ],
+    //         "combinations": [
+    //             "3",
+    //             "2"
+    //         ]
+    //     },
+    //     {
+    //         "names": [
+    //             "geography",
+    //             "campaignId"
+    //         ],
+    //         "combinations": [
+    //             "3",
+    //             "4"
+    //         ]
+    //     },
+    //     {
+    //         "names": [
+    //             "campaignId",
+    //             "productCategory"
+    //         ],
+    //         "combinations": [
+    //             "4",
+    //             "2"
+    //         ]
+    //     }
+    // ]
+
+    // -----------------------------
+    // -----------------------------
+
+    // Key structure 1
+    // o geography
+    // x campaignId
+    // x productCategory
+
+    // Key structure 2
+    // x geography
+    // x campaignId
+    // x productCategory
+
+    // [
+    //     {
+    //         "names": [
+    //             "campaignId",
+    //             "productCategory"
+    //         ],
+    //         "combinations": [
+    //             "4",
+    //             "2"
+    //         ]
+    //     },
+    //     {
+    //         "names": [
+    //             "geography",
+    //             "campaignId",
+    //             "productCategory"
+    //         ],
+    //         "combinations": [
+    //             "3",
+    //             "4",
+    //             "2"
+    //         ]
+    //     }
+    // ]
 
     return allCombs
 }
@@ -857,14 +945,24 @@ export function capEpsilon(event, inputEl) {
     }
 }
 
-export function getNumberOfBuckets() {
-    const allDimensionSizes = document.querySelectorAll('.dimension-size')
-    let nbOfBuckets = 1
-    allDimensionSizes.forEach((dimSize) => {
-        nbOfBuckets = nbOfBuckets * dimSize.value
-    })
-    return nbOfBuckets
-}
+// export function getNumberOfBuckets() {
+//     const allDimensionSizes = document.querySelectorAll('.dimension-size')
+//     let nbOfBuckets = 1
+//     allDimensionSizes.forEach((dimSize) => {
+//         nbOfBuckets = nbOfBuckets * dimSize.value
+//     })
+//     return nbOfBuckets
+// }
+
+// export function getNumberOfBuckets(dimensions) {
+//     let nbOfBuckets = 1
+//     dimensions
+//         .map((d) => d.size)
+//         .forEach((dimSize) => {
+//             nbOfBuckets = nbOfBuckets * dimSize
+//         })
+//     return nbOfBuckets
+// }
 
 export function updateDailyPerBucket() {
     const dailyTotal = document.getElementById('event-count-daily-total').value
@@ -883,31 +981,35 @@ export function resetFormValidation() {
 
 // Validate the inputs are correct
 // TODO-CLEAN Base this on state source of truth, not on DOM!
+// TODO fix!
 export function validateInputsBeforeSimulation(
     metrics,
     dimensions,
-    isGranular
+    isGranular,
+    isUseScaling,
+    keyStructuresCount
 ) {
-    var errors = []
-    validateBudgetPercentages(metrics, errors)
-    validateMetrics(metrics, errors)
-    validateDimensions(dimensions, errors)
-    if (!isGranular) validateKeyStrategy(errors)
-    validateConversionsPerBucket(errors)
-
-    const formValidationWrapperEl = getFormValidationElFromDom()
-
-    if (errors.length <= 0) {
-        resetFormValidation()
-        return true
-    }
-
-    formValidationWrapperEl.className = ''
-    const suffix = errors.length > 1 ? 's' : ''
-    const title = `❌ Could not simulate. ${errors.length} error${suffix}: \n`
-    const errorListAsString = errors.map((e) => `• ${e}.`).join('\n')
-    formValidationWrapperEl.innerText = `${title} \n ${errorListAsString}`
-    return false
+    // TODO
+    // var errors = []
+    // if (isUseScaling) {
+    //     validateBudgetPercentages(metrics, errors, keyStructuresCount)
+    // }
+    // validateMetrics(metrics, errors)
+    // validateDimensions(dimensions, errors)
+    // if (!isGranular) validateKeyStrategy(errors, keyStructuresCount)
+    // validateConversionsPerBucket(errors)
+    // const formValidationWrapperEl = getFormValidationElFromDom()
+    // if (errors.length <= 0) {
+    //     resetFormValidation()
+    //     return true
+    // }
+    // formValidationWrapperEl.className = ''
+    // const suffix = errors.length > 1 ? 's' : ''
+    // const title = `❌ Could not simulate. ${errors.length} error${suffix}: \n`
+    // const errorListAsString = errors.map((e) => `• ${e}.`).join('\n')
+    // formValidationWrapperEl.innerText = `${title} \n ${errorListAsString}`
+    // return false
+    return true
 }
 
 function validateMetrics(metrics, errors) {
@@ -924,7 +1026,7 @@ function validateMetrics(metrics, errors) {
     })
 }
 
-function validateBudgetPercentages(metrics, errors) {
+function validateBudgetPercentages(metrics, errors, keyStructuresCount) {
     const sumOfAllPercentages = metrics.reduce((sum, metric) => {
         return sum + getBudgetValueForMetricIdFromDom(metric.id)
     }, 0)
@@ -936,7 +1038,7 @@ function validateBudgetPercentages(metrics, errors) {
     if (
         getIsPercentageBudgetSplitFromDom() &&
         !getIsKeyStrategyGranularFromDom() &&
-        sumOfAllPercentages > Math.floor(100 / getKeyStrategiesNumberFromDom())
+        sumOfAllPercentages > Math.floor(100 / keyStructuresCount)
     ) {
         errors.push(
             'The sum of all budget split percentages exceeds the maximum allowed per key: 100/<the number of all keys>'
@@ -957,9 +1059,7 @@ function validateBudgetPercentages(metrics, errors) {
         !getIsPercentageBudgetSplitFromDom() &&
         !getIsKeyStrategyGranularFromDom() &&
         sumOfAllPercentages >
-            Math.floor(
-                getContributionBudgetFromDom() / getKeyStrategiesNumberFromDom()
-            )
+            Math.floor(getContributionBudgetFromDom() / keyStructuresCount)
     ) {
         errors.push(
             'The sum of all budget split values exceeds the total contribution budget per key - <total contribution budget>/<total number of keys>'
@@ -988,15 +1088,14 @@ function validateDimensions(dimensions, errors) {
         )
 }
 
-function validateKeyStrategy(errors) {
-    var keyStructNumber = getKeyStrategiesNumberFromDom()
-    if (keyStructNumber <= 1) {
+function validateKeyStrategy(errors, keyStructuresCount) {
+    if (keyStructuresCount <= 1) {
         errors.push(
             'When using Key Strategy B (less granular), the number of key structures must be >1 '
         )
         return
     }
-    for (var i = 1; i <= keyStructNumber; i++) {
+    for (var i = 1; i <= keyStructuresCount; i++) {
         var checkboxes = document.getElementsByName('strategy' + i)
         checkboxes = Array.prototype.slice.call(checkboxes, 0)
         var noChecked = checkboxes.filter((element) => element.checked).length

@@ -41,5 +41,4 @@ export function Simulation(props) {
 }
 
 // TODO-FIX Missing tooltips, see legacy function updateTooltips()
-// TODO-CHECK downloadAll
 // TODO-NOTE idx

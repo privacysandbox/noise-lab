@@ -11,8 +11,6 @@ export function SummaryReport(props) {
     const { noise_ape_percent, noise_rmsre } = noiseMetrics
     const [reportTable, setReportTable] = useState([])
 
-    // TODO-FIX-MINOR Fix noise average display 0.xxxxxx
-
     const tableId = `output-data-table-${simulationId}-${measurementGoal}-${simulationNo}`
 
     useEffect(() => {
@@ -37,6 +35,7 @@ export function SummaryReport(props) {
                 <div class="help help-noise-ape"></div>
                 <h5>RMSRE with t=5: </h5>
                 <div class={getClassNoise_rmsre(noise_rmsre)}></div>
+                {/* TODO remove inline toFixed */}
                 <div class="has-helper mono">
                     Exact value = {noise_rmsre.toFixed(3)}
                 </div>

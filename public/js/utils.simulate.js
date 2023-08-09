@@ -14,19 +14,19 @@ limitations under the License. */
 
 import {
     validateInputsBeforeSimulation,
-    getKeyStrategyFromDom,
+    // getKeyStrategyFromDom,
     getIsKeyStrategyGranularFromDom,
     getDailyEventCountPerBucket,
     getBudgetValueForMetricIdFromDom,
     getIsPercentageBudgetSplitFromDom,
     getKeyCombinationString,
-    getZeroConversionsPercentageFromDom,
     getStrategiesKeyCombinations,
 } from './dom'
 import { generateSimulationId, generateSimulationTitle } from './utils.misc'
 import {
     getRandomLaplacianNoise,
-    getScalingFactorForMetric,
+    // getScalingFactorForMetric,
+    getScalingFactorForMeasurementGoal,
     calculateNoisePercentage,
     generateKeyCombinationArray,
     generateSummaryValue,
@@ -34,7 +34,8 @@ import {
     getNoise_Rmsre,
 } from './utils.noise'
 
-// generate dataset
+// Generate dataset
+// TODO use config object
 export function simulate(
     metrics,
     dimensions,
@@ -46,26 +47,48 @@ export function simulate(
     isGranular,
     batchingFrequency,
     dailyConversionCountPerBucket,
-    dailyConversionCountTotal
+    dailyConversionCountTotal,
+    zeroBucketsPercentage,
+    keyStrategy,
+    keyStructuresCount,
+    keyStructures,
+    budgetSplitMode,
+    budgetSplit
 ) {
     // Validate inputs are correct
-    if (!validateInputsBeforeSimulation(metrics, dimensions, isGranular)) return
+    // TODO fix
+    if (
+        !validateInputsBeforeSimulation(
+            metrics,
+            dimensions,
+            isGranular,
+            isUseScaling,
+            keyStructuresCount
+        )
+    )
+        return
 
-    // declare array containing possible combinations for keys
+    // TODO use keyStrategy OR keyStructuresCount OR isGranular
+    console.log('STRAT', keyStrategy)
+    console.log('KEY COUNT', keyStructuresCount)
+
+    // Declare array containing possible combinations for keys
     var r = []
     var keyCombList = []
 
-    // logic for generating one dataset with all keys - string parameter 'all' is used
+    // Logic for generating one dataset with all keys - string parameter 'all' is used
     if (isGranular) {
         var keyComb = generateKeyCombinationArray(dimensionSizes)
+        console.log(keyComb)
         keyCombList.push({
             names: dimensionNames,
             combinations: keyComb,
         })
+        console.log(keyCombList)
     } else {
-        const allCombs = getStrategiesKeyCombinations(dimensions)
-
+        const allCombs = keyStructures
         for (let i = 0; i < allCombs.length; i++) {
+            // TODO unify this code across the two branches (key strategies)
             keyCombList.push({
                 names: allCombs[i].names,
                 combinations: generateKeyCombinationArray(
@@ -79,8 +102,6 @@ export function simulate(
             })
         }
     }
-
-    const keyStrategy = getKeyStrategyFromDom()
 
     const simulation = {
         metadata: {
@@ -110,20 +131,26 @@ export function simulate(
                     contributionBudget,
                     isUseScaling,
                     batchingFrequency,
-                    getIsKeyStrategyGranularFromDom()
-                        ? getDailyEventCountPerBucket()
+                    isGranular
+                        ? dailyConversionCountPerBucket
                         : Math.floor(
                               dailyConversionCountTotal / keyCombList[i].size
                           ),
-                    i
+                    i,
+                    zeroBucketsPercentage,
+                    budgetSplitMode,
+                    budgetSplit
                 )
             )
         }
     })
 
+    console.log(simulation)
+
     return simulation
 }
 
+// TODO use config object
 function simulatePerMetric(
     keyCombinations,
     metric,
@@ -132,20 +159,27 @@ function simulatePerMetric(
     isUseScaling,
     batchingFrequency,
     dailyCount,
-    simulationNo
+    simulationNo,
+    zeroBucketsPercentage,
+    budgetSplitMode,
+    budgetSplit
 ) {
-    const value = getBudgetValueForMetricIdFromDom(metric.id)
-    const isPercentage = getIsPercentageBudgetSplitFromDom()
-
-    const scalingFactor = !!isUseScaling
-        ? getScalingFactorForMetric(
-              metric,
-              value,
-              isPercentage,
-              contributionBudget
-          )
-        : 1
-    const keyCombinationString = getKeyCombinationString(keyCombinations.names)
+    console.log(budgetSplitMode)
+    let scalingFactor = 1
+    // TODO ensure it's a boolean
+    if (!!isUseScaling) {
+        scalingFactor = getScalingFactorForMeasurementGoal(
+            metric,
+            // TODO-array-learn forgot budget split prefixing
+            // TODO simplify
+            budgetSplit[
+                budgetSplit.findIndex(
+                    (entry) => entry.measurementGoal === metric.name
+                )
+            ].percentage,
+            contributionBudget
+        )
+    }
 
     const report = []
 
@@ -158,7 +192,7 @@ function simulatePerMetric(
             i,
             dailyCount,
             batchingFrequency,
-            getZeroConversionsPercentageFromDom()
+            zeroBucketsPercentage
         )
 
         const noiseValueAPE = calculateNoisePercentage(
@@ -168,12 +202,16 @@ function simulatePerMetric(
         )
         noisePercentageSum += noiseValueAPE
 
-        const summaryValue_scaled_noisy = Math.round(randCount * scalingFactor + noise)
+        const summaryValue_scaled_noisy = Math.round(
+            randCount * scalingFactor + noise
+        )
 
         report.push({
             key: keyCombinations.combinations[i],
             summaryValue: randCount,
-            summaryValue_scaled_noiseless: Math.round(randCount * scalingFactor),
+            summaryValue_scaled_noiseless: Math.round(
+                randCount * scalingFactor
+            ),
             summaryValue_scaled_noisy: summaryValue_scaled_noisy,
             noise: noise,
             noise_ape_individual: noiseValueAPE,
@@ -207,7 +245,7 @@ function simulatePerMetric(
         },
         scalingFactor: scalingFactor,
         measurementGoal: metric.name,
-        dimensionsString: keyCombinationString,
+        dimensionsString: getKeyCombinationString(keyCombinations.names),
         simulationNo: simulationNo,
     }
 

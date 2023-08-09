@@ -28,4 +28,3 @@ export function Scaling(props) {
         </div>
     )
 }
-// TODO-CHECK check values with and without scaling, check that budget split is working properly

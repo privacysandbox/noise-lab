@@ -20,6 +20,8 @@ export const SIMPLE = 'simple'
 export const ADVANCED = 'advanced'
 export const MODES = [SIMPLE, ADVANCED]
 
+
+// Remove
 export const KEY_STRATEGIES = {
     A: { name: 'A', value: 'A' },
     B: { name: 'B', value: 'B' },
@@ -48,6 +50,7 @@ export const EVENT_COUNT_TOTAL_OPTIONS = {
     5: { name: '5', value: 5 },
     10: { name: '10', value: 10 },
     100: { name: '100', value: 100 },
+    100: { name: '500', value: 500 },
     1000: { name: '1000', value: 1000, isDefault: true },
     10000: { name: '10000', value: 10000 },
     100000: { name: '100000', value: 100000 },
@@ -70,3 +73,8 @@ export const RMSRE_THRESHOLD = 5
 export const CONTRIBUTION_BUDGET = 65536
 
 export const DEFAULT_EPSILON = 10
+export const MIN_EPSILON = 0
+export const MAX_EPSILON = 64
+
+
+

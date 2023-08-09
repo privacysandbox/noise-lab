@@ -518,6 +518,7 @@ select:focus {
     font-size: 0.8rem;
     transition: filter 0.2s ease-out;
     display: inline-block;
+    margin-left: 0.2rem;
 }
 
 .help:hover {
@@ -536,7 +537,6 @@ select:focus {
 
 .has-helper {
     display: inline-block;
-    padding-right: 0.4rem;
 }
 
 /* VERSION */

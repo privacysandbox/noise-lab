@@ -17,15 +17,12 @@ import { RMSRE_THRESHOLD } from './config'
 
 // SHARED UTILS
 
-export function getScalingFactorForMetric(
+export function getScalingFactorForMeasurementGoal(
     metric,
-    value,
-    isPercentage,
+    valueAsPercentage,
     contributionBudget
 ) {
-    const budgetForThisMetric = isPercentage
-        ? contributionBudget * (value / 100)
-        : value
+    const budgetForThisMetric = contributionBudget * (valueAsPercentage / 100)
     const scalingFactorForThisMetric = budgetForThisMetric / metric.maxValue
     return scalingFactorForThisMetric.toFixed(1)
 }

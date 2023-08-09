@@ -1,20 +1,12 @@
 import { h, render, Component } from 'preact'
-
-// TODO-refactor make capValue a utility function
-function capValue(inputValue) {
-    if (inputValue < 0) {
-        return 0
-    } else if (inputValue > 10) {
-        return 10
-    } else return Number(inputValue)
-}
+import { cap } from '../utils.misc'
 
 export function ZeroBuckets(props) {
     const { setZeroBucketsPercentage, zeroBucketsPercentage } = props
 
     function handleChange(event) {
         const inputValue = event.target.value
-        const cappedValue = capValue(inputValue)
+        const cappedValue = cap(Number(inputValue), 0, 10)
         // Update the state in the parent component
         setZeroBucketsPercentage(cappedValue)
     }

@@ -1,5 +1,5 @@
 import { h, render, Component } from 'preact'
-import { getNumberOfBuckets } from '../dom'
+import { getDailyEventCountPerBucket } from '../utils.misc'
 
 export function Dimensions(props) {
     const {
@@ -21,8 +21,7 @@ export function Dimensions(props) {
         setDimensions(newDimensions)
 
         setDailyEventCountPerBucket(
-            // TODO DRY this code, it's used in several places
-            Math.floor(dailyEventCountTotal / getNumberOfBuckets(newDimensions))
+            getDailyEventCountPerBucket(dailyEventCountTotal, newDimensions)
         )
     }
 
@@ -33,10 +32,7 @@ export function Dimensions(props) {
             setDimensions(newDimensions)
 
             setDailyEventCountPerBucket(
-                // TODO DRY this code, it's used in several places
-                Math.floor(
-                    dailyEventCountTotal / getNumberOfBuckets(newDimensions)
-                )
+                getDailyEventCountPerBucket(dailyEventCountTotal, newDimensions)
             )
         }
     }

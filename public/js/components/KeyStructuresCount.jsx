@@ -1,11 +1,5 @@
 import { h, render, Component } from 'preact'
-
-// TODO-refactor make this a utility function
-function capValue(inputValue) {
-    if (inputValue < 1) {
-        return 1
-    } else return inputValue
-}
+import { cap, getKeyStrategy } from '../utils.misc'
 
 export function KeyStructuresCount(props) {
     const {
@@ -15,19 +9,20 @@ export function KeyStructuresCount(props) {
         keyStructuresCount,
         measurementGoals,
         updateBudgetSplit,
+        setKeyStrategy,
     } = props
 
     function handleChange(event) {
         const inputValue = event.target.value
-        const newKeyStructuresCount = capValue(inputValue)
+        const newKeyStructuresCount = cap(inputValue, 1)
         setKeyStructuresCount(newKeyStructuresCount)
+        setKeyStrategy(getKeyStrategy(newKeyStructuresCount))
         updateBudgetSplit(measurementGoals, newKeyStructuresCount)
 
-        const numberOfKeyStructuresToAdd =
-            newKeyStructuresCount - keyStructuresCount
-
-        // TOOD update when dimensions update????
-        if (numberOfKeyStructuresToAdd > 0) {
+        // TOOD update when dimensions update
+        if (newKeyStructuresCount > keyStructuresCount) {
+            const numberOfKeyStructuresToAdd =
+                newKeyStructuresCount - keyStructuresCount
             const newKeyStructures = Array(numberOfKeyStructuresToAdd)
                 .fill(0)
                 .map((v, idx) => ({
@@ -35,11 +30,14 @@ export function KeyStructuresCount(props) {
                     combinations: [],
                 }))
             setKeyStructures([...keyStructures, ...newKeyStructures])
-        } else if (numberOfKeyStructuresToAdd < 0) {
-            // TODO fix bug is tuis taken into account?
-            const newKeyStructures = [...keyStructures].splice(
-                keyStructures.length - Math.abs(numberOfKeyStructuresToAdd),
-                Math.abs(numberOfKeyStructuresToAdd)
+        } else {
+            const numberOfKeyStructuresToRemove =
+                keyStructuresCount - newKeyStructuresCount
+            const newKeyStructures = [...keyStructures]
+            // `splice` mutates the object or array!
+            newKeyStructures.splice(
+                keyStructures.length - numberOfKeyStructuresToRemove,
+                numberOfKeyStructuresToRemove
             )
             setKeyStructures(newKeyStructures)
         }
@@ -55,7 +53,6 @@ export function KeyStructuresCount(props) {
                 value={keyStructuresCount}
             />
             <div class="help" id="help-key-strategy-number"></div>
-            {/* TODO tooltip */}
             <div class="input-hint below-input">Min: 1</div>
         </div>
     )

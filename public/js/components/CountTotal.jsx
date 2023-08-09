@@ -1,5 +1,5 @@
 import { h, render, Component } from 'preact'
-import { getNumberOfBuckets } from '../dom'
+import { getDailyEventCountPerBucket } from '../utils.misc'
 
 export function CountTotal(props) {
     const {
@@ -15,7 +15,7 @@ export function CountTotal(props) {
         setDailyEventCountTotal(inputCountTotal)
         // TODO do I need to do that manually? no way to observe dimensions or total, and update dailyEventCountPerBucket when they change?
         setDailyEventCountPerBucket(
-            Math.floor(inputCountTotal / getNumberOfBuckets(dimensions))
+            getDailyEventCountPerBucket(inputCountTotal, dimensions)
         )
     }
 

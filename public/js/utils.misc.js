@@ -31,3 +31,31 @@ export function generateSimulationWrapperElId(simulationId) {
 export function generateConfirmMessage() {
     return 'This will clear all simulations, so make sure to download your simulation data before you continue. Continue?'
 }
+
+export function cap(input, min, max) {
+    if (max !== undefined && input > max) {
+        return max
+    } else if (input < min) {
+        return min
+    } else {
+        return input
+    }
+}
+
+export function getKeyStrategy(keyStructuresCount) {
+    return keyStructuresCount > 1 ? 'B' : 'A'
+}
+
+export function getDailyEventCountPerBucket(dailyEventCountTotal, dimensions) {
+    return Math.floor(dailyEventCountTotal / getNumberOfBuckets(dimensions))
+}
+
+export function getNumberOfBuckets(dimensions) {
+    let nbOfBuckets = 1
+    dimensions
+        .map((d) => d.size)
+        .forEach((dimSize) => {
+            nbOfBuckets = nbOfBuckets * dimSize
+        })
+    return nbOfBuckets
+}

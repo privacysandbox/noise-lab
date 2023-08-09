@@ -97,8 +97,8 @@ In Strategy A, you use one granular key structure, that includes all your dimens
 </li>
 <li>
 In Strategy B, you use two coarse key structures, each including a subset of your dimensions. For example:
-Key structure I: <em>Measurement goal type</em> x <em>Geo ID</em> x <em>Product category</em>.
-Key structure II: <em>Measurement goal type</em> x <em>Campaign ID</em> x <em>Geo ID</em>.
+Key structure 1: <em>Measurement goal type</em> x <em>Geo ID</em> x <em>Product category</em>.
+Key structure 2: <em>Measurement goal type</em> x <em>Campaign ID</em> x <em>Geo ID</em>.
 </li>
 </ul>`
 
@@ -120,10 +120,10 @@ tippy('#help-key-strategy-number', {
     For example: 
     <ul>
     <li>
-    Key structure I: <em>Measurement goal type</em> x <em>Geo ID</em> x <em>Product category</em>.
+    Key structure 1: <em>Measurement goal type</em> x <em>Geo ID</em> x <em>Product category</em>.
     </li>
     <li>
-    Key structure II: <em>Measurement goal type</em> x <em>Campaign ID</em> x <em>Geo ID</em>.
+    Key structure 2: <em>Measurement goal type</em> x <em>Campaign ID</em> x <em>Geo ID</em>.
     </li>
     </ul>`,
     ...defaultOptions,

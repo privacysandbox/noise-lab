@@ -10,6 +10,8 @@ import {
     CONTRIBUTION_BUDGET,
     BATCHING_FREQUENCIES,
     DEFAULT_EPSILON,
+    MIN_EPSILON,
+    MAX_EPSILON,
     EVENT_COUNT_PER_BUCKET_OPTIONS,
     KEY_STRATEGIES,
 } from '../config'
@@ -59,7 +61,6 @@ export function SimpleMode(props) {
                 setSimulations([])
             }
         }
-        // TODO-NOTE that displayEmptyState is not needed here anymore
     }
 
     function downloadAllTables() {
@@ -109,7 +110,28 @@ export function SimpleMode(props) {
             batchingFrequency,
             dailyEventCountPerBucket,
             // Last param not is not needed in the simple mode
-            null
+            null,
+            // No zero Buckets in Simple mode
+            0,
+            // TODO replace isGranular with keyStrategy
+            keyStrategy,
+            0, // TODO remove? / Make sim input a config object,
+            [], // TODO remove,
+            'percentage', // budgetSplitMode // TODO change
+            // TODO calc this from the measurementGoal etc
+            // TODO change budgetSplit data structure: Use an object for faster retrieval
+            [
+                {
+                    measurementGoal: 'purchaseCount',
+                    percentage: 50,
+                    value: 32768,
+                },
+                {
+                    measurementGoal: 'purchaseValue',
+                    percentage: 50,
+                    value: 32768,
+                },
+            ]
         )
         setSimulations([...simulations, simulation])
     }
@@ -128,6 +150,8 @@ export function SimpleMode(props) {
                             <Epsilon
                                 epsilon={epsilon}
                                 setEpsilon={setEpsilon}
+                                minEpsilon={MIN_EPSILON}
+                                maxEpsilon={MAX_EPSILON}
                             />
                         </div>
                         <div>
@@ -175,12 +199,7 @@ export function SimpleMode(props) {
                                 disabled
                             />
                             <h4>Key strategy:</h4>
-                            <KeyStrategy
-                                keyStrategiesOptions={KEY_STRATEGIES}
-                                keyStrategy={keyStrategy}
-                                setKeyStrategy={setKeyStrategy}
-                                disabled
-                            />
+                            <KeyStrategy keyStrategy={keyStrategy} />
                         </div>
                     </div>
                     <div class="buttons-wrapper-launch-panel">

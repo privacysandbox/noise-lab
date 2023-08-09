@@ -8,17 +8,14 @@ export function MeasurementGoals(props) {
         keyStructuresCount,
     } = props
 
-    // TOOD check if ID and idx do not interfere!
-
     function handleChange(event, fieldToUpdate, idx) {
-        // TODO cap like epsilon!
         const newMeasurementGoals = [...measurementGoals]
         newMeasurementGoals[idx] = {
             ...newMeasurementGoals[idx],
             [fieldToUpdate]: event.target.value,
         }
         setMeasurementGoals(newMeasurementGoals)
-        // updateBudgetSplit not needed here
+        // Note that calling updateBudgetSplit is not needed here, because `handleChange` is only called when the name or property of the measurement goals change. Not when the number of goals change.
         // TODO associate setMeasurementGoals with updateBudgetSplit?
     }
 
@@ -31,11 +28,8 @@ export function MeasurementGoals(props) {
         }
     }
 
-    // TODO fix tooltips
-
     return (
         <div>
-            {/* {JSON.stringify(measurementGoals)} */}
             {measurementGoals.length < 2 && (
                 <div class="input-hint margin-v">
                     ⚠️ At least one goal required

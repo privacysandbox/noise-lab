@@ -1,4 +1,5 @@
 import { h, render, Component } from 'preact'
+import { generateKeyStructure } from '../utils.misc'
 
 export function KeyStructures(props) {
     const { keyStructuresCount, dimensions, keyStructures, setKeyStructures } =
@@ -7,27 +8,24 @@ export function KeyStructures(props) {
     function handleChange(event, idx, dimensionName) {
         const isChecked = event.target.checked
         const keyStructureToUpdate = keyStructures[idx]
-        const newKeyStructure = {}
+        const dimensionSetToUpdate = keyStructureToUpdate.names
 
+        let newDimensionSet = []
         if (isChecked) {
             // Add the dimension
-            newKeyStructure.names = [
-                ...keyStructureToUpdate.names,
-                dimensionName,
-            ]
+            newDimensionSet = [...dimensionSetToUpdate, dimensionName]
         } else {
             // Remove the dimension
-            newKeyStructure.names = [...keyStructureToUpdate.names].filter(
+            newDimensionSet = [...dimensionSetToUpdate].filter(
                 (dimName) => dimName !== dimensionName
             )
         }
         // Generate the `combinations` field based on the new dimensions for this key structure
-        newKeyStructure.combinations = newKeyStructure.names.map(
-            (dimensionName) =>
-                dimensions[
-                    dimensions.findIndex((d) => d.name === dimensionName)
-                ].size
+        const newKeyStructure = generateKeyStructure(
+            newDimensionSet,
+            dimensions
         )
+
         // Replace the old key structure with the new one
         const newKeyStructures = [...keyStructures]
         newKeyStructures[idx] = newKeyStructure
@@ -62,3 +60,88 @@ export function KeyStructures(props) {
 }
 
 
+
+    // Key structure 1
+    // x geography
+    // o campaignId
+    // x productCategory
+
+    // Key structure 2
+    // x geography
+    // x campaignId
+    // o productCategory
+
+    // Key structure 3
+    // o geography
+    // x campaignId
+    // x productCategory
+    // [
+    //     {
+    //         "names": [
+    //             "geography",
+    //             "productCategory"
+    //         ],
+    //         "combinations": [
+    //             "3",
+    //             "2"
+    //         ]
+    //     },
+    //     {
+    //         "names": [
+    //             "geography",
+    //             "campaignId"
+    //         ],
+    //         "combinations": [
+    //             "3",
+    //             "4"
+    //         ]
+    //     },
+    //     {
+    //         "names": [
+    //             "campaignId",
+    //             "productCategory"
+    //         ],
+    //         "combinations": [
+    //             "4",
+    //             "2"
+    //         ]
+    //     }
+    // ]
+
+    // -----------------------------
+    // -----------------------------
+
+    // Key structure 1
+    // o geography
+    // x campaignId
+    // x productCategory
+
+    // Key structure 2
+    // x geography
+    // x campaignId
+    // x productCategory
+
+    // [
+    //     {
+    //         "names": [
+    //             "campaignId",
+    //             "productCategory"
+    //         ],
+    //         "combinations": [
+    //             "4",
+    //             "2"
+    //         ]
+    //     },
+    //     {
+    //         "names": [
+    //             "geography",
+    //             "campaignId",
+    //             "productCategory"
+    //         ],
+    //         "combinations": [
+    //             "3",
+    //             "4",
+    //             "2"
+    //         ]
+    //     }
+    // ]

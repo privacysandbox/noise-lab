@@ -4,18 +4,18 @@ import { simulate } from '../utils.simulate'
 import { downloadAll } from '../store'
 import {
     generateConfirmMessage,
-    getNumberOfBuckets,
+    getKeyStrategy,
     getDailyEventCountPerBucket,
+    generateKeyStructure,
 } from '../utils.misc'
 import {
     DEFAULT_MEASUREMENT_GOALS,
+    DEFAULT_DIMENSIONS_NAMES,
     DEFAULT_DIMENSIONS,
     CONTRIBUTION_BUDGET,
     BATCHING_FREQUENCIES,
     DEFAULT_EPSILON,
-    EVENT_COUNT_PER_BUCKET_OPTIONS,
     EVENT_COUNT_TOTAL_OPTIONS,
-    KEY_STRATEGIES,
     MIN_EPSILON,
     MAX_EPSILON,
 } from '../config'
@@ -34,9 +34,16 @@ import { ZeroBuckets } from './ZeroBuckets'
 import { KeyStructuresCount } from './KeyStructuresCount'
 import { KeyStructures } from './KeyStructures'
 
+// TODO If only one key structure, enforce that all checkboxes for dimensions must always e checked
+// TODO ensure key structure count and key structure list are in sync at all times
+
+// For simple mode, TODO use generateKeyStructures in simulate (or pass it from parent)
+// For simple mode, display number of key structures
+
+// TODO when key count is reset to 1, hard reset and disable all fields!!
+
 // Default values for simulation parameters
 const defaultUseScaling = true
-const defaultKeyStrategy = KEY_STRATEGIES.A.value
 const defaultBatchingFrequency = BATCHING_FREQUENCIES.daily.value
 const defaultDailyEventCountTotal = 1000
 const defaultBudgetSplit = DEFAULT_MEASUREMENT_GOALS.map((m) => ({
@@ -44,6 +51,7 @@ const defaultBudgetSplit = DEFAULT_MEASUREMENT_GOALS.map((m) => ({
     percentage: 100 / DEFAULT_MEASUREMENT_GOALS.length,
     value: CONTRIBUTION_BUDGET / DEFAULT_MEASUREMENT_GOALS.length,
 }))
+const defaultKeyStructuresCount = 1
 
 export function AdvancedMode(props) {
     // TODO Reorder
@@ -56,9 +64,10 @@ export function AdvancedMode(props) {
     const [dailyEventCountTotal, setDailyEventCountTotal] = useState(
         defaultDailyEventCountTotal
     )
-    // TODO make this depend on key count instead
-    const [keyStrategy, setKeyStrategy] = useState(defaultKeyStrategy)
-    // TODO do we really need both sims and simdatatables? Yes
+    const [keyStrategy, setKeyStrategy] = useState(
+        getKeyStrategy(defaultKeyStructuresCount)
+    )
+    // Both `simulations` and `allSimulationDataTables` are needed
     const [simulations, setSimulations] = useState([])
     const [allSimulationDataTables, setAllSimulationDataTables] = useState({})
     const [measurementGoals, setMeasurementGoals] = useState(
@@ -67,21 +76,18 @@ export function AdvancedMode(props) {
     const [zeroBucketsPercentage, setZeroBucketsPercentage] = useState(0)
     const [budgetSplitMode, setBudgetSplitMode] = useState('percentage')
     const [dimensions, setDimensions] = useState(DEFAULT_DIMENSIONS)
-
     const [dailyEventCountPerBucket, setDailyEventCountPerBucket] = useState(
         getDailyEventCountPerBucket(
             defaultDailyEventCountTotal,
             DEFAULT_DIMENSIONS
         )
     )
-    const [keyStructuresCount, setKeyStructuresCount] = useState(1)
-
-    // TODO generate this based on the on the default dimensions
+    const [keyStructuresCount, setKeyStructuresCount] = useState(
+        defaultKeyStructuresCount
+    )
+    // By default: only one key structure, that uses all the default dimensions
     const [keyStructures, setKeyStructures] = useState([
-        {
-            names: ['geography', 'campaignId', 'productCategory'],
-            combinations: [3, 4, 2],
-        },
+        generateKeyStructure(DEFAULT_DIMENSIONS_NAMES, DEFAULT_DIMENSIONS),
     ])
 
     useEffect(() => {
@@ -119,7 +125,7 @@ export function AdvancedMode(props) {
             keyStrategy,
             keyStructuresCount,
             keyStructures,
-            budgetSplitMode,
+            // budgetSplitMode,
             budgetSplit
         )
         setSimulations([...simulations, simulation])

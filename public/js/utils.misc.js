@@ -12,6 +12,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
+import { KEY_STRATEGY_A, KEY_STRATEGY_B } from './config'
+
 export function generateSimulationId() {
     return crypto.randomUUID().substring(0, 8)
 }
@@ -43,7 +45,7 @@ export function cap(input, min, max) {
 }
 
 export function getKeyStrategy(keyStructuresCount) {
-    return keyStructuresCount > 1 ? 'B' : 'A'
+    return keyStructuresCount > 1 ? KEY_STRATEGY_B : KEY_STRATEGY_A
 }
 
 export function getDailyEventCountPerBucket(dailyEventCountTotal, dimensions) {
@@ -58,4 +60,26 @@ export function getNumberOfBuckets(dimensions) {
             nbOfBuckets = nbOfBuckets * dimSize
         })
     return nbOfBuckets
+}
+
+// input =  (
+// ['geography', 'campaignId'],
+// [{ id: 0, size: 3, name: 'geography' },
+//     { id: 1, size: 4, name: 'campaignId' },
+//     { id: 2, size: 2, name: 'productCategory' },
+// ]
+// )
+// output = ({names: ['geography', 'campaignId'], combinations: [3, 4]})
+export function generateKeyStructure(dimensionsSubsetNames, allDimensions) {
+    const keyStructure = {}
+    keyStructure.names = dimensionsSubsetNames
+    keyStructure.combinations = dimensionsSubsetNames.map((dimName) =>
+        getDimensionSize(dimName, allDimensions)
+    )
+    return keyStructure
+}
+
+function getDimensionSize(dimName, allDimensions) {
+    const dimensionIdx = allDimensions.findIndex((d) => d.name === dimName)
+    return allDimensions[dimensionIdx].size
 }

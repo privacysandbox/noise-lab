@@ -14,18 +14,14 @@ limitations under the License. */
 
 export const APP_NAME = '🧪 Noise Lab'
 
-export const APP_VERSION = 'v3.2.0'
+export const APP_VERSION = 'v4.0.0'
 
 export const SIMPLE = 'simple'
 export const ADVANCED = 'advanced'
 export const MODES = [SIMPLE, ADVANCED]
 
-
-// Remove
-export const KEY_STRATEGIES = {
-    A: { name: 'A', value: 'A' },
-    B: { name: 'B', value: 'B' },
-}
+export const KEY_STRATEGY_A = 'A'
+export const KEY_STRATEGY_B = 'B'
 
 export const BATCHING_FREQUENCIES = {
     // value represents the multiplier on a daily reference value
@@ -79,6 +75,10 @@ export const DEFAULT_DIMENSIONS = [
     { id: 2, size: 2, name: 'productCategory' },
 ]
 
+export const DEFAULT_DIMENSIONS_NAMES = [
+    'geography',
+    'campaignId',
+    'productCategory',
 ]
 
 export const RMSRE_THRESHOLD = 5
@@ -88,6 +88,5 @@ export const CONTRIBUTION_BUDGET = 65536
 export const DEFAULT_EPSILON = 10
 export const MIN_EPSILON = 0
 export const MAX_EPSILON = 64
-
 
 

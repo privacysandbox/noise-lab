@@ -7,9 +7,8 @@ export function Simulation(props) {
     const { simulation } = props
     const { inputParameters, summaryReports } = simulation
     const { simulationId, simulationTitle } = simulation.metadata
+    // `useRef`: https://react.dev/reference/react/useRef#manipulating-the-dom-with-a-ref
     const inputParamsTableEl = useRef(null)
-
-    console.log(simulation)
 
     useEffect(() => {
         const el = inputParamsTableEl.current
@@ -29,6 +28,7 @@ export function Simulation(props) {
                     <h3>Summary reports (output)</h3>
                     {summaryReports.map((r, idx) => (
                         <SummaryReport
+                            // `idx` is now used as a `simulationNo`
                             simulationNo={idx}
                             report={r}
                             simulationId={simulationId}
@@ -39,6 +39,3 @@ export function Simulation(props) {
         </div>
     )
 }
-
-// TODO-FIX Missing tooltips, see legacy function updateTooltips()
-// TODO-NOTE idx

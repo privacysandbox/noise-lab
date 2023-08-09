@@ -3,7 +3,7 @@ import { useState, useEffect } from 'preact/hooks'
 import { appendDataTableChild } from '../dom'
 import { simulate } from '../utils.simulate'
 import { downloadAll } from '../store'
-import { generateConfirmMessage } from '../utils.misc'
+import { generateConfirmMessage, getKeyStrategy } from '../utils.misc'
 import {
     DEFAULT_MEASUREMENT_GOALS,
     DEFAULT_DIMENSIONS,
@@ -13,7 +13,6 @@ import {
     MIN_EPSILON,
     MAX_EPSILON,
     EVENT_COUNT_PER_BUCKET_OPTIONS,
-    KEY_STRATEGIES,
 } from '../config'
 import { Epsilon } from './Epsilon'
 import { ContributionBudget } from './ContributionBudget'
@@ -29,24 +28,23 @@ import { SimulationsList } from './SimulationsList'
 const defaultUseScaling = true
 const defaultDailyEventCountPerBucket =
     EVENT_COUNT_PER_BUCKET_OPTIONS[100].value
-const defaultKeyStrategy = KEY_STRATEGIES.A.value
+const defaultKeyStrategy = getKeyStrategy(1)
 const defaultBatchingFrequency = BATCHING_FREQUENCIES.daily.value
 const defaultBudgetSplit = DEFAULT_MEASUREMENT_GOALS.map((m) => ({
     measurementGoal: m.name,
     percentage: 100 / DEFAULT_MEASUREMENT_GOALS.length,
 }))
+
 // TODO display budget split
 
 const useMountEffect = (fun) => useEffect(fun, [])
 
 export function SimpleMode(props) {
     const [epsilon, setEpsilon] = useState(DEFAULT_EPSILON)
-
     const [batchingFrequency, setBatchingFrequency] = useState(
         defaultBatchingFrequency
     )
     const [budgetSplit, setBudgetSplit] = useState(defaultBudgetSplit)
-
     const [useScaling, setUseScaling] = useState(defaultUseScaling)
     const [dailyEventCountPerBucket, setDailyEventCountPerBucket] = useState(
         defaultDailyEventCountPerBucket
@@ -119,8 +117,8 @@ export function SimpleMode(props) {
             keyStrategy,
             0, // TODO remove? / Make sim input a config object,
             [], // TODO remove,
-            'percentage', // budgetSplitMode // TODO change
-            // TODO calc this from the measurementGoal etc
+            // 'percentage', // budgetSplitMode // TODO change
+            // TODO generate this from the measurementGoal etc
             // TODO change budgetSplit data structure: Use an object for faster retrieval
             [
                 {

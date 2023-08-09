@@ -12,20 +12,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import {
-    validateInputsBeforeSimulation,
-    // getKeyStrategyFromDom,
-    getIsKeyStrategyGranularFromDom,
-    getDailyEventCountPerBucket,
-    getBudgetValueForMetricIdFromDom,
-    getIsPercentageBudgetSplitFromDom,
-    getKeyCombinationString,
-    getStrategiesKeyCombinations,
-} from './dom'
+import { validateInputsBeforeSimulation } from './dom'
 import { generateSimulationId, generateSimulationTitle } from './utils.misc'
 import {
     getRandomLaplacianNoise,
-    // getScalingFactorForMetric,
     getScalingFactorForMeasurementGoal,
     calculateNoisePercentage,
     generateKeyCombinationArray,
@@ -36,6 +26,22 @@ import {
 
 // Generate dataset
 // TODO use config object
+
+// const options = {
+//     contributionBudget,
+//     epsilon,
+//     measurementGoals,
+//     dimensions,
+//     scaling,
+//     batchingFrequency,
+//     dailyConversionCountPerBucket,
+//     dailyConversionCountTotal,
+//     keyStrategy,
+//     keyStructures,
+//     budgetSplit,
+//     zeroBucketsPercentage,
+// }
+
 export function simulate(
     metrics,
     dimensions,
@@ -52,7 +58,7 @@ export function simulate(
     keyStrategy,
     keyStructuresCount,
     keyStructures,
-    budgetSplitMode,
+    // budgetSplitMode,
     budgetSplit
 ) {
     // Validate inputs are correct
@@ -138,7 +144,7 @@ export function simulate(
                           ),
                     i,
                     zeroBucketsPercentage,
-                    budgetSplitMode,
+                    // budgetSplitMode,
                     budgetSplit
                 )
             )
@@ -161,16 +167,14 @@ function simulatePerMetric(
     dailyCount,
     simulationNo,
     zeroBucketsPercentage,
-    budgetSplitMode,
+    // budgetSplitMode,
     budgetSplit
 ) {
-    console.log(budgetSplitMode)
+    // console.log(budgetSplitMode)
     let scalingFactor = 1
-    // TODO ensure it's a boolean
-    if (!!isUseScaling) {
+    if (isUseScaling) {
         scalingFactor = getScalingFactorForMeasurementGoal(
             metric,
-            // TODO-array-learn forgot budget split prefixing
             // TODO simplify
             budgetSplit[
                 budgetSplit.findIndex(
@@ -245,7 +249,7 @@ function simulatePerMetric(
         },
         scalingFactor: scalingFactor,
         measurementGoal: metric.name,
-        dimensionsString: getKeyCombinationString(keyCombinations.names),
+        dimensionsString: keyCombinations.names.join(' x '),
         simulationNo: simulationNo,
     }
 

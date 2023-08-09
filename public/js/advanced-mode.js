@@ -1,3 +1,5 @@
+// TODO-CLEAN Delete this whole file
+
 /* Copyright 2022 Google LLC
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,41 +14,40 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import {
-    addKeyStrategyListener,
-    addMetricsButtons,
-    addDimensionsButtons,
-    getEpsilonFromDom,
-    getBatchingFrequencyFromDom,
-    getAllDimensionSizes,
-    displaySimulationResults,
-    getMetricsArrayFromDom,
-    getDimensionsArrayFromDom,
-    getIsKeyStrategyGranularFromDom,
-    getAllDimensionNamesFromDom,
-    displayMetrics,
-    displayDimensions,
-    addMetric,
-    removeMetric,
-    initializeDisplayGeneric,
-    addDimension,
-    removeDimension,
-    getIsUseScalingFromDom,
-    displayBudgetSplit,
-    loadPython,
-    getDailyEventCountPerBucket,
-    getDailyEventCountTotal,
-    updateDailyPerBucket,
-} from './dom'
-import {
-    CONTRIBUTION_BUDGET,
-    DEFAULT_MEASUREMENT_GOALS,
-    DEFAULT_DIMENSIONS,
-} from './config'
+// import {
+//     addKeyStrategyListener,
+//     addMetricsButtons,
+//     addDimensionsButtons,
+//     getEpsilonFromDom,
+//     getBatchingFrequencyFromDom,
+//     getAllDimensionSizes,
+//     displaySimulationResults,
+//     getMetricsArrayFromDom,
+//     getDimensionsArrayFromDom,
+//     getIsKeyStrategyGranularFromDom,
+//     getAllDimensionNamesFromDom,
+//     displayMetrics,
+//     displayDimensions,
+//     addMetric,
+//     removeMetric,
+//     initializeDisplayGeneric,
+//     addDimension,
+//     removeDimension,
+//     getIsUseScalingFromDom,
+//     displayBudgetSplit,
+//     loadPython,
+//     getDailyEventCountPerBucket,
+//     getDailyEventCountTotal,
+//     updateDailyPerBucket,
+// } from './dom'
+// import {
+//     CONTRIBUTION_BUDGET,
+//     DEFAULT_MEASUREMENT_GOALS,
+//     DEFAULT_DIMENSIONS,
+// } from './config'
 
-import { simulate } from './utils.simulate'
+// import { simulate } from './utils.simulate'
 
-// TODO-CLEAN Remove all of this
 // export function initializeDisplay_advancedMode() {
 //     loadPython()
 //     initializeDisplayGeneric(

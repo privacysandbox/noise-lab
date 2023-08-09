@@ -9,14 +9,17 @@ export function Dimensions(props) {
         dailyEventCountTotal,
     } = props
 
-    // TOOD check if ID and idx do not interfere!
-
     function handleChange(event, fieldToUpdate, idx) {
-        // TODO cap like epsilon!
+        let newValue = event.target.value
+        if (fieldToUpdate === 'size') {
+            newValue = Number(newValue)
+        }
+
+        // Copy the object to prevent mutations
         const newDimensions = [...dimensions]
         newDimensions[idx] = {
             ...newDimensions[idx],
-            [fieldToUpdate]: event.target.value,
+            [fieldToUpdate]: newValue,
         }
         setDimensions(newDimensions)
 

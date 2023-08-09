@@ -74,9 +74,11 @@ export const DEFAULT_MEASUREMENT_GOALS = [
 
 export const DEFAULT_DIMENSIONS = [
     // dimension.size is the number of distinct values for that dimension
-    { id: 0, size: '3', name: 'geography' },
-    { id: 1, size: '4', name: 'campaignId' },
-    { id: 2, size: '2', name: 'productCategory' },
+    { id: 0, size: 3, name: 'geography' },
+    { id: 1, size: 4, name: 'campaignId' },
+    { id: 2, size: 2, name: 'productCategory' },
+]
+
 ]
 
 export const RMSRE_THRESHOLD = 5

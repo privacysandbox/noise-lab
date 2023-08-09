@@ -14,7 +14,6 @@ export function SummaryReport(props) {
     const tableId = `output-data-table-${simulationId}-${measurementGoal}-${simulationNo}`
 
     useEffect(() => {
-        // TODO-CLEAN createAndDisplayDataTable vs appendDataTableChild
         const table = createAndDisplayDataTable(`#${tableId}`, data, {
             pagination: true,
             paginationSize: 5,

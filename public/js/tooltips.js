@@ -104,7 +104,6 @@ Key structure 2: <em>Measurement goal type</em> x <em>Campaign ID</em> x <em>Geo
 
 const advancedModeOnly = `This option is only available in the <strong>Advanced mode</strong>.<br/><br/>`
 
-// TODO clean unneeeded ones
 tippy('#help-key-strategy-simple-mode', {
     content: `${advancedModeOnly}${keyStrategyHelperHTML}`,
     ...defaultOptions,

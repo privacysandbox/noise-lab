@@ -35,6 +35,7 @@ const defaultBudgetSplit = DEFAULT_MEASUREMENT_GOALS.map((m) => ({
     measurementGoal: m.name,
     percentage: 100 / DEFAULT_MEASUREMENT_GOALS.length,
 }))
+// TODO display budget split
 
 const useMountEffect = (fun) => useEffect(fun, [])
 
@@ -51,6 +52,7 @@ export function SimpleMode(props) {
         defaultDailyEventCountPerBucket
     )
     const [keyStrategy, setKeyStrategy] = useState(defaultKeyStrategy)
+    // Both `simulations` and `allSimulationDataTables` are needed
     const [simulations, setSimulations] = useState([])
     const [allSimulationDataTables, setAllSimulationDataTables] = useState({})
 

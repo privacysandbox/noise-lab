@@ -19,7 +19,6 @@ export function CountTotal(props) {
         )
     }
 
-    // TODO update budget split when keys
     return (
         <div>
             <label>TOTAL daily attributable conversion count:</label>

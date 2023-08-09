@@ -1,5 +1,6 @@
 import { h, render, Component, Fragment } from 'preact'
 import { SimpleMode } from './SimpleMode'
+import { AdvancedMode } from './AdvancedMode'
 import { loadPython } from '../dom'
 import { SIMPLE, ADVANCED } from '../config'
 

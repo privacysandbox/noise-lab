@@ -34,6 +34,17 @@ export const BATCHING_FREQUENCIES = {
     weekly: { name: 'weekly', value: 7 },
     monthly: { name: 'monthly', value: 30 },
 }
+export const BATCHING_FREQUENCIES_MAP = {
+    [1 / 24]: 'hourly',
+    1: 'daily',
+    7: 'weekly',
+    30: 'monthly',
+}
+
+export const SCALING_MAP = {
+    true: 'Yes (recommended)',
+    false: 'No',
+}
 
 export const EVENT_COUNT_PER_BUCKET_OPTIONS = {
     // `value` represents the multiplier on a daily reference value

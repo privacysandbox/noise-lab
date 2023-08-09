@@ -228,20 +228,6 @@ export function displayInputParameters(
         )
         .join('\n⏤⏤⏤\n ')
 
-    // TODO-CLEAN Move this out
-    const batchingFrequenciesMap = {
-        [1 / 24]: 'hourly',
-        1: 'daily',
-        7: 'weekly',
-        30: 'monthly',
-    }
-
-    // TODO-CLEAN Move this out
-    const scalingMap = {
-        true: 'Yes (recommended)',
-        false: 'No',
-    }
-
     const table = appendDataTableChild(
         tableContainerEl,
         [
@@ -274,12 +260,13 @@ export function displayInputParameters(
             {
                 Parameter: 'Batching frequency',
                 'Value (raw)': batchingFrequency,
-                'Value (formatted)': batchingFrequenciesMap[batchingFrequency],
+                'Value (formatted)':
+                    BATCHING_FREQUENCIES_MAP[batchingFrequency],
             },
             {
                 Parameter: 'Scaling',
                 'Value (raw)': isUseScaling,
-                'Value (formatted)': scalingMap[isUseScaling],
+                'Value (formatted)': SCALING_MAP[isUseScaling],
             },
         ],
         true

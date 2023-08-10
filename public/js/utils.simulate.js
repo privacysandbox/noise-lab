@@ -12,75 +12,48 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import {
-    validateInputsBeforeSimulation,
-    getKeyStrategyFromDom,
-    getIsKeyStrategyGranularFromDom,
-    getDailyEventCountPerBucket,
-    getBudgetValueForMetricIdFromDom,
-    getIsPercentageBudgetSplitFromDom,
-    getKeyCombinationString,
-    getZeroConversionsPercentageFromDom,
-    getStrategiesKeyCombinations,
-} from './dom'
 import { generateSimulationId, generateSimulationTitle } from './utils.misc'
 import {
     getRandomLaplacianNoise,
-    getScalingFactorForMetric,
+    getScalingFactorForMeasurementGoal,
     calculateNoisePercentage,
     generateKeyCombinationArray,
     generateSummaryValue,
     calculateAverageNoisePercentageRaw,
     getNoise_Rmsre,
 } from './utils.noise'
+import { getBudgetPercentageForMeasurementGoal } from './utils.misc'
 
-// generate dataset
-export function simulate(
-    metrics,
-    dimensions,
-    dimensionNames,
-    dimensionSizes,
-    epsilon,
-    contributionBudget,
-    isUseScaling,
-    isGranular,
-    batchingFrequency,
-    dailyConversionCountPerBucket,
-    dailyConversionCountTotal
-) {
-    // Validate inputs are correct
-    if (!validateInputsBeforeSimulation(metrics, dimensions, isGranular)) return
+export function simulate(options) {
+    const {
+        contributionBudget,
+        epsilon,
+        measurementGoals,
+        dimensions,
+        useScaling,
+        batchingFrequency,
+        dailyEventCountPerBucket,
+        keyStrategy,
+        keyStructures,
+        budgetSplit,
+        zeroBucketsPercentage,
+    } = options
 
-    // declare array containing possible combinations for keys
-    var r = []
-    var keyCombList = []
-
-    // logic for generating one dataset with all keys - string parameter 'all' is used
-    if (isGranular) {
-        var keyComb = generateKeyCombinationArray(dimensionSizes)
+    // Declare array containing possible combinations for keys
+    const keyCombList = []
+    for (let i = 0; i < keyStructures.length; i++) {
         keyCombList.push({
-            names: dimensionNames,
-            combinations: keyComb,
+            names: keyStructures[i].names,
+            combinations: generateKeyCombinationArray(
+                keyStructures[i].combinations
+            ),
+            // Calculate the size of the sub-key
+            size: keyStructures[i].combinations.reduce((acc, val) => {
+                acc = acc * val
+                return acc
+            }, 1),
         })
-    } else {
-        const allCombs = getStrategiesKeyCombinations(dimensions)
-
-        for (let i = 0; i < allCombs.length; i++) {
-            keyCombList.push({
-                names: allCombs[i].names,
-                combinations: generateKeyCombinationArray(
-                    allCombs[i].combinations
-                ),
-                // Calculate the size of the sub-key
-                size: allCombs[i].combinations.reduce((acc, val) => {
-                    acc = acc * val
-                    return acc
-                }, 1),
-            })
-        }
     }
-
-    const keyStrategy = getKeyStrategyFromDom()
 
     const simulation = {
         metadata: {
@@ -89,90 +62,90 @@ export function simulate(
         },
         inputParameters: {
             // Used later for display
-            dailyConversionCountPerBucket,
+            dailyEventCountPerBucket,
             dimensions,
             epsilon,
             keyStrategy,
-            metrics,
+            measurementGoals,
             batchingFrequency,
-            isUseScaling,
+            useScaling,
         },
         summaryReports: [],
     }
 
-    metrics.forEach((element) => {
+    measurementGoals.forEach((measGoal) => {
         for (let i = 0; i < keyCombList.length; i++) {
-            simulation.summaryReports.push(
-                simulatePerMetric(
-                    keyCombList[i],
-                    element,
-                    epsilon,
-                    contributionBudget,
-                    isUseScaling,
-                    batchingFrequency,
-                    getIsKeyStrategyGranularFromDom()
-                        ? getDailyEventCountPerBucket()
-                        : Math.floor(
-                              dailyConversionCountTotal / keyCombList[i].size
-                          ),
-                    i
-                )
-            )
+            const options = {
+                contributionBudget: contributionBudget,
+                epsilon: epsilon,
+                measurementGoal: measGoal,
+                useScaling: useScaling,
+                batchingFrequency: batchingFrequency,
+                dailyEventCountPerBucket: dailyEventCountPerBucket,
+                budgetSplit: budgetSplit,
+                zeroBucketsPercentage: zeroBucketsPercentage,
+                keyCombinations: keyCombList[i],
+                simulationNo: i,
+            }
+            simulation.summaryReports.push(simulatePerMeasurementGoal(options))
         }
     })
-
     return simulation
 }
 
-function simulatePerMetric(
-    keyCombinations,
-    metric,
-    epsilon,
-    contributionBudget,
-    isUseScaling,
-    batchingFrequency,
-    dailyCount,
-    simulationNo
-) {
-    const value = getBudgetValueForMetricIdFromDom(metric.id)
-    const isPercentage = getIsPercentageBudgetSplitFromDom()
-    const scalingFactor = isUseScaling
-        ? getScalingFactorForMetric(
-              metric,
-              value,
-              isPercentage,
-              contributionBudget
-          )
-        : 1
-    const keyCombinationString = getKeyCombinationString(keyCombinations.names)
+function simulatePerMeasurementGoal(options) {
+    const {
+        contributionBudget,
+        epsilon,
+        measurementGoal,
+        useScaling,
+        batchingFrequency,
+        dailyEventCountPerBucket,
+        budgetSplit,
+        zeroBucketsPercentage,
+        keyCombinations,
+        simulationNo,
+    } = options
+
+    let scalingFactor = 1
+    if (useScaling) {
+        scalingFactor = getScalingFactorForMeasurementGoal(
+            measurementGoal,
+            getBudgetPercentageForMeasurementGoal(
+                budgetSplit,
+                measurementGoal.name
+            ),
+            contributionBudget
+        )
+    }
 
     const report = []
 
     var noisePercentageSum = 0
     for (let i = 0; i < keyCombinations.combinations.length; i++) {
         const noise = getRandomLaplacianNoise(contributionBudget, epsilon)
-
         const randCount = generateSummaryValue(
-            metric,
+            measurementGoal,
             i,
-            dailyCount,
+            dailyEventCountPerBucket,
             batchingFrequency,
-            getZeroConversionsPercentageFromDom()
+            zeroBucketsPercentage
         )
-
         const noiseValueAPE = calculateNoisePercentage(
             noise,
             // Noiseless summary value
             Math.round(randCount * scalingFactor)
         )
         noisePercentageSum += noiseValueAPE
-
-        const summaryValue_scaled_noisy = Math.round(randCount * scalingFactor + noise)
-
+        const summaryValue_scaled_noisy = Math.round(
+            randCount * scalingFactor + noise
+        )
         report.push({
             key: keyCombinations.combinations[i],
             summaryValue: randCount,
-            summaryValue_scaled_noiseless: Math.round(randCount * scalingFactor),
+            summaryValue_scaled_noiseless: Math.round(
+                randCount * scalingFactor
+            ),
             summaryValue_scaled_noisy: summaryValue_scaled_noisy,
             noise: noise,
             noise_ape_individual: noiseValueAPE,
@@ -185,19 +158,16 @@ function simulatePerMetric(
     const allSummaryValuesPostNoise = Object.values(report).map(
         (v) => v.summaryValue_scaled_noisy
     )
-
     const noise_ape =
         calculateAverageNoisePercentageRaw(
             noisePercentageSum,
             keyCombinations.combinations.length
         ) * 100
-
     const noise_rmsre = getNoise_Rmsre(
         allSummaryValuesPostNoise,
         allSummaryValuesPreNoise,
         scalingFactor
     )
-
     const simulationReport = {
         data: report,
         noiseMetrics: {
@@ -205,10 +175,9 @@ function simulatePerMetric(
             noise_rmsre: noise_rmsre,
         },
         scalingFactor: scalingFactor,
-        measurementGoal: metric.name,
-        dimensionsString: keyCombinationString,
+        measurementGoal: measurementGoal.name,
+        dimensionsString: keyCombinations.names.join(' x '),
         simulationNo: simulationNo,
     }
-
     return simulationReport
 }

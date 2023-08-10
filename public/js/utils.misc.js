@@ -12,16 +12,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
+import { KEY_STRATEGY_A, KEY_STRATEGY_B } from './config'
+
 export function generateSimulationId() {
     return crypto.randomUUID().substring(0, 8)
 }
 
 export function generateSimulationTitle(dateTime) {
     return `Simulation ${dateTime.toLocaleTimeString()} ${dateTime.toLocaleDateString()} `
-}
-
-export function generateCsvFileName(simulationId, tableName) {
-    return `${simulationId}-${tableName}-noiseLab.csv`
 }
 
 export function generateRandomTableId(prefix = '') {
@@ -34,4 +32,70 @@ export function generateSimulationWrapperElId(simulationId) {
 
 export function generateConfirmMessage() {
     return 'This will clear all simulations, so make sure to download your simulation data before you continue. Continue?'
+}
+
+export function cap(input, min, max) {
+    if (max !== undefined && input > max) {
+        return max
+    } else if (input < min) {
+        return min
+    } else {
+        return input
+    }
+}
+
+export function getKeyStrategy(keyStructuresCount) {
+    return keyStructuresCount > 1 ? KEY_STRATEGY_B : KEY_STRATEGY_A
+}
+
+export function getDailyEventCountPerBucket(dailyEventCountTotal, dimensions) {
+    return Math.floor(dailyEventCountTotal / getNumberOfBuckets(dimensions))
+}
+
+export function getNumberOfBuckets(dimensions) {
+    let nbOfBuckets = 1
+    dimensions
+        .map((d) => d.size)
+        .forEach((dimSize) => {
+            nbOfBuckets = nbOfBuckets * dimSize
+        })
+    return nbOfBuckets
+}
+
+// input =  (
+// ['geography', 'campaignId'],
+// [{ id: 0, size: 3, name: 'geography' },
+//     { id: 1, size: 4, name: 'campaignId' },
+//     { id: 2, size: 2, name: 'productCategory' },
+// ]
+// )
+// output = ({names: ['geography', 'campaignId'], combinations: [3, 4]})
+export function generateKeyStructure(dimensionsSubsetNames, allDimensions) {
+    const keyStructure = {}
+    keyStructure.names = dimensionsSubsetNames
+    keyStructure.combinations = dimensionsSubsetNames.map((dimName) =>
+        getDimensionSize(dimName, allDimensions)
+    )
+    return keyStructure
+}
+
+function getDimensionSize(dimName, allDimensions) {
+    const dimensionIdx = allDimensions.findIndex((d) => d.name === dimName)
+    return allDimensions[dimensionIdx].size
+}
+
+export function generateEqualBudgetSplit(measurementGoals, contributionBudget) {
+    return measurementGoals.map((measGoal) => ({
+        measurementGoal: measGoal.name,
+        percentage: 100 / measurementGoals.length,
+        value: contributionBudget / measurementGoals.length,
+    }))
+}
+
+// budgetSplit looks like this: { measurementGoal: xxx, percentage: xxx, value: xxx }
+export function getBudgetPercentageForMeasurementGoal(budgetSplit, measurementGoalName) {
+    const idx = budgetSplit.findIndex(
+        (entry) => entry.measurementGoal === measurementGoalName
+    )
+    return budgetSplit[idx].percentage
 }

@@ -84,7 +84,7 @@ tippy('#help-batching-frequency', {
 })
 
 tippy('#help-zero-pct', {
-    content: `<em> Final text TBC</em> <br> The percentage of buckets with zero conversions expected. Expected values between 0-10.  <br> NOTE: <em>In real world we can expect up to 99% of the buckets to have <1 conversions. However, this parameter only allows up to 10% just to give you a better understanding of how this can affect the noise overall</em>`,
+    content: `The percentage of buckets with zero conversions expected. Expected values between 0-10.<br> NOTE: <em>In the real world, we can expect up to 99% of the buckets to have <1 conversions. However, this parameter only allows up to 10% just to give you a better understanding of how this can affect the noise overall</em>`,
     ...defaultOptions,
 })
 
@@ -97,8 +97,8 @@ In Strategy A, you use one granular key structure, that includes all your dimens
 </li>
 <li>
 In Strategy B, you use two coarse key structures, each including a subset of your dimensions. For example:
-Key structure I: <em>Measurement goal type</em> x <em>Geo ID</em> x <em>Product category</em>.
-Key structure II: <em>Measurement goal type</em> x <em>Campaign ID</em> x <em>Geo ID</em>.
+Key structure 1: <em>Measurement goal type</em> x <em>Geo ID</em> x <em>Product category</em>.
+Key structure 2: <em>Measurement goal type</em> x <em>Campaign ID</em> x <em>Geo ID</em>.
 </li>
 </ul>`
 
@@ -109,7 +109,7 @@ tippy('#help-key-strategy-simple-mode', {
     ...defaultOptions,
 })
 
-tippy('#help-key-strategy-advanced-mode', {
+tippy('#help-key-strategy', {
     content: keyStrategyHelperHTML,
     ...defaultOptions,
 })
@@ -119,16 +119,16 @@ tippy('#help-key-strategy-number', {
     For example: 
     <ul>
     <li>
-    Key structure I: <em>Measurement goal type</em> x <em>Geo ID</em> x <em>Product category</em>.
+    Key structure 1: <em>Measurement goal type</em> x <em>Geo ID</em> x <em>Product category</em>.
     </li>
     <li>
-    Key structure II: <em>Measurement goal type</em> x <em>Campaign ID</em> x <em>Geo ID</em>.
+    Key structure 2: <em>Measurement goal type</em> x <em>Campaign ID</em> x <em>Geo ID</em>.
     </li>
     </ul>`,
     ...defaultOptions,
 })
 
-const budgetHelperHTML = `When scaling, adtechs can decide to split their contribution budget in various ways. You can split the budget equally across measurement goals⏤this is the more basic approach, and the default Noise Lab uses⏤, or to split it inequally by assigning more budget to a measurement goal⏤this leads to <strong>higher signal-to-noise ratios</strong>.`
+const budgetHelperHTML = `You can split the budget equally across measurement goals⏤this is the more basic approach. But you can also to split it inequally, by assigning more budget to a measurement goal that needs it. This can lead to <strong>higher signal-to-noise ratios</strong>.`
 
 tippy('#help-budget-split-simple-mode', {
     content: `${advancedModeOnly}${budgetHelperHTML}`,
@@ -210,9 +210,7 @@ tippy('#user-guide', {
     ...bottomOptions,
 })
 
-export function updateOutlierNote() {
-    tippy('#help-outlier-management', {
-        content: `'Max value' will be used for calculating the scaling factor. If this maximum value includes outliers, you may want to consider setting up a different key structure as explained in this section of the user guide - <a href="${quickGuideUrl}/#outlier-management-advanced">Advanced outlier management</a>, or by removing outliers, when figuring out the maximum value, if they account for a small percentage of all the values.`,
-        ...defaultOptions,
-    })
-}
+tippy('#help-outlier-management', {
+    content: `'Max value' will be used for calculating the scaling factor. If this maximum value includes outliers, you may want to consider setting up a different key structure as explained in this section of the user guide - <a href="${quickGuideUrl}/#outlier-management-advanced">Advanced outlier management</a>, or by removing outliers, when figuring out the maximum value, if they account for a small percentage of all the values.`,
+    ...defaultOptions,
+})

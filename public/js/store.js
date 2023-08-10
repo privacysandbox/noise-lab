@@ -14,18 +14,17 @@ limitations under the License. */
 
 let allSimulationDataTables = {}
 
+// Used for XLSX multi-table download
 export function saveTable(
     // newTable must be a TabulatorFull object
     newTable,
     newTableTitle
 ) {
-    console.log(newTable)
     allSimulationDataTables = {
         ...allSimulationDataTables,
         // tableTitle already includes the simulation Id
         [`${newTableTitle}`]: newTable,
     }
-    console.log(allSimulationDataTables)
 }
 
 export function downloadAll() {

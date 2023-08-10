@@ -12,25 +12,16 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-export const APP_VERSION = 'v3.1.0'
+export const APP_NAME = '🧪 Noise Lab'
 
-export const MODES = {
-    simple: {
-        name: 'simple',
-        searchQueryParam: 'simple',
-        displayName: 'simple mode',
-    },
-    advanced: {
-        name: 'advanced',
-        searchQueryParam: 'advanced',
-        displayName: 'advanced mode',
-    },
-}
+export const APP_VERSION = 'v4.0.0'
 
-export const KEY_STRATEGIES = {
-    A: { value: 'A', name: 'A' },
-    B: { value: 'B', name: 'B' },
-}
+export const SIMPLE = 'simple'
+export const ADVANCED = 'advanced'
+export const MODES = [SIMPLE, ADVANCED]
+
+export const KEY_STRATEGY_A = 'A'
+export const KEY_STRATEGY_B = 'B'
 
 export const BATCHING_FREQUENCIES = {
     // value represents the multiplier on a daily reference value
@@ -39,25 +30,67 @@ export const BATCHING_FREQUENCIES = {
     weekly: { name: 'weekly', value: 7 },
     monthly: { name: 'monthly', value: 30 },
 }
+export const BATCHING_FREQUENCIES_MAP = {
+    [1 / 24]: 'hourly',
+    1: 'daily',
+    7: 'weekly',
+    30: 'monthly',
+}
+
+export const SCALING_MAP = {
+    true: 'Yes (recommended)',
+    false: 'No',
+}
+
+export const EVENT_COUNT_PER_BUCKET_OPTIONS = {
+    // `value` represents the multiplier on a daily reference value
+    5: { name: '5', value: 5 },
+    10: { name: '10', value: 10 },
+    100: { name: '100', value: 100 },
+    1000: { name: '1000', value: 1000, isDefault: true },
+    10000: { name: '10000', value: 10000 },
+    100000: { name: '100000', value: 100000 },
+}
+
+export const EVENT_COUNT_TOTAL_OPTIONS = {
+    // `value` represents the multiplier on a daily reference value
+    5: { name: '5', value: 5 },
+    10: { name: '10', value: 10 },
+    100: { name: '100', value: 100 },
+    100: { name: '500', value: 500 },
+    1000: { name: '1000', value: 1000, isDefault: true },
+    10000: { name: '10000', value: 10000 },
+    100000: { name: '100000', value: 100000 },
+}
 
 export const DEFAULT_MEASUREMENT_GOALS = [
-    { id: 1, name: 'purchaseValue', maxValue: 1000, avgValue: 120 },
-    { id: 2, name: 'purchaseCount', maxValue: 1, avgValue: 1 },
+    { id: 0, name: 'purchaseValue', maxValue: 1000, avgValue: 120 },
+    { id: 1, name: 'purchaseCount', maxValue: 1, avgValue: 1 },
 ]
 
 export const DEFAULT_DIMENSIONS = [
     // dimension.size is the number of distinct values for that dimension
-    // id is not needed for simple mode; TODO why needed for advanced?
-    { id: '1', size: '3', name: 'geography' },
-    { id: '2', size: '4', name: 'campaignId' },
-    { id: '3', size: '2', name: 'productCategory' },
+    { id: 0, size: 3, name: 'geography' },
+    { id: 1, size: 4, name: 'campaignId' },
+    { id: 2, size: 2, name: 'productCategory' },
 ]
 
+export const DEFAULT_DIMENSIONS_NAMES = [
+    'geography',
+    'campaignId',
+    'productCategory',
+]
 
 export const RMSRE_THRESHOLD = 5
 
 export const CONTRIBUTION_BUDGET = 65536
 
-export const modeSearchQueryParams = Object.values(MODES).map(
-    (mode) => mode.searchQueryParam
-)
+export const DEFAULT_EPSILON = 10
+export const MIN_EPSILON = 0
+export const MAX_EPSILON = 64
+
+export const BUDGET_SPLIT_VALUE = 'value'
+export const BUDGET_SPLIT_PERCENTAGE = 'percentage'
+
+
+

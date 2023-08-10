@@ -14,7 +14,15 @@
     "license": "Apache-2.0",
     "dependencies": {
         "@stdlib/random-base-laplace": "^0.0.6",
+        "preact": "^10.16.0",
         "tabulator-tables": "^5.4.3",
         "tippy.js": "^6.3.7"
+    },
+    "alias": {
+        "preact/jsx-dev-runtime": "preact/jsx-runtime"
+    },
+    "devDependencies": {
+        "domain-browser": "^3.5.0",
+        "parcel-bundler": "^1.12.5"
     }
 }

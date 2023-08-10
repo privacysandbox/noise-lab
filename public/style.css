@@ -64,21 +64,21 @@ h3 {
     font-size: var(--font-size-s);
     letter-spacing: 0.8px;
     text-transform: uppercase;
-    margin: 1.5rem 0 1.3rem 0;
+    margin: 3.2rem 0 1.3rem 0;
     border-top: solid 1.4px var(--border-color);
     padding-top: 0.8rem;
     color: var(--text-color-x-lighter);
 }
 
 h4 {
-    margin: 1.8rem 0 0.5rem 0;
-    font-size: 1rem;
+    margin: 1.2rem 0;
+    font-size: .94rem;
 }
 
 h5 {
     margin: var(--margin-helper);
     padding: 0.8rem 0 0.2rem 0;
-    font-size: 0.9rem;
+    font-size: .84rem;
     display: block;
 }
 
@@ -96,6 +96,10 @@ a {
 
 .mono {
     font-family: monospace;
+}
+
+.header-count {
+    color: var(--primary)
 }
 
 /* DATA TABLES */
@@ -189,7 +193,7 @@ main {
 .launch-panel {
     background: var(--blue-light);
     z-index: 100;
-    width: 27rem !important;
+    width: 28rem !important;
     background: var(--x-light-grey);
     height: var(--main-height);
     border-right: solid 1px var(--border-color);
@@ -334,7 +338,12 @@ button {
     transition: filter 0.1s linear, box-shadow 0.1s linear;
 }
 
-button:hover {
+button:disabled {
+    color: grey !important;
+    cursor: not-allowed !important;
+}
+
+button:hover:not([disabled]) {
     filter: brightness(0.86);
 }
 
@@ -443,16 +452,17 @@ label {
     width: var(--label-width);
     padding-right: var(--label-padding-right);
     display: inline-block;
+    line-height: 1rem;
 }
 
 label.long {
     width: auto;
 }
 
-#budget-split-wrapper-el {
+.framed {
     border: solid 1px var(--border-color-dark);
-    margin: 0.2rem 2rem 0.2rem 0rem;
-    padding: 0.4rem;
+    margin: 0.6rem 0.6rem 0.6rem 0;
+    padding: 0.6rem;
 }
 
 input,
@@ -508,6 +518,7 @@ select:focus {
     font-size: 0.8rem;
     transition: filter 0.2s ease-out;
     display: inline-block;
+    margin-left: 0.2rem;
 }
 
 .help:hover {
@@ -526,7 +537,6 @@ select:focus {
 
 .has-helper {
     display: inline-block;
-    padding-right: 0.4rem;
 }
 
 /* VERSION */
@@ -592,19 +602,33 @@ hr {
     margin-left: 0.4rem;
 }
 
+.button-bar {
+    display: flex;
+    align-items: center;
+}
+
+.button-bar button {
+    margin-right: 1.4rem;
+}
+
+.margin-v {
+    margin: .4rem 0;
+}
+
 /* FORM VALIDATION */
 
 #form-validation-wrapper {
-    animation: appear 0.5s forwards;
+    animation: appear 0.3s forwards;
     box-shadow: rgba(75, 75, 85, 0.446) 0px 7px 29px 0px;
-    color: var(--red);
-    background: var(--red-light);
+    background: var(--red);
+    color: var(--red-light);
+    z-index: 100000;
     height: 10ch;
     padding: 1.2ch;
     position: absolute;
-    z-index: 10000;
-    overflow-y: scroll;
     bottom: 1.2rem;
+    right: 2rem;
+    overflow-y: scroll;
 }
 
 /* EMPTY STATE */

@@ -20,6 +20,7 @@ import {
     EVENT_COUNT_TOTAL_OPTIONS,
     MIN_EPSILON,
     MAX_EPSILON,
+    BUDGET_SPLIT_PERCENTAGE,
 } from '../config'
 import { Epsilon } from './Epsilon'
 import { ContributionBudget } from './ContributionBudget'
@@ -35,14 +36,6 @@ import { Dimensions } from './Dimensions'
 import { ZeroBuckets } from './ZeroBuckets'
 import { KeyStructuresCount } from './KeyStructuresCount'
 import { KeyStructures } from './KeyStructures'
-
-// TODO If only one key structure, enforce that all checkboxes for dimensions must always e checked
-// TODO ensure key structure count and key structure list are in sync at all times
-
-// For simple mode, TODO use generateKeyStructures in simulate (or pass it from parent)
-// For simple mode, display number of key structures
-
-// TODO when key count is reset to 1, hard reset and disable all fields!!
 
 // Default values for simulation parameters
 const defaultUseScaling = true
@@ -73,7 +66,9 @@ export function AdvancedMode(props) {
         DEFAULT_MEASUREMENT_GOALS
     )
     const [zeroBucketsPercentage, setZeroBucketsPercentage] = useState(0)
-    const [budgetSplitMode, setBudgetSplitMode] = useState('percentage')
+    const [budgetSplitMode, setBudgetSplitMode] = useState(
+        BUDGET_SPLIT_PERCENTAGE
+    )
     const [dimensions, setDimensions] = useState(DEFAULT_DIMENSIONS)
 
     const [keyStructuresCount, setKeyStructuresCount] = useState(
@@ -99,6 +94,9 @@ export function AdvancedMode(props) {
     // TODO: if key count changes and is lower, regenerate keyStructures
     // TODO: if dimensions changes (name, count or even size(?)), regenerate keyStructures here
     // TODO: setKeyStructure within the keyStructure
+    // TODO If only one key structure, enforce that all checkboxes for dimensions must always e checked
+    // TODO ensure key structure count and key structure list are in sync at all times
+    // TODO when key count is reset to 1, hard reset and disable all fields!!
 
     useEffect(() => {
         const simulationsCount = simulations.length
@@ -136,9 +134,7 @@ export function AdvancedMode(props) {
                 dimensions: dimensions,
                 useScaling: useScaling,
                 batchingFrequency: batchingFrequency,
-                // TODO rename conversion to event
-                dailyConversionCountPerBucket: dailyEventCountPerBucket,
-                dailyConversionCountTotal: dailyEventCountTotal,
+                dailyEventCountPerBucket: dailyEventCountPerBucket,
                 keyStrategy: keyStrategy,
                 keyStructures: keyStructures,
                 budgetSplit: budgetSplit,
@@ -150,14 +146,13 @@ export function AdvancedMode(props) {
     }
 
     function clearAll() {
-        // TODO-CHECK: reset form validation
         if (simulations.length > 0) {
             if (window.confirm(generateConfirmMessage())) {
                 setSimulations([])
                 setAllSimulationDataTables({})
+                setErrors([])
             }
         }
-        // TODO-NOTE that displayEmptyState is not needed here anymore
     }
 
     function downloadAllTables() {
@@ -168,7 +163,7 @@ export function AdvancedMode(props) {
         const newMeasurementGoals = [
             ...measurementGoals,
             {
-                // TODO Check if id is needed
+                // TODO-improvement Remove id if not needed
                 id: measurementGoals.length,
                 name: 'newMeasurementGoal',
                 maxValue: 1,
@@ -201,7 +196,7 @@ export function AdvancedMode(props) {
 
     function addNewDimension() {
         const newDimension = {
-            // TODO Check if id is needed
+            // TODO-improvement Remove id if not needed
             id: dimensions.length,
             name: 'newDimension',
             size: 2,
@@ -337,7 +332,6 @@ export function AdvancedMode(props) {
                             <h4>Key strategy:</h4>
                             <KeyStrategy keyStrategy={keyStrategy} />
                             <KeyStructuresCount
-                                dimensions={dimensions}
                                 keyStructuresCount={keyStructuresCount}
                                 setKeyStructuresCount={setKeyStructuresCount}
                                 measurementGoals={measurementGoals}

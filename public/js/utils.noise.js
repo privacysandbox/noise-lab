@@ -121,7 +121,7 @@ function cartesian(...args) {
 export function generateSummaryValue(
     measGoal,
     deterministicValue,
-    dailyConversionCount,
+    dailyEventCount,
     batchingFrequency,
     zeroPct
 ) {
@@ -151,15 +151,15 @@ export function generateSummaryValue(
     // we are adding/deducting the deterministic value
     var dailyConversionValue =
         deterministicValue % 2 == 0 && deterministicValue > 0
-            ? Number(dailyConversionCount) + Number(deterministicValue)
-            : Number(dailyConversionCount) - Number(deterministicValue)
+            ? Number(dailyEventCount) + Number(deterministicValue)
+            : Number(dailyEventCount) - Number(deterministicValue)
 
     // Limit the number of conversaion per current bucket to double the avg
     dailyConversionValue =
         dailyConversionValue > 0 &&
-        dailyConversionValue < 2 * Number(dailyConversionCount)
+        dailyConversionValue < 2 * Number(dailyEventCount)
             ? dailyConversionValue
-            : dailyConversionCount
+            : dailyEventCount
 
     // result is the product between variated measurement goal value, variated conversion count per current bucket and frequency
     var res = Math.floor(

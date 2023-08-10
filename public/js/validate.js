@@ -131,7 +131,6 @@ function validateKeyStructures(errors, keyStructuresCount, keyStructures) {
         return
     }
     keyStructures.forEach((keyStructure, idx) => {
-        console.log(keyStructure)
         if (keyStructure.combinations.length < 2) {
             errors.push(
                 `Key structure ${

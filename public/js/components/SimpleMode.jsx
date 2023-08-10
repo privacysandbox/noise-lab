@@ -30,6 +30,7 @@ import { BatchingFrequency } from './BatchingFrequency'
 import { Scaling } from './Scaling'
 import { EmptyState } from './EmptyState'
 import { KeyStrategy } from './KeyStrategy'
+import { KeyStructures } from './KeyStructures'
 import { SimulationsList } from './SimulationsList'
 
 // Default values for simulation parameters
@@ -42,8 +43,6 @@ const defaultBudgetSplit = generateEqualBudgetSplit(
     CONTRIBUTION_BUDGET
 )
 
-// TODO display budget split
-// TODO display the one key
 // TODO clearAll!
 
 const useMountEffect = (fun) => useEffect(fun, [])
@@ -55,25 +54,30 @@ export function SimpleMode(props) {
         defaultBatchingFrequency
     )
     const [budgetSplit, setBudgetSplit] = useState(defaultBudgetSplit)
+    const [budgetSplitMode, setBudgetSplitMode] = useState(
+        BUDGET_SPLIT_PERCENTAGE
+    )
     const [useScaling, setUseScaling] = useState(defaultUseScaling)
     const [dailyEventCountPerBucket, setDailyEventCountPerBucket] = useState(
         defaultDailyEventCountPerBucket
     )
-    const keyStrategy = getKeyStrategy(1)
     // Both `simulations` and `allSimulationDataTables` are needed
     const [simulations, setSimulations] = useState([])
     const [allSimulationDataTables, setAllSimulationDataTables] = useState({})
 
+    // In Simple mode, we enforce Strategy A: one key structure that encodes all the dimensions (= one deep tree)
+    const keyStructuresCount = 1
+    const keyStrategy = getKeyStrategy(1)
     const keyStructures = [
         generateKeyStructure(DEFAULT_DIMENSIONS_NAMES, DEFAULT_DIMENSIONS),
     ]
 
     function clearAll() {
-        // TODO-CHECK: reset form validation
         if (simulations.length > 0) {
             if (window.confirm(generateConfirmMessage())) {
                 setSimulations([])
                 setAllSimulationDataTables({})
+                setErrors([])
             }
         }
     }
@@ -116,7 +120,7 @@ export function SimpleMode(props) {
             dimensions: DEFAULT_DIMENSIONS,
             useScaling: useScaling,
             dailyEventCountPerBucket: dailyEventCountPerBucket,
-            keyStructuresCount: 1,
+            keyStructuresCount: keyStructuresCount,
             keyStructures: keyStructures,
             budgetSplit: budgetSplit,
             budgetSplitMode: BUDGET_SPLIT_PERCENTAGE,
@@ -130,16 +134,9 @@ export function SimpleMode(props) {
             dimensions: DEFAULT_DIMENSIONS,
             useScaling: useScaling,
             batchingFrequency: batchingFrequency,
-            // TODO rename conversion to event
-            dailyConversionCountPerBucket: dailyEventCountPerBucket,
-            // Not needed for simple mode
-            // TODO change that
-            dailyConversionCountTotal: null,
+            dailyEventCountPerBucket: dailyEventCountPerBucket,
             keyStrategy: keyStrategy,
-            // TODO change that - Not needed for simple mode (?)
             keyStructures: keyStructures,
-            // TODO generate this from the measurementGoal etc
-            // TODO change budgetSplit data structure: Use an object for faster retrieval
             budgetSplit,
             zeroBucketsPercentage: 0,
         }
@@ -204,13 +201,28 @@ export function SimpleMode(props) {
                                 useScaling={useScaling}
                                 setUseScaling={setUseScaling}
                             />
-                            <ContributionBudgetSplit
-                                budgetSplit={budgetSplit}
-                                setBudgetSplit={setBudgetSplit}
-                                disabled
-                            />
+                            {useScaling && (
+                                <ContributionBudgetSplit
+                                    budgetSplit={budgetSplit}
+                                    setBudgetSplit={setBudgetSplit}
+                                    budgetSplitMode={budgetSplitMode}
+                                    setBudgetSplitMode={setBudgetSplitMode}
+                                    disabled
+                                />
+                            )}
                             <h4>Key strategy:</h4>
                             <KeyStrategy keyStrategy={keyStrategy} />
+                            <div class="input-hint">
+                                In <bold>Simple mode</bold>, only Key Strategy A
+                                is available. Try Key Strategy B in the{' '}
+                                <bold>Advanced mode</bold>.
+                            </div>
+                            <KeyStructures
+                                keyStructuresCount={keyStructuresCount}
+                                dimensions={DEFAULT_DIMENSIONS}
+                                keyStructures={keyStructures}
+                                setKeyStructures={undefined}
+                            />
                         </div>
                     </div>
                     <div class="buttons-wrapper-launch-panel">

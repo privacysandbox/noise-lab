@@ -31,8 +31,7 @@ export function simulate(options) {
         dimensions,
         useScaling,
         batchingFrequency,
-        dailyConversionCountPerBucket,
-        dailyConversionCountTotal,
+        dailyEventCountPerBucket,
         keyStrategy,
         keyStructures,
         budgetSplit,
@@ -40,36 +39,19 @@ export function simulate(options) {
     } = options
 
     // Declare array containing possible combinations for keys
-    var keyCombList = []
-
-    // TODO change
-    const isGranular = keyStrategy === 'A'
-
-    // Logic for generating one dataset with all keys - string parameter 'all' is used
-    const dimensionSizes = dimensions.map((dim) => dim.size)
-    const dimensionNames = dimensions.map((dim) => dim.name)
-    if (isGranular) {
-        var keyComb = generateKeyCombinationArray(dimensionSizes)
+    const keyCombList = []
+    for (let i = 0; i < keyStructures.length; i++) {
         keyCombList.push({
-            names: dimensionNames,
-            combinations: keyComb,
+            names: keyStructures[i].names,
+            combinations: generateKeyCombinationArray(
+                keyStructures[i].combinations
+            ),
+            // Calculate the size of the sub-key
+            size: keyStructures[i].combinations.reduce((acc, val) => {
+                acc = acc * val
+                return acc
+            }, 1),
         })
-    } else {
-        const allCombs = keyStructures
-        for (let i = 0; i < allCombs.length; i++) {
-            // TODO unify this code across the two branches (key strategies)
-            keyCombList.push({
-                names: allCombs[i].names,
-                combinations: generateKeyCombinationArray(
-                    allCombs[i].combinations
-                ),
-                // Calculate the size of the sub-key
-                size: allCombs[i].combinations.reduce((acc, val) => {
-                    acc = acc * val
-                    return acc
-                }, 1),
-            })
-        }
     }
 
     const simulation = {
@@ -79,7 +61,7 @@ export function simulate(options) {
         },
         inputParameters: {
             // Used later for display
-            dailyConversionCountPerBucket,
+            dailyEventCountPerBucket,
             dimensions,
             epsilon,
             keyStrategy,
@@ -98,11 +80,7 @@ export function simulate(options) {
                 measurementGoal: measGoal,
                 useScaling: useScaling,
                 batchingFrequency: batchingFrequency,
-                dailyConversionCountPerBucket: isGranular
-                    ? dailyConversionCountPerBucket
-                    : Math.floor(
-                          dailyConversionCountTotal / keyCombList[i].size
-                      ),
+                dailyEventCountPerBucket: dailyEventCountPerBucket,
                 budgetSplit: budgetSplit,
                 zeroBucketsPercentage: zeroBucketsPercentage,
                 keyCombinations: keyCombList[i],
@@ -121,7 +99,7 @@ function simulatePerMeasurementGoal(options) {
         measurementGoal,
         useScaling,
         batchingFrequency,
-        dailyConversionCountPerBucket,
+        dailyEventCountPerBucket,
         budgetSplit,
         zeroBucketsPercentage,
         keyCombinations,
@@ -150,7 +128,7 @@ function simulatePerMeasurementGoal(options) {
         const randCount = generateSummaryValue(
             measurementGoal,
             i,
-            dailyConversionCountPerBucket,
+            dailyEventCountPerBucket,
             batchingFrequency,
             zeroBucketsPercentage
         )

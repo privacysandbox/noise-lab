@@ -13,13 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import { TabulatorFull } from 'tabulator-tables'
-// TODO-NOTE the non needed deps. Changing this to avoid circular dependencies in tooltips
 import { BATCHING_FREQUENCIES_MAP, SCALING_MAP } from './config'
 import { saveTable } from './store'
-//  TODO-NOTE Keeping this below breaks!! Changed this to avoid circular dependencies in tooltips that caused a module loading issue
-// import { updateTooltips, updateOutlierNote } from './tooltips'
-
-// TODO-CLEAN Remove all unneeded functions
 
 export function appendDataTableChild(
     parentDomEl,
@@ -63,7 +58,7 @@ export function displayInputParameters(
     parentDomEl.appendChild(tableContainerEl)
 
     const {
-        dailyConversionCountPerBucket,
+        dailyEventCountPerBucket,
         dimensions,
         epsilon,
         measurementGoals,
@@ -106,8 +101,8 @@ export function displayInputParameters(
             {
                 Parameter:
                     'Average daily attributable conversion count PER BUCKET',
-                'Value (raw)': dailyConversionCountPerBucket,
-                'Value (formatted)': dailyConversionCountPerBucket,
+                'Value (raw)': dailyEventCountPerBucket,
+                'Value (formatted)': dailyEventCountPerBucket,
             },
             {
                 Parameter: 'Dimensions',

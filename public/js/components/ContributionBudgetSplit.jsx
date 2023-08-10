@@ -5,6 +5,7 @@ import {
     BUDGET_SPLIT_VALUE,
 } from '../config'
 
+// TODO-improvement Change budgetSplit data structure: Use an object for faster retrieval
 export function ContributionBudgetSplit(props) {
     const {
         setBudgetSplit,

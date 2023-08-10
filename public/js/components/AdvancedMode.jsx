@@ -64,9 +64,6 @@ export function AdvancedMode(props) {
     const [dailyEventCountTotal, setDailyEventCountTotal] = useState(
         defaultDailyEventCountTotal
     )
-    const [keyStrategy, setKeyStrategy] = useState(
-        getKeyStrategy(defaultKeyStructuresCount)
-    )
     // Both `simulations` and `allSimulationDataTables` are needed
     const [simulations, setSimulations] = useState([])
     const [allSimulationDataTables, setAllSimulationDataTables] = useState({})
@@ -76,12 +73,7 @@ export function AdvancedMode(props) {
     const [zeroBucketsPercentage, setZeroBucketsPercentage] = useState(0)
     const [budgetSplitMode, setBudgetSplitMode] = useState('percentage')
     const [dimensions, setDimensions] = useState(DEFAULT_DIMENSIONS)
-    const [dailyEventCountPerBucket, setDailyEventCountPerBucket] = useState(
-        getDailyEventCountPerBucket(
-            defaultDailyEventCountTotal,
-            DEFAULT_DIMENSIONS
-        )
-    )
+
     const [keyStructuresCount, setKeyStructuresCount] = useState(
         defaultKeyStructuresCount
     )
@@ -89,6 +81,22 @@ export function AdvancedMode(props) {
     const [keyStructures, setKeyStructures] = useState([
         generateKeyStructure(DEFAULT_DIMENSIONS_NAMES, DEFAULT_DIMENSIONS),
     ])
+
+    // No need to put `keyStrategy` in State, because it can be calculated from other state (`keyStructureCount`)
+    // https://react.dev/learn/choosing-the-state-structure#avoid-redundant-state
+    // `keyStrategy` will be updated every time `keyStructureCount` is, because `keyStructureCount` is in the state
+    const keyStrategy = getKeyStrategy(keyStructuresCount)
+    // Same for `dailyEventCountPerBucket`: by defining it like this, we ensure it will be updated anytime `dailyEventCountTotal` or `dimensions` get updated
+    const dailyEventCountPerBucket = getDailyEventCountPerBucket(
+        dailyEventCountTotal,
+        dimensions
+    )
+
+    // TODO: if key count changes and is set to one, regenerate keyStructures
+    // TODO: if key count changes and is higher, regenerate keyStructures
+    // TODO: if key count changes and is lower, regenerate keyStructures
+    // TODO: if dimensions changes (name, count or even size(?)), regenerate keyStructures here
+    // TODO: setKeyStructure within the keyStructure
 
     useEffect(() => {
         const simulationsCount = simulations.length
@@ -188,19 +196,10 @@ export function AdvancedMode(props) {
         }
         const newDimensions = [...dimensions, newDimension]
         setDimensions(newDimensions)
-        setDailyEventCountPerBucket(
-            getDailyEventCountPerBucket(dailyEventCountTotal, newDimensions)
-        )
     }
 
     function resetDimensions() {
         setDimensions(DEFAULT_DIMENSIONS)
-        setDailyEventCountPerBucket(
-            getDailyEventCountPerBucket(
-                dailyEventCountTotal,
-                DEFAULT_DIMENSIONS
-            )
-        )
     }
 
     return (
@@ -237,9 +236,6 @@ export function AdvancedMode(props) {
                                 dailyEventCountTotal={dailyEventCountTotal}
                                 setDailyEventCountTotal={
                                     setDailyEventCountTotal
-                                }
-                                setDailyEventCountPerBucket={
-                                    setDailyEventCountPerBucket
                                 }
                                 dimensions={dimensions}
                             />
@@ -302,9 +298,6 @@ export function AdvancedMode(props) {
                             <Dimensions
                                 dimensions={dimensions}
                                 setDimensions={setDimensions}
-                                setDailyEventCountPerBucket={
-                                    setDailyEventCountPerBucket
-                                }
                                 dailyEventCountTotal={dailyEventCountTotal}
                             />
                         </div>
@@ -331,15 +324,14 @@ export function AdvancedMode(props) {
                             )}
                             <h4>Key strategy:</h4>
                             <KeyStrategy keyStrategy={keyStrategy} />
-
                             <KeyStructuresCount
+                                dimensions={dimensions}
                                 keyStructuresCount={keyStructuresCount}
                                 setKeyStructuresCount={setKeyStructuresCount}
                                 measurementGoals={measurementGoals}
                                 updateBudgetSplit={updateBudgetSplit}
                                 keyStructures={keyStructures}
                                 setKeyStructures={setKeyStructures}
-                                setKeyStrategy={setKeyStrategy}
                             />
                             <KeyStructures
                                 keyStructuresCount={keyStructuresCount}

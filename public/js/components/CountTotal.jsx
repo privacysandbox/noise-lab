@@ -1,22 +1,15 @@
 import { h, render, Component } from 'preact'
-import { getDailyEventCountPerBucket } from '../utils.misc'
 
 export function CountTotal(props) {
     const {
         setDailyEventCountTotal,
         dailyEventCountTotal,
         dailyEventCountTotalOptions,
-        setDailyEventCountPerBucket,
-        dimensions,
     } = props
 
     function handleChange(event) {
         const inputCountTotal = event.target.value
         setDailyEventCountTotal(inputCountTotal)
-        // TODO do I need to do that manually? no way to observe dimensions or total, and update dailyEventCountPerBucket when they change?
-        setDailyEventCountPerBucket(
-            getDailyEventCountPerBucket(inputCountTotal, dimensions)
-        )
     }
 
     return (

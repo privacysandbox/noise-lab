@@ -1,5 +1,5 @@
 import { h, render, Component } from 'preact'
-import { cap, getKeyStrategy } from '../utils.misc'
+import { cap } from '../utils.misc'
 
 export function KeyStructuresCount(props) {
     const {
@@ -9,14 +9,12 @@ export function KeyStructuresCount(props) {
         keyStructuresCount,
         measurementGoals,
         updateBudgetSplit,
-        setKeyStrategy,
     } = props
 
     function handleChange(event) {
         const inputValue = event.target.value
         const newKeyStructuresCount = cap(inputValue, 1)
         setKeyStructuresCount(newKeyStructuresCount)
-        setKeyStrategy(getKeyStrategy(newKeyStructuresCount))
         updateBudgetSplit(measurementGoals, newKeyStructuresCount)
 
         // TOOD update when dimensions update

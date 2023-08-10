@@ -9,7 +9,6 @@ export function KeyStructures(props) {
         const isChecked = event.target.checked
         const keyStructureToUpdate = keyStructures[idx]
         const dimensionSetToUpdate = keyStructureToUpdate.names
-
         let newDimensionSet = []
         if (isChecked) {
             // Add the dimension
@@ -25,7 +24,6 @@ export function KeyStructures(props) {
             newDimensionSet,
             dimensions
         )
-
         // Replace the old key structure with the new one
         const newKeyStructures = [...keyStructures]
         newKeyStructures[idx] = newKeyStructure
@@ -49,6 +47,9 @@ export function KeyStructures(props) {
                                     onClick={(event) =>
                                         handleChange(event, idx, dim.name)
                                     }
+                                    // A key structure's dimensions can only be edited if there are multiple key structures (Strategy B)
+                                    // If there's only 1 key structure, we consider this to be Strategy A, i.e. the one and only key structure encodes all the dimensions
+                                    disabled={keyStructuresCount === 1}
                                 ></input>
                                 <label>{dim.name}</label>
                             </div>

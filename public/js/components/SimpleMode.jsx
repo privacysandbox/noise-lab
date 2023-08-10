@@ -28,7 +28,6 @@ import { SimulationsList } from './SimulationsList'
 const defaultUseScaling = true
 const defaultDailyEventCountPerBucket =
     EVENT_COUNT_PER_BUCKET_OPTIONS[100].value
-const defaultKeyStrategy = getKeyStrategy(1)
 const defaultBatchingFrequency = BATCHING_FREQUENCIES.daily.value
 const defaultBudgetSplit = DEFAULT_MEASUREMENT_GOALS.map((m) => ({
     measurementGoal: m.name,
@@ -49,7 +48,7 @@ export function SimpleMode(props) {
     const [dailyEventCountPerBucket, setDailyEventCountPerBucket] = useState(
         defaultDailyEventCountPerBucket
     )
-    const [keyStrategy, setKeyStrategy] = useState(defaultKeyStrategy)
+    const keyStrategy = getKeyStrategy(1)
     // Both `simulations` and `allSimulationDataTables` are needed
     const [simulations, setSimulations] = useState([])
     const [allSimulationDataTables, setAllSimulationDataTables] = useState({})

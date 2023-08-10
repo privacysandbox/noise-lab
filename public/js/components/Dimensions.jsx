@@ -1,13 +1,7 @@
 import { h, render, Component } from 'preact'
-import { getDailyEventCountPerBucket } from '../utils.misc'
 
 export function Dimensions(props) {
-    const {
-        setDimensions,
-        dimensions,
-        setDailyEventCountPerBucket,
-        dailyEventCountTotal,
-    } = props
+    const { setDimensions, dimensions } = props
 
     function handleChange(event, fieldToUpdate, idx) {
         let newValue = event.target.value
@@ -22,10 +16,6 @@ export function Dimensions(props) {
             [fieldToUpdate]: newValue,
         }
         setDimensions(newDimensions)
-
-        setDailyEventCountPerBucket(
-            getDailyEventCountPerBucket(dailyEventCountTotal, newDimensions)
-        )
     }
 
     function removeDimension(event, idx) {
@@ -33,16 +23,11 @@ export function Dimensions(props) {
             const newDimensions = [...dimensions]
             newDimensions.splice(idx, 1)
             setDimensions(newDimensions)
-
-            setDailyEventCountPerBucket(
-                getDailyEventCountPerBucket(dailyEventCountTotal, newDimensions)
-            )
         }
     }
 
     return (
         <div>
-            {/* {JSON.stringify(dimensions)} */}
             {dimensions.length < 2 && (
                 <div class="input-hint margin-v">
                     ⚠️ At least one dimension required

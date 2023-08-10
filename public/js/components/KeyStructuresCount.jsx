@@ -31,7 +31,6 @@ export function KeyStructuresCount(props) {
         setKeyStructuresCount(newKeyStructuresCount)
         updateBudgetSplit(measurementGoals, newKeyStructuresCount)
 
-        // TOOD update when dimensions update
         if (newKeyStructuresCount > keyStructuresCount) {
             const numberOfKeyStructuresToAdd =
                 newKeyStructuresCount - keyStructuresCount

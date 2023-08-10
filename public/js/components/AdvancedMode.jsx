@@ -103,14 +103,13 @@ export function AdvancedMode(props) {
         dimensions
     )
 
-    // TODO: if key count changes and is set to one, regenerate keyStructures
+    // TODO: if key count changes and is set to one, regenerate keyStructures (hard reset and disable all fields)
     // TODO: if key count changes and is higher, regenerate keyStructures
     // TODO: if key count changes and is lower, regenerate keyStructures
-    // TODO: if dimensions changes (name, count or even size(?)), regenerate keyStructures here
+    // TODO: if dimensions changes (name, count or even size(?)), regenerate keyStructures
     // TODO: setKeyStructure within the keyStructure
-    // TODO If only one key structure, enforce that all checkboxes for dimensions must always e checked
+    // TODO If only one key structure, enforce that all checkboxes for dimensions must always be checked
     // TODO ensure key structure count and key structure list are in sync at all times
-    // TODO when key count is reset to 1, hard reset and disable all fields!!
 
     useEffect(() => {
         const simulationsCount = simulations.length

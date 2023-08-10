@@ -35,6 +35,8 @@ const defaultBudgetSplit = DEFAULT_MEASUREMENT_GOALS.map((m) => ({
 }))
 
 // TODO display budget split
+// TODO display the one key
+// TODO clearAll!
 
 const useMountEffect = (fun) => useEffect(fun, [])
 
@@ -58,6 +60,7 @@ export function SimpleMode(props) {
         if (simulations.length > 0) {
             if (window.confirm(generateConfirmMessage())) {
                 setSimulations([])
+                setAllSimulationDataTables({})
             }
         }
     }
@@ -94,32 +97,26 @@ export function SimpleMode(props) {
     }, [simulations])
 
     function simulateSimpleMode() {
-        const dimensionNames = DEFAULT_DIMENSIONS.map((dim) => dim.name)
-        const dimensionSizes = DEFAULT_DIMENSIONS.map((dim) => dim.size)
-        const simulation = simulate(
-            DEFAULT_MEASUREMENT_GOALS,
-            DEFAULT_DIMENSIONS,
-            dimensionNames,
-            dimensionSizes,
-            epsilon,
-            CONTRIBUTION_BUDGET,
-            useScaling,
-            // TODO-CLEAN switch to DOM / source of truth function?
-            true,
-            batchingFrequency,
-            dailyEventCountPerBucket,
-            // Last param not is not needed in the simple mode
-            null,
-            // No zero Buckets in Simple mode
-            0,
-            // TODO replace isGranular with keyStrategy
-            keyStrategy,
-            0, // TODO remove? / Make sim input a config object,
-            [], // TODO remove,
-            // 'percentage', // budgetSplitMode // TODO change
+        const options = {
+            contributionBudget: CONTRIBUTION_BUDGET,
+            epsilon: epsilon,
+            measurementGoals: DEFAULT_MEASUREMENT_GOALS,
+            dimensions: DEFAULT_DIMENSIONS,
+            // TODO rename?
+            scaling: useScaling,
+            batchingFrequency: batchingFrequency,
+            // TODO rename conversion to event
+            dailyConversionCountPerBucket: dailyEventCountPerBucket,
+            // Not needed for simple mode
+            // TODO change that
+            dailyConversionCountTotal: null,
+            keyStrategy: keyStrategy,
+            // Not needed for simple mode
+            // TODO change that
+            keyStructures: [],
             // TODO generate this from the measurementGoal etc
             // TODO change budgetSplit data structure: Use an object for faster retrieval
-            [
+            budgetSplit: [
                 {
                     measurementGoal: 'purchaseCount',
                     percentage: 50,
@@ -130,8 +127,10 @@ export function SimpleMode(props) {
                     percentage: 50,
                     value: 32768,
                 },
-            ]
-        )
+            ],
+            zeroBucketsPercentage: 0,
+        }
+        const simulation = simulate(options)
         setSimulations([...simulations, simulation])
     }
 

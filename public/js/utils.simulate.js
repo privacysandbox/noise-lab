@@ -24,73 +24,50 @@ import {
     getNoise_Rmsre,
 } from './utils.noise'
 
-// Generate dataset
-// TODO use config object
+export function simulate(options) {
+    const {
+        contributionBudget,
+        epsilon,
+        measurementGoals,
+        dimensions,
+        scaling,
+        batchingFrequency,
+        dailyConversionCountPerBucket,
+        dailyConversionCountTotal,
+        keyStrategy,
+        keyStructures,
+        budgetSplit,
+        zeroBucketsPercentage,
+    } = options
 
-// const options = {
-//     contributionBudget,
-//     epsilon,
-//     measurementGoals,
-//     dimensions,
-//     scaling,
-//     batchingFrequency,
-//     dailyConversionCountPerBucket,
-//     dailyConversionCountTotal,
-//     keyStrategy,
-//     keyStructures,
-//     budgetSplit,
-//     zeroBucketsPercentage,
-// }
-
-export function simulate(
-    metrics,
-    dimensions,
-    dimensionNames,
-    dimensionSizes,
-    epsilon,
-    contributionBudget,
-    isUseScaling,
-    isGranular,
-    batchingFrequency,
-    dailyConversionCountPerBucket,
-    dailyConversionCountTotal,
-    zeroBucketsPercentage,
-    keyStrategy,
-    keyStructuresCount,
-    keyStructures,
-    // budgetSplitMode,
-    budgetSplit
-) {
     // Validate inputs are correct
     // TODO fix
-    if (
-        !validateInputsBeforeSimulation(
-            metrics,
-            dimensions,
-            isGranular,
-            isUseScaling,
-            keyStructuresCount
-        )
-    )
-        return
-
-    // TODO use keyStrategy OR keyStructuresCount OR isGranular
-    console.log('STRAT', keyStrategy)
-    console.log('KEY COUNT', keyStructuresCount)
+    // if (
+    //     !validateInputsBeforeSimulation(
+    //         measurementGoals,
+    //         dimensions,
+    //         isGranular,
+    //         scaling,
+    //         keyStructures.length
+    //     )
+    // )
+    //     return
 
     // Declare array containing possible combinations for keys
-    var r = []
     var keyCombList = []
 
+    // TODO change
+    const isGranular = keyStrategy === 'A'
+
     // Logic for generating one dataset with all keys - string parameter 'all' is used
+    const dimensionSizes = dimensions.map((dim) => dim.size)
+    const dimensionNames = dimensions.map((dim) => dim.name)
     if (isGranular) {
         var keyComb = generateKeyCombinationArray(dimensionSizes)
-        console.log(keyComb)
         keyCombList.push({
             names: dimensionNames,
             combinations: keyComb,
         })
-        console.log(keyCombList)
     } else {
         const allCombs = keyStructures
         for (let i = 0; i < allCombs.length; i++) {
@@ -120,65 +97,60 @@ export function simulate(
             dimensions,
             epsilon,
             keyStrategy,
-            metrics,
+            measurementGoals,
             batchingFrequency,
-            isUseScaling,
+            scaling,
         },
         summaryReports: [],
     }
 
-    metrics.forEach((element) => {
+    measurementGoals.forEach((measGoal) => {
         for (let i = 0; i < keyCombList.length; i++) {
-            simulation.summaryReports.push(
-                simulatePerMetric(
-                    keyCombList[i],
-                    element,
-                    epsilon,
-                    contributionBudget,
-                    isUseScaling,
-                    batchingFrequency,
-                    isGranular
-                        ? dailyConversionCountPerBucket
-                        : Math.floor(
-                              dailyConversionCountTotal / keyCombList[i].size
-                          ),
-                    i,
-                    zeroBucketsPercentage,
-                    // budgetSplitMode,
-                    budgetSplit
-                )
-            )
+            const options = {
+                contributionBudget: contributionBudget,
+                epsilon: epsilon,
+                measurementGoal: measGoal,
+                scaling: scaling,
+                batchingFrequency: batchingFrequency,
+                dailyConversionCountPerBucket: isGranular
+                    ? dailyConversionCountPerBucket
+                    : Math.floor(
+                          dailyConversionCountTotal / keyCombList[i].size
+                      ),
+                budgetSplit: budgetSplit,
+                zeroBucketsPercentage: zeroBucketsPercentage,
+                keyCombinations: keyCombList[i],
+                simulationNo: i,
+            }
+            simulation.summaryReports.push(simulatePerMeasurementGoal(options))
         }
     })
-
-    console.log(simulation)
-
     return simulation
 }
 
 // TODO use config object
-function simulatePerMetric(
-    keyCombinations,
-    metric,
-    epsilon,
-    contributionBudget,
-    isUseScaling,
-    batchingFrequency,
-    dailyCount,
-    simulationNo,
-    zeroBucketsPercentage,
-    // budgetSplitMode,
-    budgetSplit
-) {
-    // console.log(budgetSplitMode)
+function simulatePerMeasurementGoal(options) {
+    const {
+        contributionBudget,
+        epsilon,
+        measurementGoal,
+        scaling,
+        batchingFrequency,
+        dailyConversionCountPerBucket,
+        budgetSplit,
+        zeroBucketsPercentage,
+        keyCombinations,
+        simulationNo,
+    } = options
+
     let scalingFactor = 1
-    if (isUseScaling) {
+    if (scaling) {
         scalingFactor = getScalingFactorForMeasurementGoal(
-            metric,
+            measurementGoal,
             // TODO simplify
             budgetSplit[
                 budgetSplit.findIndex(
-                    (entry) => entry.measurementGoal === metric.name
+                    (entry) => entry.measurementGoal === measurementGoal.name
                 )
             ].percentage,
             contributionBudget
@@ -190,26 +162,22 @@ function simulatePerMetric(
     var noisePercentageSum = 0
     for (let i = 0; i < keyCombinations.combinations.length; i++) {
         const noise = getRandomLaplacianNoise(contributionBudget, epsilon)
-
         const randCount = generateSummaryValue(
-            metric,
+            measurementGoal,
             i,
-            dailyCount,
+            dailyConversionCountPerBucket,
             batchingFrequency,
             zeroBucketsPercentage
         )
-
         const noiseValueAPE = calculateNoisePercentage(
             noise,
             // Noiseless summary value
             Math.round(randCount * scalingFactor)
         )
         noisePercentageSum += noiseValueAPE
-
         const summaryValue_scaled_noisy = Math.round(
             randCount * scalingFactor + noise
         )
-
         report.push({
             key: keyCombinations.combinations[i],
             summaryValue: randCount,
@@ -228,19 +196,16 @@ function simulatePerMetric(
     const allSummaryValuesPostNoise = Object.values(report).map(
         (v) => v.summaryValue_scaled_noisy
     )
-
     const noise_ape =
         calculateAverageNoisePercentageRaw(
             noisePercentageSum,
             keyCombinations.combinations.length
         ) * 100
-
     const noise_rmsre = getNoise_Rmsre(
         allSummaryValuesPostNoise,
         allSummaryValuesPreNoise,
         scalingFactor
     )
-
     const simulationReport = {
         data: report,
         noiseMetrics: {
@@ -248,10 +213,9 @@ function simulatePerMetric(
             noise_rmsre: noise_rmsre,
         },
         scalingFactor: scalingFactor,
-        measurementGoal: metric.name,
+        measurementGoal: measurementGoal.name,
         dimensionsString: keyCombinations.names.join(' x '),
         simulationNo: simulationNo,
     }
-
     return simulationReport
 }

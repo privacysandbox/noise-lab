@@ -111,31 +111,23 @@ export function AdvancedMode(props) {
     }, [simulations])
 
     function simulateAdvancedMode() {
-        console.log(budgetSplit)
-        const dimensionNames = dimensions.map((dim) => dim.name)
-        const dimensionSizes = dimensions.map((dim) => dim.size)
-
-        const simulation = simulate(
-            measurementGoals,
-            dimensions,
-            dimensionNames,
-            dimensionSizes,
-            epsilon,
-            CONTRIBUTION_BUDGET,
-            useScaling,
-            // TODO-CLEAN switch to DOM / source of truth function?
-            keyStrategy === 'A', // TODO use IsKeyStrategyGranular, or directly keyStrategy
-            batchingFrequency,
-            dailyEventCountPerBucket,
-            // Last param not is not needed in the simple mode
-            dailyEventCountTotal, // TODO getDailyEventCountTotal(),
-            zeroBucketsPercentage,
-            keyStrategy,
-            keyStructuresCount,
-            keyStructures,
-            // budgetSplitMode,
-            budgetSplit
-        )
+        const options = {
+            contributionBudget: CONTRIBUTION_BUDGET,
+            epsilon: epsilon,
+            measurementGoals: measurementGoals,
+            dimensions: dimensions,
+            // TODO rename?
+            scaling: useScaling,
+            batchingFrequency: batchingFrequency,
+            // TODO rename conversion to event
+            dailyConversionCountPerBucket: dailyEventCountPerBucket,
+            dailyConversionCountTotal: dailyEventCountTotal,
+            keyStrategy: keyStrategy,
+            keyStructures: keyStructures,
+            budgetSplit: budgetSplit,
+            zeroBucketsPercentage: zeroBucketsPercentage,
+        }
+        const simulation = simulate(options)
         setSimulations([...simulations, simulation])
     }
 
@@ -144,6 +136,7 @@ export function AdvancedMode(props) {
         if (simulations.length > 0) {
             if (window.confirm(generateConfirmMessage())) {
                 setSimulations([])
+                setAllSimulationDataTables({})
             }
         }
         // TODO-NOTE that displayEmptyState is not needed here anymore
@@ -157,7 +150,7 @@ export function AdvancedMode(props) {
         const newMeasurementGoals = [
             ...measurementGoals,
             {
-                // TODO id????
+                // TODO Check if id is needed
                 id: measurementGoals.length,
                 name: 'newMeasurementGoal',
                 maxValue: 1,
@@ -173,8 +166,9 @@ export function AdvancedMode(props) {
         updateBudgetSplit(DEFAULT_MEASUREMENT_GOALS, keyStructuresCount)
     }
 
+    // `budgetSplit` must be updated when any of these change: `numberOfMeasurementGoals`, `contributionBudget`, `keyStructuresCount`
+    // Or when the user manually updates the split across goals
     function updateBudgetSplit(newMeasurementGoals, keyStructuresCount) {
-        console.log(keyStructuresCount)
         const numberOfMeasurementGoals = newMeasurementGoals.length
         const newBudgetSplit = newMeasurementGoals.map((m) => ({
             measurementGoal: m.name,
@@ -189,7 +183,7 @@ export function AdvancedMode(props) {
 
     function addNewDimension() {
         const newDimension = {
-            // TODO id????
+            // TODO Check if id is needed
             id: dimensions.length,
             name: 'newDimension',
             size: 2,

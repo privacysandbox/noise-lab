@@ -18,13 +18,14 @@ import { RMSRE_THRESHOLD } from './config'
 // SHARED UTILS
 
 export function getScalingFactorForMeasurementGoal(
-    metric,
+    measGoal,
     valueAsPercentage,
     contributionBudget
 ) {
-    const budgetForThisMetric = contributionBudget * (valueAsPercentage / 100)
-    const scalingFactorForThisMetric = budgetForThisMetric / metric.maxValue
-    return scalingFactorForThisMetric.toFixed(1)
+    const budgetForThisMeasGoal = contributionBudget * (valueAsPercentage / 100)
+    const scalingFactorForThisMeasGoal =
+        budgetForThisMeasGoal / measGoal.maxValue
+    return scalingFactorForThisMeasGoal.toFixed(1)
 }
 
 export function getRandomLaplacianNoise(budget, epsilon) {
@@ -118,7 +119,7 @@ function cartesian(...args) {
 }
 
 export function generateSummaryValue(
-    metric,
+    measGoal,
     deterministicValue,
     dailyConversionCount,
     batchingFrequency,
@@ -133,17 +134,17 @@ export function generateSummaryValue(
         return 0
     }
 
-    // Calculate deterministic Number - variation between 0 and metric max
+    // Calculate deterministic number - variation between 0 and measGoal max
     // If the avg and max are equal, all buckets will be calculated with this value, no variation added
-    if (metric.avgValue == metric.maxValue)
-        var deterministicNumber = metric.avgValue
+    if (measGoal.avgValue == measGoal.maxValue)
+        var deterministicNumber = measGoal.avgValue
     else {
         var deterministicNumber = Math.abs(
-            metric.avgValue * 1 +
+            measGoal.avgValue * 1 +
                 deterministicValue * 1 * (deterministicValue % 2 == 0 ? 1 : -1)
         )
-        if (deterministicNumber == 0) deterministicNumber = metric.avgValue
-        deterministicNumber = Math.min(deterministicNumber, metric.maxValue)
+        if (deterministicNumber == 0) deterministicNumber = measGoal.avgValue
+        deterministicNumber = Math.min(deterministicNumber, measGoal.maxValue)
     }
 
     // calculate variation for conversions/bucket
@@ -160,7 +161,7 @@ export function generateSummaryValue(
             ? dailyConversionValue
             : dailyConversionCount
 
-    // result is the product between variated metric value, variated conversion count per current bucket and frequency
+    // result is the product between variated measurement goal value, variated conversion count per current bucket and frequency
     var res = Math.floor(
         deterministicNumber * dailyConversionValue * batchingFrequency
     )

@@ -66,14 +66,14 @@ export function displayInputParameters(
         dailyConversionCountPerBucket,
         dimensions,
         epsilon,
-        metrics,
+        measurementGoals,
         keyStrategy,
         batchingFrequency,
-        isUseScaling,
+        scaling,
     } = inputParameters
 
-    const metricsDisplay = document.createElement('div')
-    metricsDisplay.innerText = metrics
+    const measGoalsDisplay = document.createElement('div')
+    measGoalsDisplay.innerText = measurementGoals
         .map((m) =>
             Object.entries(m)
                 .map(([k, v]) => `${k}: ${v}`)
@@ -115,9 +115,9 @@ export function displayInputParameters(
                 'Value (formatted)': dimensionsDisplay,
             },
             {
-                Parameter: 'Metrics',
-                'Value (raw)': JSON.stringify(metrics),
-                'Value (formatted)': metricsDisplay,
+                Parameter: 'Measurement goals',
+                'Value (raw)': JSON.stringify(measurementGoals),
+                'Value (formatted)': measGoalsDisplay,
             },
             {
                 Parameter: 'Batching frequency',
@@ -127,8 +127,8 @@ export function displayInputParameters(
             },
             {
                 Parameter: 'Scaling',
-                'Value (raw)': isUseScaling,
-                'Value (formatted)': SCALING_MAP[isUseScaling],
+                'Value (raw)': scaling,
+                'Value (formatted)': SCALING_MAP[scaling],
             },
         ],
         true
@@ -146,7 +146,6 @@ export function validateInputsBeforeSimulation(
     isUseScaling,
     keyStructuresCount
 ) {
-    // TODO
     // var errors = []
     // if (isUseScaling) {
     //     validateBudgetPercentages(metrics, errors, keyStructuresCount)

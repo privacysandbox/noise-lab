@@ -15,8 +15,7 @@ export function MeasurementGoals(props) {
             [fieldToUpdate]: event.target.value,
         }
         setMeasurementGoals(newMeasurementGoals)
-        // Note that calling updateBudgetSplit is not needed here, because `handleChange` is only called when the name or property of the measurement goals change. Not when the number of goals change.
-        // TODO associate setMeasurementGoals with updateBudgetSplit?
+        // `updateBudgetSplit` is not needed here, because `handleChange` is only called when the name or property of the measurement goals change (not when the number of goals change)
     }
 
     function removeMeasurementGoal(event, idx) {

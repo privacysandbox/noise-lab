@@ -57,8 +57,6 @@ const defaultBudgetSplit = generateEqualBudgetSplit(
     CONTRIBUTION_BUDGET
 )
 
-// TODO clearAll!
-
 const useMountEffect = (fun) => useEffect(fun, [])
 
 export function SimpleMode(props) {

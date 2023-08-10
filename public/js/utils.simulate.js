@@ -22,6 +22,7 @@ import {
     calculateAverageNoisePercentageRaw,
     getNoise_Rmsre,
 } from './utils.noise'
+import { getBudgetPercentageForMeasurementGoal } from './utils.misc'
 
 export function simulate(options) {
     const {
@@ -110,12 +111,10 @@ function simulatePerMeasurementGoal(options) {
     if (useScaling) {
         scalingFactor = getScalingFactorForMeasurementGoal(
             measurementGoal,
-            // TODO simplify
-            budgetSplit[
-                budgetSplit.findIndex(
-                    (entry) => entry.measurementGoal === measurementGoal.name
-                )
-            ].percentage,
+            getBudgetPercentageForMeasurementGoal(
+                budgetSplit,
+                measurementGoal.name
+            ),
             contributionBudget
         )
     }

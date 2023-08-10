@@ -91,3 +91,11 @@ export function generateEqualBudgetSplit(measurementGoals, contributionBudget) {
         value: contributionBudget / measurementGoals.length,
     }))
 }
+
+// budgetSplit looks like this: { measurementGoal: xxx, percentage: xxx, value: xxx }
+export function getBudgetPercentageForMeasurementGoal(budgetSplit, measurementGoalName) {
+    const idx = budgetSplit.findIndex(
+        (entry) => entry.measurementGoal === measurementGoalName
+    )
+    return budgetSplit[idx].percentage
+}

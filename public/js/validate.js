@@ -86,7 +86,7 @@ function validateDailyEventCountPerBucket(dailyEventCountPerBucket, errors) {
 }
 
 function validateBudgetSplit(
-    // budgetSplit looks as follows: { measurementGoal: xxx, percentage: xxx, value: xxx }
+    // budgetSplit looks like this: { measurementGoal: xxx, percentage: xxx, value: xxx }
     budgetSplit,
     budgetSplitMode,
     contributionBudget,

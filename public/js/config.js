@@ -89,4 +89,8 @@ export const DEFAULT_EPSILON = 10
 export const MIN_EPSILON = 0
 export const MAX_EPSILON = 64
 
+export const BUDGET_SPLIT_VALUE = 'value'
+export const BUDGET_SPLIT_PERCENTAGE = 'percentage'
+
+
 

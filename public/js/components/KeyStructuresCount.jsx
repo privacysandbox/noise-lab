@@ -13,7 +13,7 @@ export function KeyStructuresCount(props) {
 
     function handleChange(event) {
         const inputValue = event.target.value
-        const newKeyStructuresCount = cap(inputValue, 1)
+        const newKeyStructuresCount = Number(cap(inputValue, 1))
         setKeyStructuresCount(newKeyStructuresCount)
         updateBudgetSplit(measurementGoals, newKeyStructuresCount)
 

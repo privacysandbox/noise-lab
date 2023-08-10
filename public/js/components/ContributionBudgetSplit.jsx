@@ -1,5 +1,9 @@
 import { h, render, Component } from 'preact'
-import { CONTRIBUTION_BUDGET } from '../config'
+import {
+    CONTRIBUTION_BUDGET,
+    BUDGET_SPLIT_PERCENTAGE,
+    BUDGET_SPLIT_VALUE,
+} from '../config'
 
 export function ContributionBudgetSplit(props) {
     const {
@@ -13,18 +17,18 @@ export function ContributionBudgetSplit(props) {
     function handleChange(event, idx) {
         let newPercentage,
             newValue = 0
-        if (budgetSplitMode === 'percentage') {
+        if (budgetSplitMode === BUDGET_SPLIT_PERCENTAGE) {
             newPercentage = event.target.value
             newValue = (CONTRIBUTION_BUDGET * newPercentage) / 100
-        } else if (budgetSplitMode === 'value') {
+        } else if (budgetSplitMode === BUDGET_SPLIT_VALUE) {
             newValue = event.target.value
             newPercentage = (newValue * 100) / CONTRIBUTION_BUDGET
         }
         const newBudgetSplit = [...budgetSplit]
         newBudgetSplit[idx] = {
             ...budgetSplit[idx],
-            percentage: newPercentage,
-            value: newValue,
+            percentage: Number(newPercentage),
+            value: Number(newValue),
         }
         setBudgetSplit(newBudgetSplit)
     }
@@ -46,9 +50,9 @@ export function ContributionBudgetSplit(props) {
                     <input
                         type="radio"
                         id="percentage"
-                        value="percentage"
+                        value={BUDGET_SPLIT_PERCENTAGE}
                         onInput={handleModeChange}
-                        checked={budgetSplitMode === 'percentage'}
+                        checked={budgetSplitMode === BUDGET_SPLIT_PERCENTAGE}
                     ></input>
                     <label for="percentage">Percentage</label>
                 </div>
@@ -56,9 +60,9 @@ export function ContributionBudgetSplit(props) {
                     <input
                         type="radio"
                         id="value"
-                        value="value"
+                        value={BUDGET_SPLIT_VALUE}
                         onInput={handleModeChange}
-                        checked={budgetSplitMode === 'value'}
+                        checked={budgetSplitMode === BUDGET_SPLIT_VALUE}
                     ></input>
                     <label for="value">Value</label>
                 </div>
@@ -83,7 +87,7 @@ export function ContributionBudgetSplit(props) {
                             type="number"
                             disabled={disabled}
                             value={
-                                budgetSplitMode === 'percentage'
+                                budgetSplitMode === BUDGET_SPLIT_PERCENTAGE
                                     ? budgetSplit[idx].percentage
                                     : budgetSplit[idx].value
                             }

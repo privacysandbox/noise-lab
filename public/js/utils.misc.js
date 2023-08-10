@@ -83,3 +83,11 @@ function getDimensionSize(dimName, allDimensions) {
     const dimensionIdx = allDimensions.findIndex((d) => d.name === dimName)
     return allDimensions[dimensionIdx].size
 }
+
+export function generateEqualBudgetSplit(measurementGoals, contributionBudget) {
+    return measurementGoals.map((measGoal) => ({
+        measurementGoal: measGoal.name,
+        percentage: 100 / measurementGoals.length,
+        value: contributionBudget / measurementGoals.length,
+    }))
+}

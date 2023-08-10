@@ -618,16 +618,17 @@ hr {
 /* FORM VALIDATION */
 
 #form-validation-wrapper {
-    animation: appear 0.5s forwards;
+    animation: appear 0.3s forwards;
     box-shadow: rgba(75, 75, 85, 0.446) 0px 7px 29px 0px;
-    color: var(--red);
-    background: var(--red-light);
+    background: var(--red);
+    color: var(--red-light);
+    z-index: 100000;
     height: 10ch;
     padding: 1.2ch;
     position: absolute;
-    z-index: 10000;
-    overflow-y: scroll;
     bottom: 1.2rem;
+    right: 2rem;
+    overflow-y: scroll;
 }
 
 /* EMPTY STATE */

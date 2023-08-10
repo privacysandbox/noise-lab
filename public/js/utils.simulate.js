@@ -12,7 +12,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import { validateInputsBeforeSimulation } from './dom'
 import { generateSimulationId, generateSimulationTitle } from './utils.misc'
 import {
     getRandomLaplacianNoise,
@@ -30,7 +29,7 @@ export function simulate(options) {
         epsilon,
         measurementGoals,
         dimensions,
-        scaling,
+        useScaling,
         batchingFrequency,
         dailyConversionCountPerBucket,
         dailyConversionCountTotal,
@@ -39,19 +38,6 @@ export function simulate(options) {
         budgetSplit,
         zeroBucketsPercentage,
     } = options
-
-    // Validate inputs are correct
-    // TODO fix
-    // if (
-    //     !validateInputsBeforeSimulation(
-    //         measurementGoals,
-    //         dimensions,
-    //         isGranular,
-    //         scaling,
-    //         keyStructures.length
-    //     )
-    // )
-    //     return
 
     // Declare array containing possible combinations for keys
     var keyCombList = []
@@ -99,7 +85,7 @@ export function simulate(options) {
             keyStrategy,
             measurementGoals,
             batchingFrequency,
-            scaling,
+            useScaling,
         },
         summaryReports: [],
     }
@@ -110,7 +96,7 @@ export function simulate(options) {
                 contributionBudget: contributionBudget,
                 epsilon: epsilon,
                 measurementGoal: measGoal,
-                scaling: scaling,
+                useScaling: useScaling,
                 batchingFrequency: batchingFrequency,
                 dailyConversionCountPerBucket: isGranular
                     ? dailyConversionCountPerBucket
@@ -128,13 +114,12 @@ export function simulate(options) {
     return simulation
 }
 
-// TODO use config object
 function simulatePerMeasurementGoal(options) {
     const {
         contributionBudget,
         epsilon,
         measurementGoal,
-        scaling,
+        useScaling,
         batchingFrequency,
         dailyConversionCountPerBucket,
         budgetSplit,
@@ -144,7 +129,7 @@ function simulatePerMeasurementGoal(options) {
     } = options
 
     let scalingFactor = 1
-    if (scaling) {
+    if (useScaling) {
         scalingFactor = getScalingFactorForMeasurementGoal(
             measurementGoal,
             // TODO simplify

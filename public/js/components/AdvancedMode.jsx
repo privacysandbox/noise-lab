@@ -7,7 +7,9 @@ import {
     getKeyStrategy,
     getDailyEventCountPerBucket,
     generateKeyStructure,
+    generateEqualBudgetSplit,
 } from '../utils.misc'
+import { validateInputs } from '../validate'
 import {
     DEFAULT_MEASUREMENT_GOALS,
     DEFAULT_DIMENSIONS_NAMES,
@@ -46,14 +48,14 @@ import { KeyStructures } from './KeyStructures'
 const defaultUseScaling = true
 const defaultBatchingFrequency = BATCHING_FREQUENCIES.daily.value
 const defaultDailyEventCountTotal = 1000
-const defaultBudgetSplit = DEFAULT_MEASUREMENT_GOALS.map((m) => ({
-    measurementGoal: m.name,
-    percentage: 100 / DEFAULT_MEASUREMENT_GOALS.length,
-    value: CONTRIBUTION_BUDGET / DEFAULT_MEASUREMENT_GOALS.length,
-}))
+const defaultBudgetSplit = generateEqualBudgetSplit(
+    DEFAULT_MEASUREMENT_GOALS,
+    CONTRIBUTION_BUDGET
+)
 const defaultKeyStructuresCount = 1
 
 export function AdvancedMode(props) {
+    const [errors, setErrors] = useState([])
     // TODO Reorder
     const [epsilon, setEpsilon] = useState(DEFAULT_EPSILON)
     const [batchingFrequency, setBatchingFrequency] = useState(
@@ -111,24 +113,40 @@ export function AdvancedMode(props) {
     }, [simulations])
 
     function simulateAdvancedMode() {
-        const options = {
+        let errs = validateInputs({
             contributionBudget: CONTRIBUTION_BUDGET,
-            epsilon: epsilon,
             measurementGoals: measurementGoals,
             dimensions: dimensions,
-            // TODO rename?
-            scaling: useScaling,
-            batchingFrequency: batchingFrequency,
-            // TODO rename conversion to event
-            dailyConversionCountPerBucket: dailyEventCountPerBucket,
-            dailyConversionCountTotal: dailyEventCountTotal,
-            keyStrategy: keyStrategy,
+            useScaling: useScaling,
+            dailyEventCountPerBucket: dailyEventCountPerBucket,
+            keyStructuresCount: keyStructuresCount,
             keyStructures: keyStructures,
             budgetSplit: budgetSplit,
-            zeroBucketsPercentage: zeroBucketsPercentage,
+            budgetSplitMode: budgetSplitMode,
+        })
+        setErrors(errs)
+
+        if (errs.length > 0) {
+            return
+        } else {
+            const options = {
+                contributionBudget: CONTRIBUTION_BUDGET,
+                epsilon: epsilon,
+                measurementGoals: measurementGoals,
+                dimensions: dimensions,
+                useScaling: useScaling,
+                batchingFrequency: batchingFrequency,
+                // TODO rename conversion to event
+                dailyConversionCountPerBucket: dailyEventCountPerBucket,
+                dailyConversionCountTotal: dailyEventCountTotal,
+                keyStrategy: keyStrategy,
+                keyStructures: keyStructures,
+                budgetSplit: budgetSplit,
+                zeroBucketsPercentage: zeroBucketsPercentage,
+            }
+            const simulation = simulate(options)
+            setSimulations([...simulations, simulation])
         }
-        const simulation = simulate(options)
-        setSimulations([...simulations, simulation])
     }
 
     function clearAll() {
@@ -346,6 +364,16 @@ export function AdvancedMode(props) {
                     </div>
                 </div>
             </div>
+            {errors.length > 0 && (
+                <div id="form-validation-wrapper">
+                    Could not simulate. {errors.length} error(s):
+                    <ul>
+                        {errors.map((e) => (
+                            <li>{e}</li>
+                        ))}
+                    </ul>
+                </div>
+            )}
             <main>
                 <h2>Simulations</h2>
                 <div class="global-buttons">

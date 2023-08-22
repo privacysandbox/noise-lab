@@ -24,7 +24,7 @@ def noise_ratio(noisy_data: Sequence[float],
     avg_error_ratios = np.average(error_ratios)
     return avg_error_ratios
 
-def rmspe_t(
+def rmsre_t(
     noisy_data: Sequence[float],
     noiseless_data: Sequence[float],
     l1_scale: int,
@@ -60,4 +60,4 @@ def rmspe_t(
 
 # also works in native python
 # print(noise_ratio([1, 2], [88, 10]))
-# print(rmspe_t([1, 2], [88, 10]))`
+# print(rmsre_t([1, 2], [88, 10]))`

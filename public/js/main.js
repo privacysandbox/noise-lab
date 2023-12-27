@@ -15,6 +15,7 @@ limitations under the License. */
 import { generateConfirmMessage } from './utils.misc'
 import { initializeDisplay_simpleMode } from './simple-mode'
 import { initializeDisplay_advancedMode } from './advanced-mode'
+import { initializeDisplay_proMode } from './pro-mode'
 import { APP_VERSION, MODES, modeSearchQueryParams } from './config'
 import { resetData } from './store'
 
@@ -71,7 +72,7 @@ window.addEventListener('load', function (event) {
     allSections.forEach((section) => {
         if (section.id !== `${getCurrentModeFromUrl()}-mode`) {
             // Mode isn't selected => remove it from the DOM
-            section.parentElement.removeChild(section)
+            section.parentElement.removeChild(section)           
         }
     })
 
@@ -81,7 +82,9 @@ window.addEventListener('load', function (event) {
         initializeDisplay_simpleMode()
     } else if (mode === MODES.advanced.searchQueryParam) {
         initializeDisplay_advancedMode()
-    } else {
+    } else if (mode === MODES.pro.searchQueryParam) {
+        initializeDisplay_proMode()
+    }  else {
         throw new Error('mode unkown')
     }
 })

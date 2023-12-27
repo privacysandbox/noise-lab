@@ -80,7 +80,8 @@ function getContributionBudgetFromDom() {
 }
 
 function getBudgetSplitOptionFromDom() {
-    return document.querySelector('input[name="budget-split-option"]:checked')
+    const mode = getCurrentModeFromUrl()
+    return document.querySelector('input[name="' + mode + '-budget-split-option"]:checked')
         .value
 }
 export function displayTabularData(
@@ -138,8 +139,8 @@ export function displayBudgetSplit() {
         budgetSplitOption == 'percentage'
             ? (100 / numberOfMeasurementGoals / noKeys).toFixed(0)
             : (contributionBudget / numberOfMeasurementGoals / noKeys).toFixed(
-                  0
-              )
+                0
+            )
 
     measurementGoals.forEach((m) => {
         const { id } = m
@@ -493,12 +494,15 @@ export function getAllDimensionNamesFromDom() {
 export function getMetricsArrayFromDom() {
     var len = document.getElementById('metrics-number').value
     var metrics = []
+
+
     for (let i = 1; i <= len; i++) {
         metrics.push({
             id: i,
             maxValue: document.getElementById('metric' + i + '-max').value,
             avgValue: document.getElementById('metric' + i + '-def').value,
             name: document.getElementById('metric' + i + '-name').value,
+            modeValue: (getCurrentModeFromUrl() == 'pro') ? document.getElementById('metric' + i + '-mode').value : undefined
         })
     }
 
@@ -513,6 +517,7 @@ export function getDimensionsArrayFromDom() {
             id: i,
             size: document.getElementById('dimension' + i + '-size').value,
             name: document.getElementById('dimension' + i + '-name').value,
+            side: (document.getElementById('dimension' + i + '-side')) ? document.getElementById('dimension' + i + '-side').value : undefined
         })
     }
 
@@ -660,6 +665,21 @@ export function displayMetrics(metrics) {
         metricDiv.appendChild(metricAvgLabel)
         metricDiv.appendChild(metricAvg)
         metricDiv.appendChild(document.createElement('br'))
+
+
+        if (getCurrentModeFromUrl() == 'pro') {
+            var metricMode = document.createElement('input')
+            metricMode.setAttribute('id', 'metric' + element.id + '-mode')
+            metricMode.setAttribute('type', 'number')
+            metricMode.setAttribute('placeholder', 'Most frequent value')
+            metricMode.value = element.modeValue
+            const metricModeLabel = document.createElement('label')
+            metricModeLabel.innerText = 'Most frequent value:'
+            metricDiv.appendChild(metricModeLabel)
+            metricDiv.appendChild(metricMode)
+            metricDiv.appendChild(document.createElement('br'))
+        }
+
     })
 
     updateOutlierNote()
@@ -733,6 +753,15 @@ export function addMetric() {
     metricAvg.setAttribute('placeholder', 'Average value')
     metricDiv.appendChild(metricAvg)
 
+    metricDiv.appendChild(document.createElement('br'))
+
+    if (getCurrentModeFromUrl() == 'pro') {
+        var metricMode = document.createElement('input')
+        metricMode.setAttribute('id', 'metric' + metricsNo + '-mode')
+        metricMode.setAttribute('type', 'number')
+        metricMode.setAttribute('placeholder', 'Most frequent value')
+        metricDiv.appendChild(metricMode)
+    }
     metricsMainDiv.appendChild(metricDiv)
     updateOutlierNote()
     displayBudgetSplit()
@@ -800,6 +829,40 @@ export function displayDimensions(dimensions) {
         dimensionDiv.appendChild(dimensionSize)
         dimensionDiv.appendChild(document.createElement('br'))
 
+        const mode = getCurrentModeFromUrl()
+
+        if (mode == 'pro') {
+
+            var dimensionSide = document.createElement('select')
+            var dimensionSideImpression = document.createElement('option')
+            dimensionSideImpression.setAttribute('value', 0)
+            dimensionSideImpression.appendChild(document.createTextNode('impression'))
+            dimensionSideImpression.setAttribute('selected', 'selected')
+
+            var dimensionSideConversion = document.createElement('option')
+            dimensionSideConversion.setAttribute('value', 1)
+            dimensionSideConversion.appendChild(document.createTextNode('conversion'))
+
+            dimensionSide.setAttribute('id', 'dimension' + element.id + '-side')
+
+            dimensionSide.setAttribute('placeholder', 'Dimension side')
+            dimensionSide.setAttribute('class', 'dimension-side')
+            dimensionSide.appendChild(dimensionSideImpression)
+            dimensionSide.appendChild(dimensionSideConversion)
+
+            dimensionSide.value = element.side
+
+            const dimensionSideLabel = document.createElement('label')
+            dimensionSideLabel.innerText =
+                'On which side is the dimension set:'
+            dimensionDiv.appendChild(dimensionSideLabel)
+
+            dimensionDiv.appendChild(dimensionSide)
+
+
+            dimensionDiv.appendChild(document.createElement('br'))
+        }
+
         dimensionsMainDiv.appendChild(dimensionDiv)
 
         updateDailyPerBucket()
@@ -863,6 +926,27 @@ export function addDimension() {
     dimensionSize.addEventListener('input', () => updateDailyPerBucket())
     dimensionDiv.appendChild(dimensionSize)
     dimensionDiv.appendChild(document.createElement('br'))
+
+    const mode = getCurrentModeFromUrl()
+
+    if (mode == 'pro') {
+        var dimensionSide = document.createElement('select')
+        var dimensionSideImpression = document.createElement('option')
+        dimensionSideImpression.setAttribute('value', 0)
+        dimensionSideImpression.appendChild(document.createTextNode('impression'))
+        dimensionSideImpression.setAttribute('selected', 'selected')
+        var dimensionSideConversion = document.createElement('option')
+        dimensionSideConversion.setAttribute('value', 1)
+        dimensionSideConversion.appendChild(document.createTextNode('conversion'))
+        dimensionSide.setAttribute('id', 'dimension' + dimensionsNo + '-side')
+        dimensionSide.setAttribute('placeholder', 'Dimension side')
+        dimensionSide.setAttribute('class', 'dimension-side')
+        dimensionSide.appendChild(dimensionSideImpression)
+        dimensionSide.appendChild(dimensionSideConversion)
+        dimensionDiv.appendChild(dimensionSide)
+        dimensionDiv.appendChild(document.createElement('br'))
+    }
+
 
     dimensionsMainDiv.appendChild(dimensionDiv)
 }
@@ -953,7 +1037,7 @@ function validateMetrics(metrics, errors) {
         if (element.avgValue * 1 > element.maxValue * 1)
             errors.push(
                 element.name +
-                    ' - maximum value cannot be smaller than average value'
+                ' - maximum value cannot be smaller than average value'
             )
     })
 }
@@ -983,7 +1067,7 @@ function validateBudgetPercentages(metrics, errors) {
     ) {
         errors.push(
             'The sum of all budget split values exceeds the total contribution budget ' +
-                getContributionBudgetFromDom()
+            getContributionBudgetFromDom()
         )
     }
 
@@ -991,9 +1075,9 @@ function validateBudgetPercentages(metrics, errors) {
         !getIsPercentageBudgetSplitFromDom() &&
         !getIsKeyStrategyGranularFromDom() &&
         sumOfAllPercentages >
-            Math.floor(
-                getContributionBudgetFromDom() / getKeyStrategiesNumberFromDom()
-            )
+        Math.floor(
+            getContributionBudgetFromDom() / getKeyStrategiesNumberFromDom()
+        )
     ) {
         errors.push(
             'The sum of all budget split values exceeds the total contribution budget per key - <total contribution budget>/<total number of keys>'
@@ -1037,8 +1121,8 @@ function validateKeyStrategy(errors) {
         if (noChecked < 2)
             errors.push(
                 'Key structure ' +
-                    i +
-                    ': at least 2 dimensions should be checked for each key structure'
+                i +
+                ': at least 2 dimensions should be checked for each key structure'
             )
     }
 }
@@ -1189,6 +1273,25 @@ function displayReport(
     // Update tooltips
     updateTooltips()
 }
+
+// PRO MODE ONLY:
+
+export function getRateOneFromDom() {
+    return document.getElementById('one-conversion-percentage').value / 100
+}
+
+export function getRateTwoFromDom() {
+    return document.getElementById('two-conversion-percentage').value / 100
+}
+
+export function getMpcFromDom() {
+    return parseInt(document.getElementById('MPC').value)
+}
+
+export function getConversionsPerImpressionFromDom() {
+    return parseInt(document.getElementById('conversions-per-impression').value)
+}
+
 
 window.generateKeyStructures = generateKeyStructures
 window.capEpsilon = capEpsilon

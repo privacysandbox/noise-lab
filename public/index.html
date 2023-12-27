@@ -35,7 +35,7 @@ limitations under the License. -->
         print('Hello World, from python!')
     </py-script>
     <py-config>
-        packages = ["matplotlib", "pandas", "numpy"]
+        packages = ["matplotlib", "pandas", "numpy", "scipy", "typing"]
     </py-config>
 
     <!-- Content of the py-script below will be populated from python-file.js -->
@@ -181,174 +181,374 @@ limitations under the License. -->
     </div>
     <!-- SIMPLE MODE END -->
     <!-- ADVANCED MODE START -->
-    <div id="advanced-mode" class="mode-section">
-        <div class="launch-panel">
-            <div class="launch-panel-content-wrapper">
-                <div class="input-fields">
-                    <h2>Parameters</h2>
-                    <div>
-                        <h3>API Parameters</h3>
+        <div id="advanced-mode" class="mode-section">
+            <div class="launch-panel">
+                <div class="launch-panel-content-wrapper">
+                    <div class="input-fields">
+                        <h2>Parameters</h2>
                         <div>
-                            <label for="contribution-budget">Contribution budget:</label>
-                            <span id="contribution-budget"></span>
-                            <div class="help" id="help-budget"></div>
-                        </div>
-                        <div>
-                            <label>Epsilon:</label>
-                            <input type="number" max="64" min="0" value="10" id="eps"
-                                oninput="capEpsilon(event, this)" />
-                            <div class="help" id="help-epsilon"></div>
-                            <div class="input-hint below-input">Min: 0, Max: 64</div>
-                        </div>
-                    </div>
-                    <div>
-                        <h3>Your conversion data</h3>
-                        <label for="event-count-daily-total">TOTAL daily attributable conversion
-                            count:</label>
-                        <select name="event-count-daily-total" id="event-count-daily-total" oninput="updateDailyPerBucket()">
-                            <option value="5">5</option>
-                            <option value="10">10</option>
-                            <option value="100">100</option>
-                            <option value="500">500</option>
-                            <option value="1000" selected>1000</option>
-                            <option value="10000">10000</option>
-                            <option value="100000">100000</option>
-                        </select>
-                        <div class="help" id="help-daily-total"></div>
-                        <label for="event-count-daily-bucket">Average daily attributable conversion
-                            count PER BUCKET:</label>
-                        <input name="event-count-daily-bucket" id="event-count-daily-bucket" disabled>
-                        </input>
-                        <div class="help" id="help-daily"></div>
-                        <label for="zero-pct"> Percentage of buckets with 0 conversions: </label>
-                        <input name="zero-pct" id="zero-pct" type="number" value="0" min="0" max="10"></input>
-                        <div class="help" id="help-zero-pct"></div>
-                        <div class="input-hint below-input">Min: 0, Max: 10</div>
-                    </div>
-                    <div id="metrics-params">
-                        <h3>Data you want to track: Measurement goals</h3>
-                        <details open>
-                            <summary>
-                                <div class="ternary-xs">
-                                    Show/Hide measurement goals
-                                </div>
-                            </summary>
-                            <div class="details-wrapper">
-                                <label> Number of measurement goals:</label><input type="number" value="2"
-                                    id="metrics-number" min="0" />
-                                <br />
-                                <div id="metrics-div"></div>
-                                <div id="metrics-buttons-div"></div>
-                            </div>
-                        </details>
-                    </div>
-                    <div id="dimensions">
-                        <h3>Data you want to track: Dimensions</h3>
-                        <details open>
-                            <summary>
-                                <div class="ternary-xs">
-                                    Show/Hide dimensions
-                                </div>
-                            </summary>
-                            <div class="details-wrapper">
-                                <label>Number of dimensions to track:</label>
-                                <input type="number" id="dimensions-number" name="dimensions-number" />
-                                <div id="dimensions-div"></div>
-                                <div id="dimensions-buttons-div"></div>
-                            </div>
-                        </details>
-                    </div>
-                    <div>
-                        <h3>Your aggregation strategy</h3>
-                        <div>
-                            <label for="batching-frequency">Batching frequency:</label>
-                            <select name="batching-frequency" id="batching-frequency-select"></select>
-                            <div class="help" id="help-batching-frequency"></div>
-                            <!-- Options are populated automatically -->
-                        </div>
-                        <div>
-                            <label for="scaling">Scaling:</label>
-                            <select name="scaling" id="scaling">
-                                <option value="1">Yes (recommended)</option>
-                                <option value="0">No</option>
-                            </select>
-                            <div class="help" id="help-scaling"></div>
-                        </div>
-                        <div id="budget-split">
-                            <label class="long">Budget split (used for Scaling):</label>
-
+                            <h3>API Parameters</h3>
                             <div>
-
-                                <div id="budget-split-options-selection">
-                                    <p>Please how you prefer to split the budget:</p>
-                                    <input type="radio" id="percentage" name="budget-split-option" value="percentage"
-                                        onclick="resetBudgetSplit()" checked>
-                                    <label for="percentage">percentage</label><br>
-                                    <input type="radio" id="value" name="budget-split-option" value="value"
-                                        onclick="resetBudgetSplit()">
-                                    <label for="value">value</label><br>
-                                </div>
-                                <div class="input-hint">⚠️ The total contribution budget is split across measurement
-                                    goals following the percentages/values below, so the sum of all percentages/values
-                                    can't exceed
-                                    100/total contribution budget.</div>
-                                <div class="input-hint" id="help-budget-split-warning" hidden> ⚠️ Because you're using
-                                    Key Strategy 'B' the total contribution budget is now evenly split between all
-                                    sub-keys. Note that the total number of sub-keys is: (number of key structures per
-                                    measurement goal) * (number of measurement goals). </div>
-                                <div id="budget-split-wrapper-el"></div>
+                                <label for="contribution-budget">Contribution budget:</label>
+                                <span id="contribution-budget"></span>
+                                <div class="help" id="help-budget"></div>
+                            </div>
+                            <div>
+                                <label>Epsilon:</label>
+                                <input type="number" max="64" min="0" value="14" id="eps"
+                                    oninput="capEpsilon(event, this)" />
+                                <div class="help" id="help-epsilon"></div>
+                                <div class="input-hint below-input">Min: 0, Max: 64</div>
                             </div>
                         </div>
                         <div>
-                            <label for="key-strategy">Key strategy:</label>
-                            <!-- Options are populated automatically -->
-                            <select name="key-strategy" id="key-strategy-select"></select>
-                            <div class="help" id="help-key-strategy-advanced-mode"></div>
+                            <h3>Your conversion data</h3>
+                            <label for="event-count-daily-total">TOTAL daily attributable conversion
+                                count:</label>
+                            <select name="event-count-daily-total" id="event-count-daily-total" oninput="updateDailyPerBucket()">
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="100">100</option>
+                                <option value="500">500</option>
+                                <option value="1000" selected>1000</option>
+                                <option value="10000">10000</option>
+                                <option value="100000">100000</option>
+                            </select>
+                            <div class="help" id="help-daily-total"></div>
+                            <label for="event-count-daily-bucket">Average daily attributable conversion
+                                count PER BUCKET:</label>
+                            <input name="event-count-daily-bucket" id="event-count-daily-bucket" disabled>
+                            </input>
+                            <div class="help" id="help-daily"></div>
+                            <label for="zero-pct"> Percentage of buckets with 0 conversions: </label>
+                            <input name="zero-pct" id="zero-pct" type="number" value="0" min="0" max="10"></input>
+                            <div class="help" id="help-zero-pct"></div>
+                            <div class="input-hint below-input">Min: 0, Max: 10</div>
+                        </div>
+                        <div id="metrics-params">
+                            <h3>Data you want to track: Measurement goals</h3>
+                            <details open>
+                                <summary>
+                                    <div class="ternary-xs">
+                                        Show/Hide measurement goals
+                                    </div>
+                                </summary>
+                                <div class="details-wrapper">
+                                    <label> Number of measurement goals:</label><input type="number" value="2"
+                                        id="metrics-number" min="0" />
+                                    <br />
+                                    <div id="metrics-div"></div>
+                                    <div id="metrics-buttons-div"></div>
+                                </div>
+                            </details>
+                        </div>
+                        <div id="dimensions">
+                            <h3>Data you want to track: Dimensions</h3>
+                            <details open>
+                                <summary>
+                                    <div class="ternary-xs">
+                                        Show/Hide dimensions
+                                    </div>
+                                </summary>
+                                <div class="details-wrapper">
+                                    <label>Number of dimensions to track:</label>
+                                    <input type="number" id="dimensions-number" name="dimensions-number" />
+                                    <div id="dimensions-div"></div>
+                                    <div id="dimensions-buttons-div"></div>
+                                </div>
+                            </details>
+                        </div>
+                        <div>
+                            <h3>Your aggregation strategy</h3>
+                            <div>
+                                <label for="batching-frequency">Batching frequency:</label>
+                                <select name="batching-frequency" id="batching-frequency-select"></select>
+                                <div class="help" id="help-batching-frequency"></div>
+                                <!-- Options are populated automatically -->
+                            </div>
+                            <div>
+                                <label for="scaling">Scaling:</label>
+                                <select name="scaling" id="scaling">
+                                    <option value="1">Yes (recommended)</option>
+                                    <option value="0">No</option>
+                                </select>
+                                <div class="help" id="help-scaling"></div>
+                            </div>
+                            <div id="budget-split">
+                                <label class="long">Budget split (used for Scaling):</label>
+    
+                                <div>
+    
+                                    <div id="budget-split-options-selection">
+                                        <p>Please how you prefer to split the budget:</p>
+                                        <input type="radio" id="percentage" name="advanced-budget-split-option" value="percentage"
+                                            onclick="resetBudgetSplit()" checked>
+                                        <label for="percentage">percentage</label><br>
+                                        <input type="radio" id="value" name="advanced-budget-split-option" value="value"
+                                            onclick="resetBudgetSplit()">
+                                        <label for="value">value</label><br>
+                                    </div>
+                                    <div class="input-hint">⚠️ The total contribution budget is split across measurement
+                                        goals following the percentages/values below, so the sum of all percentages/values
+                                        can't exceed
+                                        100/total contribution budget.</div>
+                                    <div class="input-hint" id="help-budget-split-warning" hidden> ⚠️ Because you're using
+                                        Key Strategy 'B' the total contribution budget is now evenly split between all
+                                        sub-keys. Note that the total number of sub-keys is: (number of key structures per
+                                        measurement goal) * (number of measurement goals). </div>
+                                    <div id="budget-split-wrapper-el"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <label for="key-strategy">Key strategy:</label>
+                                <!-- Options are populated automatically -->
+                                <select name="key-strategy" id="key-strategy-select"></select>
+                                <div class="help" id="help-key-strategy-advanced-mode"></div>
+                            </div>
+                        </div>
+                        <div id="granular" hidden>
+                            <h4>Key structures</h4>
+    
+                            <label>Enter number of key structures you want to
+                                use:</label>
+                            <input type="number" id="structures-number" name="structures-number" min="2" value="2" />
+                            <div class="help" id="help-key-strategy-number"></div>
+                            <button class="ternary" onclick="generateKeyStructures()">
+                                Generate key structures
+                            </button>
+                            <div id="strategies"></div>
                         </div>
                     </div>
-                    <div id="granular" hidden>
-                        <h4>Key structures</h4>
-
-                        <label>Enter number of key structures you want to
-                            use:</label>
-                        <input type="number" id="structures-number" name="structures-number" min="2" value="2" />
-                        <div class="help" id="help-key-strategy-number"></div>
-                        <button class="ternary" onclick="generateKeyStructures()">
-                            Generate key structures
+                    <div class="buttons-wrapper-launch-panel">
+                        <button class="primary" onclick="simulateAndDisplayResults_advancedMode()">
+                            ▶️ Simulate
                         </button>
-                        <div id="strategies"></div>
                     </div>
                 </div>
-                <div class="buttons-wrapper-launch-panel">
-                    <button class="primary" onclick="simulateAndDisplayResults_advancedMode()">
-                        ▶️ Simulate
+            </div>
+            <main>
+                <div id="form-validation-wrapper" class="hidden"></div>
+                <h2>Simulations</h2>
+                <div class="global-buttons">
+                    <button class="primary" onclick="downloadAllDom()">
+                        ⬇️ Download all (.xlsx)
+                    </button>
+                    <button class="secondary destructive" onclick="resetUi()">
+                        🗑 Clear all
                     </button>
                 </div>
-            </div>
+                <div id="empty-state">
+                    <div class="empty-state-inner">
+                        <img src="./assets/test-tube.png" alt="">
+                        <p>
+                            No simulations yet. To generate your first simulation, click the <strong>▶️ SIMULATE</strong>
+                            button at the bottom the <strong>Parameters</strong> panel on the left.
+                        </p>
+                    </div>
+                </div>
+                <div class="all-simulations-wrapper" id="all-simulations-wrapper"></div>
+            </main>
         </div>
-        <main>
-            <div id="form-validation-wrapper" class="hidden"></div>
-            <h2>Simulations</h2>
-            <div class="global-buttons">
-                <button class="primary" onclick="downloadAllDom()">
-                    ⬇️ Download all (.xlsx)
-                </button>
-                <button class="secondary destructive" onclick="resetUi()">
-                    🗑 Clear all
-                </button>
-            </div>
-            <div id="empty-state">
-                <div class="empty-state-inner">
-                    <img src="./assets/test-tube.png" alt="">
-                    <p>
-                        No simulations yet. To generate your first simulation, click the <strong>▶️ SIMULATE</strong>
-                        button at the bottom the <strong>Parameters</strong> panel on the left.
-                    </p>
+    
+    <!-- ADVANCED MODE END -->
+
+
+
+        <!-- PRO MODE START -->
+        <div id="pro-mode" class="mode-section">
+            <div class="launch-panel">
+                <div class="launch-panel-content-wrapper">
+                    <div class="input-fields">
+                        <h2>Parameters</h2>
+                        <div>
+                            <h3>API Parameters</h3>
+                            <div>
+                                <label for="contribution-budget">Contribution budget:</label>
+                                <span id="contribution-budget"></span>
+                                <div class="help" id="help-budget"></div>
+                            </div>
+                            <div>
+                                <label>Epsilon:</label>
+                                <input type="number" max="64" min="0" value="14" id="eps"
+                                    oninput="capEpsilon(event, this)" />
+                                <div class="help" id="help-epsilon"></div>
+                                <div class="input-hint below-input">Min: 0, Max: 64</div>
+                            </div>
+                        </div>
+                        <div>
+                            <h3>Your conversion data</h3>
+                            <label for="event-count-daily-total">TOTAL daily attributable conversion
+                                count:</label>
+                            <select name="event-count-daily-total" id="event-count-daily-total" oninput="updateDailyPerBucket()">
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="100">100</option>
+                                <option value="500">500</option>
+                                <option value="1000" selected>1000</option>
+                                <option value="10000">10000</option>
+                                <option value="100000">100000</option>
+                            </select>
+                            <div class="help" id="help-daily-total"></div>
+                            <label for="event-count-daily-bucket">Average daily attributable conversion
+                                count PER BUCKET:</label>
+                            <input name="event-count-daily-bucket" id="event-count-daily-bucket" disabled>
+                            </input>
+                            <div class="help" id="help-daily"></div>
+                            <label for="zero-pct"> Percentage of buckets with 0 conversions: </label>
+                            <input name="zero-pct" id="zero-pct" type="number" value="0" min="0" max="10"></input>
+                            <div class="help" id="help-zero-pct"></div>
+                            <div class="input-hint below-input">Min: 0, Max: 10</div>
+                        </div>
+                        <div id="metrics-params">
+                            <h3>Data you want to track: Measurement goals</h3>
+                            <details open>
+                                <summary>
+                                    <div class="ternary-xs">
+                                        Show/Hide measurement goals
+                                    </div>
+                                </summary>
+                                <div class="details-wrapper">
+                                    <label> Number of measurement goals:</label><input type="number" value="2"
+                                        id="metrics-number" min="0" />
+                                    <br />
+                                    <div id="metrics-div"></div>
+                                    <div id="metrics-buttons-div"></div>
+                                </div>
+                            </details>
+                        </div>
+                        <div id="dimensions">
+                            <h3>Data you want to track: Dimensions</h3>
+                            <details open>
+                                <summary>
+                                    <div class="ternary-xs">
+                                        Show/Hide dimensions
+                                    </div>
+                                </summary>
+                                <div class="details-wrapper">
+                                    <label>Number of dimensions to track:</label>
+                                    <input type="number" id="dimensions-number" name="dimensions-number" />
+                                    <div id="dimensions-div"></div>
+                                    <div id="dimensions-buttons-div"></div>
+                                </div>
+                            </details>
+                        </div>
+
+
+                        <div>
+                            <h3>Data generation parameters</h3>
+                            <div>
+                                <!-- ADD INPUT FIELDS FOR DATA GEN PARAMS -->
+                                Enter percentage of slices with:
+                                <label>1 conversion:</label>
+                                <input type="number" id="one-conversion-percentage" name="one-conversion-percentage"  min="1" max="100" value="30"/>
+                                <label>2 conversions:</label>
+                                <input type="number" id="two-conversion-percentage" name="two-conversion-percentage"  min="1" max="100" value="15" />
+                                <br>
+
+                                <label>Average number of conversions per impression:</label>
+                                <input type="number" id="conversions-per-impression" name="conversions-per-impression" value="2"/>
+                               
+                                <label>MPC value:</label>
+                                <input type="range" min="1" max="20" value="10" id="MPC" oninput="this.nextElementSibling.value = this.value">
+                                <output>10</output>
+
+                            </div>
+                        </div>
+
+
+                        <div>
+                            <h3>Your aggregation strategy</h3>
+                            <div>
+                                <label for="batching-frequency">Batching frequency:</label>
+                                <select name="batching-frequency" id="batching-frequency-select"></select>
+                                <div class="help" id="help-batching-frequency"></div>
+                                <!-- Options are populated automatically -->
+                            </div>
+                            <div>
+                                <label for="scaling">Scaling:</label>
+                                <select name="scaling" id="scaling">
+                                    <option value="1">Yes (recommended)</option>
+                                    <option value="0">No</option>
+                                </select>
+                                <div class="help" id="help-scaling"></div>
+                            </div>
+                            <div id="budget-split">
+                                <label class="long">Budget split (used for Scaling):</label>
+    
+                                <div>
+    
+                                    <div id="budget-split-options-selection">
+                                        <p>Please how you prefer to split the budget:</p>
+                                        <input type="radio" id="percentage" name="pro-budget-split-option" value="percentage"
+                                            onclick="resetBudgetSplit()" checked="checked">
+                                        <label for="percentage">percentage</label><br>
+                                        <input type="radio" id="value" name="pro-budget-split-option" value="value"
+                                            onclick="resetBudgetSplit()">
+                                        <label for="value">value</label><br>
+                                    </div>
+                                    <div class="input-hint">⚠️ The total contribution budget is split across measurement
+                                        goals following the percentages/values below, so the sum of all percentages/values
+                                        can't exceed
+                                        100/total contribution budget.</div>
+                                    <div class="input-hint" id="help-budget-split-warning" hidden> ⚠️ Because you're using
+                                        Key Strategy 'B' the total contribution budget is now evenly split between all
+                                        sub-keys. Note that the total number of sub-keys is: (number of key structures per
+                                        measurement goal) * (number of measurement goals). </div>
+                                    <div id="budget-split-wrapper-el"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <label for="key-strategy">Key strategy:</label>
+                                <!-- Options are populated automatically -->
+                                <select name="key-strategy" id="key-strategy-select"></select>
+                                <div class="help" id="help-key-strategy-advanced-mode"></div>
+                            </div>
+                        </div>
+                        <div id="granular" hidden>
+                            <h4>Key structures</h4>
+    
+                            <label>Enter number of key structures you want to
+                                use:</label>
+                            <input type="number" id="structures-number" name="structures-number" min="2" value="2" />
+                            <div class="help" id="help-key-strategy-number"></div>
+                            <button class="ternary" onclick="generateKeyStructures()">
+                                Generate key structures
+                            </button>
+                            <div id="strategies"></div>
+                        </div>
+                    </div>
+                    <div class="buttons-wrapper-launch-panel">
+                        <button class="primary" onclick="simulateAndDisplayResults_proMode()">
+                            ▶️ Simulate
+                        </button>
+                    </div>
                 </div>
             </div>
-            <div class="all-simulations-wrapper" id="all-simulations-wrapper"></div>
-        </main>
-    </div>
+            <main>
+                <div id="form-validation-wrapper" class="hidden"></div>
+                <h2>Simulations</h2>
+                <div class="global-buttons">
+                    <button class="primary" onclick="downloadAllDom()">
+                        ⬇️ Download all (.xlsx)
+                    </button>
+                    <button class="secondary destructive" onclick="resetUi()">
+                        🗑 Clear all
+                    </button>
+                </div>
+                <div id="empty-state">
+                    <div class="empty-state-inner">
+                        <img src="./assets/test-tube.png" alt="">
+                        <p>
+                            No simulations yet. To generate your first simulation, click the <strong>▶️ SIMULATE</strong>
+                            button at the bottom the <strong>Parameters</strong> panel on the left.
+                        </p>
+                    </div>
+                </div>
+                <div class="all-simulations-wrapper" id="all-simulations-wrapper"></div>
+            </main>
+        </div>
+    <!-- PRO MODE END  -->
+
 </body>
 
 </html>

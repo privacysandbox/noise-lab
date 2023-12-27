@@ -13,9 +13,6 @@ def noise_ratio(noisy_data: Sequence[float],
     if len(noisy_data) != len(noiseless_data):
         raise ValueError('Noisy and noiseless data length did not match. ')
 
-    print(type(noisy_data))
-    print(type(noiseless_data))
-
     if not isinstance(noisy_data, list) or not isinstance(
         noiseless_data, list):
         noisy_data = noisy_data.to_py()
@@ -125,7 +122,7 @@ def generate_slice_distribution_with_conversions(
         impression_dist: dict[int, int],
         average_conversion_per_impression: float,
         conversion_key_cardinality: int,
-        max_mpc: int = 20,
+        max_mpc: int = 10,
 ) -> dict[int, dict[int, int]]:
     # final_keys_freq_with_mpc holds { mpc -> { slice_size -> freq } }
     # final_keys_freq_with_mpc[2] = {3:4} means
@@ -216,7 +213,6 @@ def generate_dataset(
         impression_side_dimensions, list):
         conversion_side_dimensions = conversion_side_dimensions.to_py()
         impression_side_dimensions = impression_side_dimensions.to_py()
-
     param_b = get_b_param_from_percentiles(slice_1_rate, slice_2_rate)
     num_impression_keys = np.prod(np.array(impression_side_dimensions))
     num_conversion_keys = np.prod(conversion_side_dimensions)
@@ -238,8 +234,83 @@ def generate_dataset(
             conversion_side_dimensions,
         )
     
-    print(isinstance( dataset[input_mpc], dict))
     final_result = dataset[input_mpc]
     for keys in final_result:
         final_result[keys] = str(final_result[keys])
-    return json.dumps(final_result)`
+    return json.dumps(final_result)
+
+
+def generate_dataset_original(
+    slice_1_rate: float,
+    slice_2_rate: float,
+    average_conversion_per_impression: int,
+    impression_side_dimensions: list[int],
+    conversion_side_dimensions: list[int],
+    maximum_mpc: int = 20,
+) -> dict[int, dict[str, int]]:
+    param_b = get_b_param_from_percentiles(slice_1_rate, slice_2_rate)
+    num_impression_keys = np.prod(impression_side_dimensions)
+    num_conversion_keys = np.prod(conversion_side_dimensions)
+    impression_dist = generate_slice_distribution_for_impressions(
+        param_b, num_impression_keys
+    )
+    final_keys_freq = generate_slice_distribution_with_conversions(
+        param_b,
+        impression_dist,
+        average_conversion_per_impression,
+        conversion_key_cardinality=num_conversion_keys,
+        max_mpc=maximum_mpc,
+    )
+    dataset = {}
+    for mpc in final_keys_freq:
+        dataset[mpc] = slice_distibution_to_dataset(
+            final_keys_freq[mpc],
+            impression_side_dimensions,
+            conversion_side_dimensions,
+        )
+    return dataset
+    
+def generate_counts_and_values_dataset(
+    slice_1_rate: float,
+    slice_2_rate: float,
+    average_conversion_per_impression: int,
+    impression_side_dimensions: list[int],
+    conversion_side_dimensions: list[int],
+    value_mean: float,
+    value_mode: float,
+    input_mpc: int,
+    maximum_mpc: int = 20,
+) -> dict[str, str]:
+    if not isinstance(conversion_side_dimensions, list) or not isinstance(
+        impression_side_dimensions, list):
+        conversion_side_dimensions = conversion_side_dimensions.to_py()
+        impression_side_dimensions = impression_side_dimensions.to_py()
+    count_dataset = generate_dataset_original(
+        slice_1_rate,
+        slice_2_rate,
+        average_conversion_per_impression,
+        impression_side_dimensions,
+        conversion_side_dimensions,
+        maximum_mpc,
+    )
+    
+    # compute mu and sigma from mean and mode values.
+    # details: go/noise-lab-dataset-value-inputs
+    def get_lognormal_mu_sigma(value_mean, value_mode):
+        value_mu = (2 * np.log(value_mean) + np.log(value_mode)) / 3
+        value_sigma = np.sqrt(value_mu - np.log(value_mode))
+        return value_mu, value_sigma
+    
+    value_mu, value_sigma = get_lognormal_mu_sigma(value_mean, value_mode)
+    dataset = {}
+    for mpc in count_dataset:
+        dataset[mpc] = {}
+        for attributed_key, conversion_count in count_dataset[mpc].items():
+            dataset[mpc][attributed_key] = str(round(np.sum(
+                    np.random.lognormal(
+                        mean=value_mu, sigma=value_sigma, size=conversion_count
+                    )
+                ))
+             )
+    res = dataset[input_mpc]
+    return json.dumps(res)`

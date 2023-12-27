@@ -46,8 +46,8 @@ export const BATCHING_FREQUENCIES = {
 }
 
 export const DEFAULT_MEASUREMENT_GOALS = [
-    { id: 1, name: 'purchaseValue', maxValue: 1000, avgValue: 120 },
-    { id: 2, name: 'purchaseCount', maxValue: 1, avgValue: 1 },
+    { id: 1, name: 'purchaseValue', maxValue: 1000, avgValue: 120, modeValue: 120 },
+    { id: 2, name: 'purchaseCount', maxValue: 1, avgValue: 1, modeValue:1 },
 ]
 
 export const DEFAULT_DIMENSIONS = [
@@ -56,19 +56,6 @@ export const DEFAULT_DIMENSIONS = [
     { id: '1', size: '3', name: 'geography', side: 0 },
     { id: '2', size: '4', name: 'campaignId', side: 0 },
     { id: '3', size: '2', name: 'productCategory', side: 1 },
-]
-
-export const DEFAULT_IMPRESSION_DIMENSIONS = [
-    // dimension.size is the number of distinct values for that dimension
-    // id is not needed for simple mode; TODO why needed for advanced?
-    { id: '1', size: '3', name: 'geography' },
-    { id: '2', size: '4', name: 'campaignId' },
-]
-
-export const DEFAULT_CONVERSION_DIMENSIONS = [
-    // dimension.size is the number of distinct values for that dimension
-    // id is not needed for simple mode; TODO why needed for advanced?
-    { id: '3', size: '2', name: 'productCategory' },
 ]
 
 

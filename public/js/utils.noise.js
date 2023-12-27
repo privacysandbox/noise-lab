@@ -107,6 +107,45 @@ export function generateDataset(
     return obj
 }
 
+
+export function generateDatasetValue(
+    rate_of_size_1,
+    rate_of_size_2,
+    average_conversion_per_impression,
+    impression_side_dimensions,
+    conversion_side_dimensions,
+    value_mean,
+    value_mode,
+    mpc
+) {
+    data_values_function_js = pyscript.runtime.globals.get('generate_counts_and_values_dataset')
+    // data_result is a JS Map.
+    // Each key is a unique key MPC value (so we could in theory get data generated for e.g. MPC=4, MPC=1 etc. if we decided to change the value of t or to parametrize it in the frontend for users to change).
+    // Each key's corresponding value is another JS Map
+    // Key of this map is a unique key combination
+    // Value is a number - the synthetically generated summary value
+    const data_values_result = data_values_function_js(
+        rate_of_size_1,
+        rate_of_size_2,
+        average_conversion_per_impression,
+        impression_side_dimensions,
+        conversion_side_dimensions,
+        value_mean,
+        value_mode,
+        mpc,
+    )
+    // Get the rmsre_t average for RMSRE_THRESHOLD
+    console.log("in js")
+    console.log(data_values_result)
+    //const result = data_result.get(mpc)
+    //const obj = JSON.parse(data_values_result)
+    //return obj
+    const obj = JSON.parse(data_values_result)
+    return obj
+
+}
+
+
 // ADVANCED MODE UTILS
 
 export function calculateMaximumCount(frequency, daily, count) {

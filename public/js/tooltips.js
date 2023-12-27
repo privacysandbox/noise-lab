@@ -216,3 +216,37 @@ export function updateOutlierNote() {
         ...defaultOptions,
     })
 }
+
+
+// PRO MODE SPECIFIC TOOLTIPS
+
+tippy('#help-data-generation-parameters', {
+    content: `Parameters needed to generate datasets that would reflect expected impact of noise on Aggregate API.`,
+    ...defaultOptions,
+})
+
+tippy('#help-one-conversion', {
+    content: `Percentage of attributed reports with one conversion`,
+    ...defaultOptions,
+})
+
+tippy('#help-two-conversion', {
+    content: `Percentage of attributed reports with two conversions`,
+    ...defaultOptions,
+})
+
+tippy('#help-average-conversion', {
+    content: `For the impressions that get converted, what is the average number of conversions reported?`,
+    ...defaultOptions,
+})
+
+tippy('#help-mpc', {
+    content: `<strong>MPC</strong> (<strong>M</strong>ultiple conversions <strong>P</strong>er <strong>C</strong>lick) is the maximum number of conversions that can be reported for each impression. The MPC value caps the number of reported conversions to better allocate the contribution budget, as the contribution budget is shared among them.`,
+    ...defaultOptions,
+})
+
+tippy('#help-impresions-conversion', {
+    content: `Define whether the dimension is set at the impression or conversion side`,
+    ...defaultOptions,
+})
+

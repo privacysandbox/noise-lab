@@ -43,12 +43,9 @@ import {
     CONTRIBUTION_BUDGET,
     DEFAULT_MEASUREMENT_GOALS,
     DEFAULT_DIMENSIONS,
-    DEFAULT_IMPRESSION_DIMENSIONS,
-    DEFAULT_CONVERSION_DIMENSIONS
 } from './config'
 
 import { simulate } from './utils.simulate'
-import { generateDataset } from './utils.noise'
 
 export function initializeDisplay_proMode() {
     loadPython()

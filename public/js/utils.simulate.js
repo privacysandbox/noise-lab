@@ -40,6 +40,7 @@ import {
     calculateAverageNoisePercentageRaw,
     getNoise_Rmsre,
     generateDataset,
+    generateDatasetValue,
 } from './utils.noise'
 
 // generate dataset
@@ -157,6 +158,7 @@ function simulatePerMetric(
 
     const mode = getCurrentModeFromUrl()
     let syntheticData = undefined
+    let syntheticDataV = undefined
 
     if (mode == 'pro') {
         const rateOne = getRateOneFromDom()
@@ -171,9 +173,9 @@ function simulatePerMetric(
 
         const mpc = getMpcFromDom()
 
-        syntheticData = generateDataset(rateOne, rateTwo, conversionsPerImpression, impressionDimensionsArray, conversionDimensionsArray, mpc)
-        console.log("syntheticData")
-        console.log(syntheticData)
+       // syntheticData  syntheticData = generateDataset(rateOne, rateTwo, conversionsPerImpression, impressionDimensionsArray, conversionDimensionsArray, mpc)
+        syntheticDataV = generateDatasetValue(rateOne, rateTwo, conversionsPerImpression, impressionDimensionsArray, conversionDimensionsArray, parseInt(metric.avgValue), parseInt(metric.modeValue), mpc)
+
     }   
 
     const report = []
@@ -189,16 +191,8 @@ function simulatePerMetric(
         if(mode == 'pro') 
         {
             const dataKey = keyCombinations.combinations[i].toString()
-            const val = syntheticData[dataKey]
-
-            //randCount = generateSummaryValuePro(val, metric, i, batchingFrequency)
-
-            console.log("avgValue")
-            console.log(metric.avgValue)
-            randCount = val * parseInt(metric.avgValue) * batchingFrequency
-            console.log("randCount")
-            console.log(randCount)
-
+            const val = syntheticDataV[dataKey]
+            randCount = val * batchingFrequency
         } 
         else 
         {
